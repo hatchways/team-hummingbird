@@ -5,6 +5,7 @@ const normalizeEmail = require('validator/lib/normalizeEmail');
 const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
+const auth = require('../../middleware/auth');
 
 const User = require("../../models/User");
 
@@ -51,6 +52,17 @@ router.post("/", function(req, res, next) {
       message: err.toString(),
     });
   }
+});
+
+// @route   POST api/auth/user
+// @desc    Get user data
+// @access  Private
+router.get('/user', auth, (req, res) => {
+  const { user } = req;
+  User.findById(user.id)
+    .select('-password')
+    .select('-email_normalized')
+    .then(user => res.json(user));
 });
 
 module.exports = router;
