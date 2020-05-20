@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", function(req, res, next) {
-  res.status(200).send({ message: "PING!" });
+  res.status(200).send({ message: "Test Login" });
 });
 
 router.post("/", function(req, res, next) {
