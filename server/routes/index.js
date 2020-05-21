@@ -32,11 +32,6 @@ router.get('/s3/sign', (req, res) => {
       console.log(err)
       res.json({ success: false, error: err })
     }
-
-    const returnData = {
-      signedUrl: data,
-      url: `https://${bucket}.s3.amazonaws.com/${objectName}`,
-    }
     res.send({ success: true, signedUrl: data, })
   })
 
