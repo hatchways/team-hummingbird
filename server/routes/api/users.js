@@ -21,7 +21,7 @@ router.post("/register", function(req, res, next) {
     if (password !== password2) throw new Error('Passwords do not match');
     User.findOne({ email }).then(user => {
       if (user) {
-        return res.status(400).json({ email: "Email already exists" });
+        return res.status(400).json({ message: "Email already exists" });
       } 
       else {
         const newUser = new User({
@@ -46,6 +46,7 @@ router.post("/register", function(req, res, next) {
                   (err, token) => {
                     if (err) throw err;
                     res.json({
+                      message: 'Registration success',
                       token,
                       user: {
                         id: user.id,
