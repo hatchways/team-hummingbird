@@ -10,6 +10,7 @@ const indexRouter = require("./routes/index");
 const pingRouter = require("./routes/ping");
 const usersRouter = require("./routes/api/users");
 const authRouter = require("./routes/api/auth");
+const constestRouter = require("./routes/api/contest");
 const db = config.get("mongoURI");
 
 const { json, urlencoded } = express;
@@ -34,6 +35,7 @@ app.use(express.static(join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/ping", pingRouter);
+app.use("/api/contest", constestRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
 
