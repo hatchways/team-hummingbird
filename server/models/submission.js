@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const submissionSchema = new Schema({
+const SubmissionSchema = new Schema({
   contest_id: {
     type: String,
     required: true,
@@ -23,4 +23,4 @@ const submissionSchema = new Schema({
   },
 });
 
-module.exports = Submission = mongoose.model("Submission", submissionSchema);
+module.exports = Submission = mongoose.model("Submission", SubmissionSchema);

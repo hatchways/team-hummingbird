@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const contestSchema = new Schema({
+const ContestSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -28,4 +28,4 @@ const contestSchema = new Schema({
   },
 });
 
-module.exports = Contest = mongoose.model("Contest", contestSchema);
+module.exports = Contest = mongoose.model("Contest", ContestSchema);

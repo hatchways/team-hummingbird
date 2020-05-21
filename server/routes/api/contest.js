@@ -2,27 +2,13 @@ const express = require("express");
 const contestRouter = express.Router();
 
 const auth = require("../../middleware/auth");
-const ContestModel = require("../../models/contest");
-
-// Route: GET api/contests/
-// Desc: get all active contests
-// access:  private
-
-contestRouter.get("/contests", auth, (req, res) => {
-  ContestModel.find({ deadline_date: { $gte: Date.now() } })
-    .then((contests) => res.json({ contests }))
-    .catch((err) => {
-      res.status(400).json({
-        message: err.message,
-      });
-    });
-});
+const ContestModel = require("../../models/Contest");
 
 // Route: GET api/contest/:id
 // Desc: get contest with the id
 // access: private
 
-contestRouter.get("/contest/:id", auth, (req, res) => {
+contestRouter.get("/:id", auth, (req, res) => {
   ContestModel.findById(req.params.id)
     .then((contest) => {
       if (contest) {
@@ -42,7 +28,7 @@ contestRouter.get("/contest/:id", auth, (req, res) => {
 // Desc: Create new contest
 // access: private
 
-contestRouter.post("/contest", auth, (req, res) => {
+contestRouter.post("/", auth, (req, res) => {
   const { title, description, prize_amount, deadline_date } = req.body;
   const user_id = req.user.id;
   const newContest = new ContestModel({
@@ -71,7 +57,7 @@ contestRouter.post("/contest", auth, (req, res) => {
 // Desc: Update contest
 // access: private
 
-contestRouter.put("/contest/:id", auth, (req, res) => {
+contestRouter.put("/:id", auth, (req, res) => {
   const { title, description, prize_amount, deadline_date, user_id } = req.body;
 
   if (user_id === req.user.id) {
