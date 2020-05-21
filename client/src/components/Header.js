@@ -2,23 +2,17 @@ import React, { useState, useEffect } from "react";
 import { 
   AppBar,
   Toolbar,
-  IconButton,
   Typography,
   Button,
   makeStyles,
-  Box,
   Grid
  } from '@material-ui/core';
 
 
 const useStyles = makeStyles({
-  container: {
-    marginTop: "80px"
-  },
-  box: {
-    boxShadow: "0 0 20px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-    borderWidth: "1px",
-    borderColor: "#edf2f7"
+  bar: {
+    backgroundColor: "black",
+    height: "5rem"
   },
   title: {
     marginTop: "60px",
@@ -28,13 +22,6 @@ const useStyles = makeStyles({
     fontWeight: 600,
     textAlign: "center",
     letterSpacing: "0.5em"
-  },
-  text: {
-    fontFamily: 'Poppins'
-  },
-  grid: {
-    marginTop: "20px",
-    marginBottom: "20px"
   },
   button: {
     backgroundColor: "black",
@@ -48,19 +35,6 @@ const useStyles = makeStyles({
     borderRadius: "0",
     border: "1px solid #ffffff",
     marginTop: "50px",
-  },
-  button2: {
-    backgroundColor: "black",
-    color: "black",
-    fontFamily: 'Poppins',
-    fontWeight: 600,
-    paddingTop: "0.8rem",
-    paddingBottom: "0.8rem",
-    paddingLeft: "2.5rem",
-    paddingRight: "2.5rem",
-    borderRadius: "0",
-    border: "1px solid #000000",
-    align: "right",
   }
 });
 
@@ -69,7 +43,7 @@ const useStyles = makeStyles({
 
   const classes = useStyles();
   return (
-    <AppBar position="static" style={{backgroundColor: "black", height: "5rem"}}>
+    <AppBar position="static" className={classes.bar}>
       <Toolbar>
         <Grid container>
           <Grid item xs={3}>

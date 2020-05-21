@@ -7,28 +7,16 @@ import {
   Grid, 
   TextField, 
   Button, 
-  FormControl, 
-  FormControlLabel,
   Box,
   Snackbar
  } from '@material-ui/core';
  import MuiAlert from '@material-ui/lab/Alert';
 
-// import { withStyles } from "@material-ui/core/styles";
 import { Route, Link } from "react-router-dom";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
-
-const styles = theme => ({
-  margin: {
-      margin: theme.spacing.unit * 2,
-  },
-  padding: {
-      padding: theme.spacing.unit
-  }
-});
 
 const useStyles = makeStyles({
   container: {
@@ -69,17 +57,11 @@ const useStyles = makeStyles({
 });
 
 function Login(props) {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [password2, setPassword2] = useState('');
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openError, setOpenError] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
-
-  // useEffect(() => {
-  //   console.log(name);
-  // }, [name]);
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
