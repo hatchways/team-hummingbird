@@ -19,7 +19,6 @@ router.post("/register", function(req, res, next) {
     if (!password || !name) throw new Error('Missing field(s)');
     if (password.length < 6) throw new Error('Password must be at least 6 characters');
     if (password !== password2) throw new Error('Passwords do not match');
-    const date = new Date();
     User.findOne({ email }).then(user => {
       if (user) {
         return res.status(400).json({ email: "Email already exists" });

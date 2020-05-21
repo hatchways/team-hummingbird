@@ -18,7 +18,6 @@ router.post("/", function(req, res, next) {
     const normalizedEmail = normalizeEmail(email);
     if (!isEmail(normalizedEmail)) throw new Error('The email you entered is invalid');
     if (!password || !email) throw new Error('Missing field(s)');
-    const date = new Date();
     User.findOne({ email }).then(user => {
       if (!user) {
         return res.status(400).json({ message: "User does not exist" });
