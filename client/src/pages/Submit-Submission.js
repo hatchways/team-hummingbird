@@ -8,6 +8,8 @@ import {
 } from '@material-ui/core'
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
 
+import S3 from 'react-s3-uploader'
+
 
 export default function SubmitSubmission(props) {
     const [document, setDocument] = useState()
@@ -20,14 +22,14 @@ export default function SubmitSubmission(props) {
         if (document) {
             console.log(document)
             alert('sending ' + document)
-
             //Todo: Send to backend route axios.put('/contest/${user.id}/submission', document)
-            //.then( response OK )
+            //.then( //next page?  )
         } else {
             alert('Select a file first')
         }
     }
     React.useEffect(() => {
+
         if (document) {
             console.log('selected ' + document)
         }
@@ -44,15 +46,12 @@ export default function SubmitSubmission(props) {
                 >
                     <Typography className={classes.title} variant="h4">Submit Your Design</Typography>
                     <div>
-                        <input
-                            accept="image/*" //jpg, gif, png
-                            onChange={e => setDocument(e.target.value)}
+                        <S3
+                            signingUrl="/s3/sign"
+                            signingUrlWithCredentials={true}
                             className={classes.uploadButton}
-                            id="uploader"
-                            multiple
-                            type="file"
-                        />
-                        <label htmlFor="uploader" >
+                            id="s3" />
+                        <label htmlFor="s3" >
                             <Button
                                 component="span"
                             >
@@ -75,6 +74,7 @@ export default function SubmitSubmission(props) {
                                 style={{ color: 'grey', fontWeight: 'lighter' }}
                                 variant="caption">PNG, JPG, GIF</Typography>
                         </div>
+
                     </div>
 
                     <Button
