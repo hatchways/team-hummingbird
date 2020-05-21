@@ -92,16 +92,14 @@ function Login(props) {
 
   const handleSubmit = () => {
     let status;
-    fetch("/api/users/register", {
+    fetch("/api/auth", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ 
-        name,
         email,
-        password,
-        password2
+        password
        })
     })
       .then(res => {

@@ -6,7 +6,8 @@ import {
   Typography,
   Button,
   makeStyles,
-  Box
+  Box,
+  Grid
  } from '@material-ui/core';
 
 
@@ -46,7 +47,7 @@ const useStyles = makeStyles({
     paddingRight: "2.5rem",
     borderRadius: "0",
     border: "1px solid #ffffff",
-    align: "right",
+    marginTop: "50px",
   },
   button2: {
     backgroundColor: "black",
@@ -70,18 +71,20 @@ const useStyles = makeStyles({
   return (
     <AppBar position="static" style={{backgroundColor: "black", height: "5rem"}}>
       <Toolbar>
-        {/* <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-          <MenuIcon />
-        </IconButton> */}
-        <Typography variant="h6" className={classes.title}>
-          TATTOO ART
-        </Typography>
-        <Button variant="outlined" className={classes.button2}>SIGN IN</Button>
-        <Button variant="outlined" className={classes.button2}>SIGN IN</Button>
-        <Button variant="outlined" className={classes.button2}>SIGN IN</Button>
-        <Button variant="outlined" className={classes.button2}>SIGN IN</Button>
-        <Button variant="outlined" className={classes.button2}>SIGN IN</Button>
-        <Button variant="outlined" className={classes.button}>SIGN IN</Button>
+        <Grid container>
+          <Grid item xs={3}>
+            <Typography variant="h6" className={classes.title}>
+              TATTOO ART
+            </Typography>
+          </Grid>
+          <Grid item xs={3}></Grid>
+          <Grid item xs={3}></Grid>
+          <Grid item xs={3}>
+            <Button variant="outlined" className={classes.button} href="/login">
+              SIGN IN
+            </Button>
+          </Grid>
+        </Grid>
       </Toolbar>
     </AppBar>
   );

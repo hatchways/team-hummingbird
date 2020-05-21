@@ -66,6 +66,14 @@ const useStyles = makeStyles({
     paddingRight: "4rem",
     borderRadius: "0"
   },
+  textField: {
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderRadius: 0,
+        borderColor: "#e2e8f0"
+      },
+    },
+  },
 });
 
 function Register(props) {
@@ -130,6 +138,7 @@ function Register(props) {
             <Grid direction="column" container spacing={3} alignItems="center">
                 <Box width="50%">
                     <TextField 
+                      className={classes.textField}
                       id="name" 
                       label="Name" 
                       type="text" 
@@ -142,6 +151,7 @@ function Register(props) {
                 <br/>
                 <Box width="50%">
                     <TextField 
+                      className={classes.textField}
                       id="email" 
                       label="Email" 
                       type="email" 
@@ -154,6 +164,7 @@ function Register(props) {
                 <br/>
                 <Box width="50%">
                   <TextField 
+                      className={classes.textField}
                       id="password" 
                       label="Password" 
                       type="password" 
@@ -166,6 +177,7 @@ function Register(props) {
                 <br/>
                 <Box width="50%">
                   <TextField 
+                      className={classes.textField}
                       id="password2" 
                       label="Confirm Password" 
                       type="password" 

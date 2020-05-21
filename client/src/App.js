@@ -1,6 +1,6 @@
 import React from "react";
 import { MuiThemeProvider } from "@material-ui/core";
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, Redirect } from "react-router-dom";
 
 import { theme } from "./themes/theme";
 import Header from "./components/Header";
@@ -14,6 +14,7 @@ function App() {
     <MuiThemeProvider theme={theme}>
       <BrowserRouter>
         <Route path="/" component={Header} />
+        <Route exact path="/" render={(props) => <Redirect to="/register"/>}/>
         <Route path="/register" component={Register} />
         <Route path="/login" component={Login} />
       </BrowserRouter>
