@@ -4,9 +4,6 @@ const jwt = require("jsonwebtoken");
 function auth(req, res, next) {
   const token = req.header('x-auth-token');
 
-  // Check for token
-  if (!token) res.status(401).json({ message: 'No token, authorization denied' });
-
   try {
     // Verify token
     const decoded = jwt.verify(token, config.get('jwtSecret'));
@@ -16,7 +13,9 @@ function auth(req, res, next) {
     next();
   }
   catch (e) {
-    res.status(400).json({ message: 'Token is not valid' });
+    // Check for token
+    if (!token) res.status(401).json({ message: 'No token, authorization denied' });
+    else res.status(400).json({ message: 'Token is not valid' });
   }
 }
 
