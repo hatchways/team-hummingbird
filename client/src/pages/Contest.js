@@ -10,10 +10,11 @@ import {
   Grid,
   GridList,
   GridListTile,
-  MenuItem,
   Typography,
   InputAdornment,
+  Snackbar,
 } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
 import AttachMoneyOutlinedIcon from "@material-ui/icons/AttachMoneyOutlined";
 import DateFnsUtils from "@date-io/date-fns";
 import {
@@ -22,8 +23,11 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 
-//import { theme } from "../themes/theme";
+import { theme } from "../themes/theme";
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant='filled' {...props}></MuiAlert>;
+}
 const styles = makeStyles({
   box: {
     width: "80%",
@@ -77,11 +81,53 @@ const Contest = () => {
   const [prize, setPrize] = useState();
   const [deadlineDate, setDeadlineDate] = useState();
   const [deadlineTime, setDeadlineTime] = useState();
-  const [deadlineTimezone, setDeadlineTimezone] = useState("EST");
+  const [openError, setOpenError] = useState(false);
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [message, setMessage] = useState("sdf");
   const classes = styles();
 
   const handleSubmit = (e) => {
-    console.log("create contest");
+    if (!(title && description && prize && deadlineDate && deadlineTime)) {
+      setOpenError(true);
+      setMessage("Please enter all required fields");
+    } else {
+      const deadlineDateToSubmit = new Date();
+      deadlineDateToSubmit.setDate(deadlineDate.getDate());
+      deadlineDateToSubmit.setMonth(deadlineDate.getMonth());
+      deadlineDateToSubmit.setFullYear(deadlineDate.getFullYear());
+      deadlineDateToSubmit.setHours(deadlineTime.getHours());
+      deadlineDateToSubmit.setMinutes(deadlineTime.getMinutes());
+
+      fetch("/api/contest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          //set x-auth-token
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          prize,
+          deadlineDateToSubmit,
+        }),
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((json) => {
+          console.log(json);
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
+    }
+  };
+
+  const closeAlert = (e, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenError(false);
   };
   return (
     <Container maxWidth='lg'>
@@ -157,14 +203,15 @@ const Contest = () => {
               <Typography className={classes.title} variant='subtitle1'>
                 Deadline
               </Typography>
-              <Box display='flex'>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Grid container spacing={3}>
                   <Grid item xs={6}>
                     <KeyboardDatePicker
                       style={{ border: "1px" }}
                       disableToolbar
                       format='MM/dd/yyyy'
                       margin='normal'
+                      required
                       id='contest-deadline-date'
                       value={deadlineDate}
                       onChange={(e) => setDeadlineDate(e)}
@@ -173,10 +220,11 @@ const Contest = () => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={6}>
                     <KeyboardTimePicker
                       margin='normal'
                       id='contest-deadline-time'
+                      required
                       value={deadlineTime}
                       onChange={(e) => setDeadlineTime(e)}
                       KeyboardButtonProps={{
@@ -184,23 +232,8 @@ const Contest = () => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={3}>
-                    <TextField
-                      id='contest-deadline-timezone'
-                      value={deadlineTimezone}
-                      select
-                      onChange={(e) => setDeadlineTimezone(e.target.value)}
-                    >
-                      <MenuItem value='GMT'>GMT</MenuItem>
-                      <MenuItem value='BST'>BST</MenuItem>
-                      <MenuItem value='PST'>PST</MenuItem>
-                      <MenuItem value='MST'>MST</MenuItem>
-                      <MenuItem value='CST'>CST</MenuItem>
-                      <MenuItem value='EST'>EST</MenuItem>
-                    </TextField>
-                  </Grid>
-                </MuiPickersUtilsProvider>
-              </Box>
+                </Grid>
+              </MuiPickersUtilsProvider>
             </Grid>
           </Grid>
         </Box>
@@ -231,9 +264,10 @@ const Contest = () => {
             </GridList>
           </Box>
         </Box>
+
         <Grid container justify='center' className={classes.grid}>
           <Button
-            size='medium'
+            size='large'
             type='submit'
             className={classes.button}
             onClick={handleSubmit}
@@ -241,6 +275,16 @@ const Contest = () => {
             CREATE CONTEST
           </Button>
         </Grid>
+        <Snackbar autoHideDuration={6000} open={openError}>
+          <Alert onClose={closeAlert} severity='error'>
+            {message}
+          </Alert>
+        </Snackbar>
+        <Snackbar autoHideDuration={6000} open={openSuccess}>
+          <Alert onClose={closeAlert} severity='success'>
+            {message}
+          </Alert>
+        </Snackbar>
       </Paper>
     </Container>
   );
