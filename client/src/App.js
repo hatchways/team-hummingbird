@@ -4,7 +4,7 @@ import { BrowserRouter, Route } from "react-router-dom";
 
 import { theme } from "./themes/theme";
 import LandingPage from "./pages/Landing";
-import Submission from './pages/Submit-Submission'
+import Submission from './pages/SubmitSubmission'
 import "./App.css";
 
 function App() {
