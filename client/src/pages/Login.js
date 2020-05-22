@@ -104,7 +104,7 @@ function Login(props) {
       <Paper className={classes.box} square>
       <br/>
         <Typography className={classes.title} variant="h3">
-          Login
+          Sign In
         </Typography>
         <div >
             <Grid direction="column" container spacing={3} alignItems="center">
@@ -138,7 +138,7 @@ function Login(props) {
                   className={classes.button}
                   onClick={handleSubmit}
                 >
-                Login
+                Sign In
                 </Button>
             </Grid>
         </div>
