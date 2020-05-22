@@ -32,6 +32,10 @@ const useStyles = makeStyles({
     border: "1px solid #ffffff",
     marginTop: "50px",
   },
+  link: {
+    textDecoration: "none",
+    color: "white",
+  },
 });
 
 function Header(props) {
@@ -43,9 +47,11 @@ function Header(props) {
       <Toolbar>
         <Grid container>
           <Grid item xs={3}>
-            <Typography variant='h6' className={classes.title}>
-              TATTOO ART
-            </Typography>
+            <a className={classes.link} href='/'>
+              <Typography variant='h6' className={classes.title}>
+                TATTOO ART
+              </Typography>
+            </a>
           </Grid>
           <Grid item xs={3}></Grid>
           <Grid item xs={3}></Grid>

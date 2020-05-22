@@ -54,6 +54,14 @@ const useStyles = makeStyles({
     paddingRight: "4rem",
     borderRadius: "0"
   },
+  textField: {
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderRadius: 0,
+        borderColor: "#e2e8f0"
+      },
+    },
+  },
 });
 
 function Login(props) {
@@ -104,12 +112,13 @@ function Login(props) {
       <Paper className={classes.box} square>
       <br/>
         <Typography className={classes.title} variant="h3">
-          Login
+          Sign In
         </Typography>
         <div >
             <Grid direction="column" container spacing={3} alignItems="center">
                 <Box width="50%">
                     <TextField 
+                      className={classes.textField}
                       id="email" 
                       label="Email" 
                       type="email" 
@@ -122,6 +131,7 @@ function Login(props) {
                 <br/>
                 <Box width="50%">
                   <TextField 
+                      className={classes.textField}
                       id="password" 
                       label="Password" 
                       type="password" 
@@ -138,7 +148,7 @@ function Login(props) {
                   className={classes.button}
                   onClick={handleSubmit}
                 >
-                Login
+                Sign In
                 </Button>
             </Grid>
         </div>
