@@ -11,7 +11,6 @@ import Alert from '@material-ui/lab/Alert'
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
 
 import S3 from 'react-s3-uploader'
-import axios from 'axios'
 
 export default function SubmitSubmission(props) {
     const [uploadedFiles, setUploadedFiles] = useState([])
@@ -22,26 +21,35 @@ export default function SubmitSubmission(props) {
     const [severity, setSeverity] = useState("error") //allowed: error, warning, success, info
 
     //get userID from future state manager
-    const user_id = props.user_id
-    const contest_id = props.contest_id
+    const userId = props.userId
+    const contestId = props.contestId
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (uploadedFiles.length > 0) {
             const submission = {
-                contest_id,
-                user_id,
+                contestId,
+                userId,
                 upload_files: {
                     uploadedFiles
                 }
             }
-            axios.put(`/contest/:id`, { submission })
-                .then(res => {
-                    handleAlert('Uploaded Successfully', 'success')
-                    setUploadedFiles([])
-                })
-                .catch(e => {
-                    handleAlert('There was a problem submitting your file, please try again.', 'error')
-                })
+            let request = await fetch(`/contest/:id`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    submission
+                }),
+            })
+            let requestJson = await request.json()
+            console.log(requestJson)
+            if (requestJson.error) {
+                handleAlert('There was a problem submitting your file, please try again later.', 'error')
+            } else {
+                handleAlert('Uploaded Successfully', 'success')
+                setUploadedFiles([])
+            }
         } else {
             handleAlert('Select a file first', 'error')
         }
@@ -53,6 +61,14 @@ export default function SubmitSubmission(props) {
         setAlertMessage(message)
     }
 
+    const handleRemoval = (index) => {
+        console.log('clicked!')
+        setUploadedFiles(prev => {
+            let copy = prev.slice()
+            copy.splice(index, 1)
+            return copy
+        })
+    }
     return (
         <div className={classes.container}>
             <Grid
@@ -80,13 +96,15 @@ export default function SubmitSubmission(props) {
                     <div>
                         <S3
                             accept="image/*"
+                            multiple={true}
                             signingUrl="/s3/sign"
                             signingUrlWithCredentials={true}
                             className={classes.uploadButton}
                             id="s3"
+                            scrubFilename={(name) => Date.now() + '-' + name.replace(/[^\w\d_\-.]+/ig, '')}
                             onFinish={e => {
                                 const url = e["uploadUrl"]
-                                setUploadedFiles([...uploadedFiles, url])
+                                setUploadedFiles(prev => [...prev, url])
                             }} />
                         <label htmlFor="s3" >
                             <Button
@@ -94,30 +112,44 @@ export default function SubmitSubmission(props) {
                             >
                                 <CloudUploadOutlinedIcon
                                     fontSize="large" />
-
                             </Button>
                         </label>
                         <div style={{ margin: '2rem' }}>
                             <Typography
                                 style={{ fontWeight: 'bolder' }}
-                                variant="body1">Click to choose a file</Typography>
-                            <br />
+                                variant="body1">{uploadedFiles.length > 0 ? 'Click to add more files. When you\'re ready, hit Submit.' : 'Click to choose a file'}</Typography>
+                            < br />
                             <Typography
                                 display="block"
-                                style={{ color: 'gray', fontWeight: 'lighter' }}
+                                className={classes.instructions}
                                 variant="caption">High resolution images</Typography>
                             <Typography
                                 display="block"
-                                style={{ color: 'grey', fontWeight: 'lighter' }}
+                                className={classes.instructions}
                                 variant="caption">PNG, JPG, GIF</Typography>
                         </div>
-                        {uploadedFiles.length > 0 ? <>{uploadedFiles.map(file => {
+                        {uploadedFiles.length > 0 ? <>{uploadedFiles.map((file, index) => {
                             return (
-                                <img
+                                <div
+                                    className={classes.previewWrapper}
+                                    id='remove-upload'
                                     key={file}
-                                    className={classes.preview}
-                                    src={file} />)
-                        })}</> : null}
+                                >
+                                    <button
+                                        className={classes.removalButton}
+                                        onClick={() => handleRemoval(index)}
+                                        style={{
+                                            position: "absolute",
+                                            right: 0
+                                        }}
+                                    >x</button>
+                                    <img
+                                        alt='preview'
+                                        className={classes.preview}
+                                        src={file} />
+                                </div>)
+
+                        })}</> : <img style={{ display: 'none', height: '75px', width: '75px', }} />}
 
                     </div>
 
@@ -157,9 +189,28 @@ const useStyles = makeStyles(theme => ({
     uploadButton: {
         display: 'none',
     },
+    previewWrapper: {
+        height: '75px',
+        width: '75px',
+        margin: '5px',
+        display: 'inline',
+        position: 'relative'
+    },
     preview: {
         height: '75px',
-        width: '75px'
+        width: '75px',
+    },
+    removalButton: {
+        position: 'absolute',
+        right: '0px',
+        backgroundColor: 'rgba(255,255,255,0.5)',
+        border: 'none',
+        textAlign: 'center',
+        cursor: 'pointer'
+    },
+    instructions: {
+        color: 'gray',
+        fontWeight: 'lighter'
     },
     submitButton: {
         backgroundColor: '#252525',
