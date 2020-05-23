@@ -17,13 +17,12 @@ import {
 import MuiAlert from "@material-ui/lab/Alert";
 import AttachMoneyOutlinedIcon from "@material-ui/icons/AttachMoneyOutlined";
 import DateFnsUtils from "@date-io/date-fns";
+
 import {
   MuiPickersUtilsProvider,
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-
-import { theme } from "../themes/theme";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant='filled' {...props}></MuiAlert>;
@@ -35,17 +34,11 @@ const styles = makeStyles({
     marginTop: "30px",
     marginBottom: "30px",
   },
-  text: {
-    fontFamily: "poppins",
-  },
+
   title: {
-    fontFamily: "poppins",
-    fontWeight: 600,
     margin: "30px 0px 7px 0px",
   },
-  title2: {
-    color: "grey",
-  },
+
   designBox: {
     padding: "10px",
     display: "flex",
@@ -92,6 +85,7 @@ const Contest = () => {
       setMessage("Please enter all required fields");
     } else {
       const deadlineDateToSubmit = new Date();
+      let status;
       deadlineDateToSubmit.setDate(deadlineDate.getDate());
       deadlineDateToSubmit.setMonth(deadlineDate.getMonth());
       deadlineDateToSubmit.setFullYear(deadlineDate.getFullYear());
@@ -112,13 +106,16 @@ const Contest = () => {
         }),
       })
         .then((res) => {
+          status = res.status;
           return res.json();
         })
         .then((json) => {
           console.log(json);
+          status < 400 ? setOpenSuccess(true) : setOpenError(true);
+          setMessage(json.message);
         })
         .catch((err) => {
-          console.log(err.message);
+          console.log(err);
         });
     }
   };
@@ -131,7 +128,7 @@ const Contest = () => {
   };
   return (
     <Container maxWidth='lg'>
-      <Typography variant='h5' className={classes.title} align='center'>
+      <Typography variant='h1' className={classes.title} align='center'>
         Create new contest
       </Typography>
       <Paper elevation={3} className={classes.box}>
@@ -139,7 +136,7 @@ const Contest = () => {
 
         <Box width='60%' margin='auto'>
           <Typography className={classes.title} variant='subtitle1'>
-            What do you need designed?
+            What do you need designed?*
           </Typography>
 
           <TextField
@@ -156,7 +153,7 @@ const Contest = () => {
         </Box>
         <Box width='60%' margin='auto'>
           <Typography className={classes.title} variant='subtitle1'>
-            Description
+            Description*
           </Typography>
 
           <TextField
@@ -174,10 +171,10 @@ const Contest = () => {
           />
         </Box>
         <Box width='60%' margin='auto' display='flex'>
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             <Grid item xs={3}>
               <Typography className={classes.title} variant='subtitle1'>
-                Prize amount
+                Prize amount*
               </Typography>
 
               <TextField
@@ -200,11 +197,15 @@ const Contest = () => {
               />
             </Grid>
             <Grid item xs={9}>
-              <Typography className={classes.title} variant='subtitle1'>
-                Deadline
+              <Typography
+                className={classes.title}
+                variant='subtitle1'
+                align='center'
+              >
+                Deadline*
               </Typography>
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Grid container spacing={3}>
+                <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <KeyboardDatePicker
                       style={{ border: "1px" }}
@@ -241,7 +242,7 @@ const Contest = () => {
           <Typography className={classes.title} variant='subtitle1'>
             Which designs do you like?
             <br />
-            <Typography variant='subtitle2' className={classes.title2}>
+            <Typography variant='subtitle2'>
               Let's start by helping your designers understand which styles you
               prefer
             </Typography>
