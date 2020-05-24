@@ -121,11 +121,14 @@ const styles = makeStyles({
   },
 });
 const Contest = () => {
+  const currentDate = new Date();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [prize, setPrize] = useState();
-  const [deadlineDate, setDeadlineDate] = useState();
-  const [deadlineTime, setDeadlineTime] = useState();
+  const [deadlineDate, setDeadlineDate] = useState(
+    new Date(currentDate.setDate(currentDate.getDate() + 1))
+  );
+  const [deadlineTime, setDeadlineTime] = useState(currentDate);
   const [openAlert, setOpenAlert] = useState(false);
   const [severity, setSeverity] = useState("error");
   const [message, setMessage] = useState("");
@@ -173,32 +176,38 @@ const Contest = () => {
       deadlineDateToSubmit.setHours(deadlineTime.getHours());
       deadlineDateToSubmit.setMinutes(deadlineTime.getMinutes());
 
-      fetch("/api/contest", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          //set x-auth-token
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          prize,
-          deadlineDateToSubmit,
-        }),
-      })
-        .then((res) => {
-          status = res.status;
-          return res.json();
+      if (deadlineDateToSubmit < new Date()) {
+        setMessage("Deadline Date must be in future");
+        setSeverity("error");
+        setOpenAlert(true);
+      } else {
+        fetch("/api/contest", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            //set x-auth-token
+          },
+          body: JSON.stringify({
+            title,
+            description,
+            prize,
+            deadlineDateToSubmit,
+          }),
         })
-        .then((json) => {
-          console.log(json);
-          status < 400 ? setSeverity("success") : setSeverity("error");
-          setOpenAlert(true);
-          setMessage(json.message);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+          .then((res) => {
+            status = res.status;
+            return res.json();
+          })
+          .then((json) => {
+            console.log(json);
+            status < 400 ? setSeverity("success") : setSeverity("error");
+            setOpenAlert(true);
+            setMessage(json.message);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     }
   };
 
@@ -296,18 +305,10 @@ const Contest = () => {
                       margin='normal'
                       required
                       id='contest-deadline-date'
+                      placeholder='mm/dd/yyyy'
+                      disablePast
                       value={deadlineDate}
-                      onChange={(e) => {
-                        if (e < Date.now()) {
-                          setOpenAlert(true);
-                          setSeverity("warning");
-                          setMessage(
-                            "Deadline Date and Time should be in future"
-                          );
-                        } else {
-                          setDeadlineDate(e);
-                        }
-                      }}
+                      onChange={(e) => setDeadlineDate(e)}
                       KeyboardButtonProps={{
                         "aria-label": "change date",
                       }}

@@ -36,10 +36,12 @@ router.post("/", function(req, res, next) {
               if (err) throw err;
               res.json({
                 token,
+                message: "Successfully signed in",
                 user: {
                   id: user.id,
                   name: user.name,
-                  email: user.email
+                  email: user.email,
+                  profile_image_url: user.profile_image_url
                 }
               });
             }
