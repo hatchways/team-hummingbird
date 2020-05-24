@@ -21,6 +21,9 @@ const UserSchema = new Schema({
   date: {
     type: Date,
     default: Date.now
+  },
+  profile_image_url: {
+    type: String
   }
 });
 

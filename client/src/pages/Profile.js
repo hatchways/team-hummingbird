@@ -137,7 +137,7 @@ function Profile(props) {
         <div className={classes.imageCropper}>
           <img 
             className={classes.profilePic}
-            src="https://i.imgur.com/Vn4hw5j.png"
+            src={user.profile_image_url}
           ></img>
         </div>
         <Typography className={classes.title} variant="h1">
