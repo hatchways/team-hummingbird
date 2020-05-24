@@ -6,9 +6,11 @@ const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
 
+const auth = require("../../middleware/auth");
+const ContestModel = require("../../models/Contest");
 const User = require("../../models/User");
 
-// @route   POST api/users
+// @route   POST api/users/register
 // @desc    Register user
 // @access  Public
 router.post("/register", function(req, res, next) {
@@ -67,6 +69,22 @@ router.post("/register", function(req, res, next) {
       message: err.toString(),
     });
   }
+});
+
+// @route   GET api/user/contests/
+// @desc    Get all contests owned by a user
+// @access  Public
+router.get("/contests", (req, res) => {
+  const { user_id } = req.query;
+
+  ContestModel.find({ user_id })
+    .sort({ deadline_date: -1 })
+    .then((contests) => res.json({ contests }))
+    .catch((err) => {
+      res.status(500).json({
+        message: err.message,
+      });
+    });
 });
 
 module.exports = router;
