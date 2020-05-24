@@ -110,6 +110,13 @@ function handleEditProfileClick() {
 
 }
 
+useEffect(() =>
+    fetch("/api/contests")
+      .then(res => res.json())
+      .then(res => this.setState({ planets: res }))
+      .catch(() => this.setState({ hasErrors: true }))
+  );
+
 function Profile(props) {
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -118,10 +125,10 @@ function Profile(props) {
     <Container className={classes.container} maxWidth="lg">
       <Grid direction="column" container spacing={3} alignItems="center">
         <div className={classes.imageCropper}>
-        <img 
-          className={classes.profilePic}
-          src="https://i.imgur.com/Vn4hw5j.png"
-        ></img>
+          <img 
+            className={classes.profilePic}
+            src="https://i.imgur.com/Vn4hw5j.png"
+          ></img>
         </div>
         <Typography className={classes.title} variant="h1">
           Kenneth Stewart
