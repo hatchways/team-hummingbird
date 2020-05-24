@@ -5,16 +5,17 @@ import {
   Paper, 
   makeStyles, 
   Grid, 
-  TextField, 
   Button, 
   Box,
-  Snackbar,
   AppBar,
   Tabs,
   Tab
  } from '@material-ui/core';
 
-import { Route, Link } from "react-router-dom";
+ import {
+  useLocation
+} from "react-router-dom";
+
 import ContestCard from '../components/ContestCard';
 
 const useStyles = makeStyles({
@@ -109,6 +110,8 @@ function TabPanel(props) {
 function Profile(props) {
   const [currentTab, setCurrentTab] = useState(0);
   const [myContests, setMyContests] = useState([]);
+  let location = useLocation();
+  const user = location.state.user;
 
   async function fetchData() {
     const userId = '5ec6c8840afdf20c749027cb'; // placeholder
@@ -138,7 +141,7 @@ function Profile(props) {
           ></img>
         </div>
         <Typography className={classes.title} variant="h1">
-          Kenneth Stewart
+          {user.name}
         </Typography>
         <Button
           size="large" 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { 
   AppBar,
   Toolbar,
@@ -40,8 +40,6 @@ const useStyles = makeStyles({
 });
 
  function Header(props) {
-  const [responseMessage, setResponseMessage] = useState('');
-
   const classes = useStyles();
   return (
     <AppBar position="static" className={classes.bar}>
