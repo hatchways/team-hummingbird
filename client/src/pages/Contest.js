@@ -16,6 +16,7 @@ import {
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import AttachMoneyOutlinedIcon from "@material-ui/icons/AttachMoneyOutlined";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import DateFnsUtils from "@date-io/date-fns";
 
 import {
@@ -55,7 +56,30 @@ const styles = makeStyles({
     },
   },
   gridList: {
-    width: 500,
+    width: 525,
+    height: 280,
+    overflow: "auto",
+    padding: "0px 15px 0px 5px",
+    margin: "15px 0px 15px 0px!important",
+    /* width */
+    "&::-webkit-scrollbar": {
+      width: "4px",
+    },
+
+    /* Track */
+    "&::-webkit-scrollbar-track": {
+      background: "#f1f1f1",
+    },
+
+    /* Handle */
+    "&::-webkit-scrollbar-thumb": {
+      background: "#555",
+    },
+
+    /* Handle on hover */
+    "&::-webkit-scrollbar-thumb:hover": {
+      background: "#000",
+    },
   },
   button: {
     marginTop: "60px",
@@ -65,7 +89,35 @@ const styles = makeStyles({
     fontFamily: "Poppins",
     fontWeight: 600,
     borderRadius: "0",
-    border: "none",
+    padding: "15px",
+    "&:hover": {
+      background: "green",
+      cursor: "pointer",
+    },
+  },
+  imageTile: {
+    "&:hover": {
+      cursor: "pointer",
+    },
+    "&.selected": {
+      filter: "brightness(50%)",
+    },
+  },
+  checked: {
+    fontSize: "30px",
+    display: "none",
+    color: "white",
+    "&.selected": {
+      display: "block",
+      zIndex: 10,
+      position: "absolute",
+      top: "40%",
+      left: "40%",
+
+      "&:hover": {
+        cursor: "pointer",
+      },
+    },
   },
 });
 const Contest = () => {
@@ -74,14 +126,43 @@ const Contest = () => {
   const [prize, setPrize] = useState();
   const [deadlineDate, setDeadlineDate] = useState();
   const [deadlineTime, setDeadlineTime] = useState();
-  const [openError, setOpenError] = useState(false);
-  const [openSuccess, setOpenSuccess] = useState(false);
-  const [message, setMessage] = useState("sdf");
+  const [openAlert, setOpenAlert] = useState(false);
+  const [severity, setSeverity] = useState("error");
+  const [message, setMessage] = useState("");
   const classes = styles();
+  const imageGridList = [
+    { id: 1, imageURL: "https://i.imgur.com/HFJL0eq.png" },
+    { id: 2, imageURL: "https://i.imgur.com/Nf8SsCu.png" },
+    { id: 3, imageURL: "https://i.imgur.com/GiwnXsg.png" },
+    { id: 4, imageURL: "https://i.imgur.com/ihBkO9i.png" },
+    { id: 5, imageURL: "https://i.imgur.com/mFs0fVv.png" },
+    { id: 6, imageURL: "https://i.imgur.com/YJYmGtD.png" },
+    { id: 7, imageURL: "https://i.imgur.com/AtGXbpx.png" },
+    { id: 8, imageURL: "https://i.imgur.com/hxhWXk9.png" },
+    { id: 9, imageURL: "https://i.imgur.com/02iEupb.png" },
+    { id: 10, imageURL: "https://i.imgur.com/u6v65NG.png" },
+    { id: 11, imageURL: "https://i.imgur.com/C4atyQX.png" },
+    { id: 12, imageURL: "https://i.imgur.com/Gh4Nrxo.png" },
+  ];
 
+  const selectDesign = (e, image) => {
+    let selectedImage = document.getElementById(image.id);
+    let selectedMark = document.getElementById(image.id + "done");
+    console.log(selectedImage.classList);
+    if (selectedImage.classList.contains("selected")) {
+      console.log("remove selected");
+      selectedImage.classList.remove("selected");
+      selectedMark.classList.remove("selected");
+    } else {
+      console.log("add selected");
+      selectedImage.classList.add("selected");
+      selectedMark.classList.add("selected");
+    }
+  };
   const handleSubmit = (e) => {
     if (!(title && description && prize && deadlineDate && deadlineTime)) {
-      setOpenError(true);
+      setOpenAlert(true);
+      setSeverity("error");
       setMessage("Please enter all required fields");
     } else {
       const deadlineDateToSubmit = new Date();
@@ -111,7 +192,8 @@ const Contest = () => {
         })
         .then((json) => {
           console.log(json);
-          status < 400 ? setOpenSuccess(true) : setOpenError(true);
+          status < 400 ? setSeverity("success") : setSeverity("error");
+          setOpenAlert(true);
           setMessage(json.message);
         })
         .catch((err) => {
@@ -124,7 +206,7 @@ const Contest = () => {
     if (reason === "clickaway") {
       return;
     }
-    setOpenError(false);
+    setOpenAlert(false);
   };
   return (
     <Container maxWidth='lg'>
@@ -215,7 +297,17 @@ const Contest = () => {
                       required
                       id='contest-deadline-date'
                       value={deadlineDate}
-                      onChange={(e) => setDeadlineDate(e)}
+                      onChange={(e) => {
+                        if (e < Date.now()) {
+                          setOpenAlert(true);
+                          setSeverity("warning");
+                          setMessage(
+                            "Deadline Date and Time should be in future"
+                          );
+                        } else {
+                          setDeadlineDate(e);
+                        }
+                      }}
                       KeyboardButtonProps={{
                         "aria-label": "change date",
                       }}
@@ -249,19 +341,28 @@ const Contest = () => {
           </Typography>
 
           <Box border={1} borderColor='grey.300' className={classes.designBox}>
-            <GridList cellHeight={160} className={classes.gridList} cols={4}>
-              <GridListTile key={1} cols={1}>
-                <Typography>1</Typography>
-              </GridListTile>
-              <GridListTile key={2} cols={1}>
-                <Typography>2</Typography>
-              </GridListTile>
-              <GridListTile key={3} cols={1}>
-                <Typography>3</Typography>
-              </GridListTile>
-              <GridListTile key={4} cols={1}>
-                <Typography>4</Typography>
-              </GridListTile>
+            <GridList
+              cellHeight={140}
+              className={classes.gridList}
+              cols={4}
+              spacing={10}
+            >
+              {imageGridList.map((image) => (
+                <GridListTile key={image.id} cols={1}>
+                  <CheckCircleOutlineIcon
+                    className={classes.checked}
+                    id={image.id + "done"}
+                    onClick={(e) => selectDesign(e, image)}
+                  />
+                  <img
+                    src={image.imageURL}
+                    alt={image.id}
+                    id={image.id}
+                    className={classes.imageTile}
+                    onClick={(e) => selectDesign(e, image)}
+                  ></img>
+                </GridListTile>
+              ))}
             </GridList>
           </Box>
         </Box>
@@ -276,13 +377,8 @@ const Contest = () => {
             CREATE CONTEST
           </Button>
         </Grid>
-        <Snackbar autoHideDuration={6000} open={openError}>
-          <Alert onClose={closeAlert} severity='error'>
-            {message}
-          </Alert>
-        </Snackbar>
-        <Snackbar autoHideDuration={6000} open={openSuccess}>
-          <Alert onClose={closeAlert} severity='success'>
+        <Snackbar autoHideDuration={5000} open={openAlert} onClose={closeAlert}>
+          <Alert onClose={closeAlert} severity={severity}>
             {message}
           </Alert>
         </Snackbar>
