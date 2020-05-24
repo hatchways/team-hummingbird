@@ -106,19 +106,26 @@ function TabPanel(props) {
   );
 }
 
-function handleEditProfileClick() {
-
-}
-
-useEffect(() =>
-    fetch("/api/contests")
-      .then(res => res.json())
-      .then(res => this.setState({ planets: res }))
-      .catch(() => this.setState({ hasErrors: true }))
-  );
-
 function Profile(props) {
   const [currentTab, setCurrentTab] = useState(0);
+  const [myContests, setMyContests] = useState([]);
+
+  async function fetchData() {
+    const userId = '5ec6c8840afdf20c749027cb'; // placeholder
+    const res = await fetch("/api/users/contests?user_id=" + userId);
+    res
+      .json()
+      .then(res => setMyContests(res.contests))
+      .catch(err => console.error(err));
+  }
+  
+  useEffect(() => {
+    fetchData();
+  });
+
+  function handleEditProfileClick() {
+
+  }
 
   const classes = useStyles();
   return (
@@ -155,20 +162,19 @@ function Profile(props) {
       </AppBar>
       <TabPanel value={currentTab} index={0}>
         <Paper className={classes.box} square>
-          <ContestCard 
-            imageUrl="https://i.imgur.com/Bl6triT.png"
-            title="Lion tattoo concept in minimal style"
-            description="Looking for cool simplicity ideas of lion."
-            prizeAmount={150}
-            deadlineDate={new Date('2020-06-01')}
-          />
-          <ContestCard 
-            imageUrl="https://i.imgur.com/kZ8lO0B.png"
-            title="Flowers tattoo for arm"
-            description="Need something beautiful!"
-            prizeAmount={300}
-            deadlineDate={new Date('2020-05-20')}
-          />
+          {
+            myContests.map(contest => {
+              return (
+                <ContestCard 
+                  imageUrl="https://i.imgur.com/Bl6triT.png" //placeholder
+                  title={contest.title}
+                  description={contest.description}
+                  prizeAmount={contest.prize_amount}
+                  deadlineDate={new Date(contest.deadline_date)}
+                />
+              )
+            })
+          }
         </Paper>
       </TabPanel>
       <TabPanel value={currentTab} index={1}>
