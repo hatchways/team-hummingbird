@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { 
   Typography, 
   Container, 
@@ -11,8 +11,6 @@ import {
   Snackbar
  } from '@material-ui/core';
  import MuiAlert from '@material-ui/lab/Alert';
-
-import { Route, Link } from "react-router-dom";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;

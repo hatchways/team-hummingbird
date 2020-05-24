@@ -5,16 +5,17 @@ import {
   Paper, 
   makeStyles, 
   Grid, 
-  TextField, 
   Button, 
   Box,
-  Snackbar,
   AppBar,
   Tabs,
   Tab
  } from '@material-ui/core';
 
-import { Route, Link } from "react-router-dom";
+ import {
+  useLocation
+} from "react-router-dom";
+
 import ContestCard from '../components/ContestCard';
 
 const useStyles = makeStyles({
@@ -106,25 +107,40 @@ function TabPanel(props) {
   );
 }
 
-function handleEditProfileClick() {
-
-}
-
 function Profile(props) {
   const [currentTab, setCurrentTab] = useState(0);
+  const [myContests, setMyContests] = useState(null);
+  let location = useLocation();
+  const user = location.state ? location.state.user : null;
+
+  async function fetchData() {
+    const res = await fetch("/api/users/contests?user_id=" + user.id);
+    res
+      .json()
+      .then(res => setMyContests(res.contests))
+      .catch(err => console.error(err));
+  }
+  
+  useEffect(() => {
+    if (user && !myContests) fetchData();
+  });
+
+  function handleEditProfileClick() {
+
+  }
 
   const classes = useStyles();
   return (
     <Container className={classes.container} maxWidth="lg">
       <Grid direction="column" container spacing={3} alignItems="center">
         <div className={classes.imageCropper}>
-        <img 
-          className={classes.profilePic}
-          src="https://i.imgur.com/Vn4hw5j.png"
-        ></img>
+          <img 
+            className={classes.profilePic}
+            src={user ? user.profile_image_url : ''}
+          ></img>
         </div>
         <Typography className={classes.title} variant="h1">
-          Kenneth Stewart
+          {user ? user.name : ''}
         </Typography>
         <Button
           size="large" 
@@ -148,20 +164,22 @@ function Profile(props) {
       </AppBar>
       <TabPanel value={currentTab} index={0}>
         <Paper className={classes.box} square>
-          <ContestCard 
-            imageUrl="https://i.imgur.com/Bl6triT.png"
-            title="Lion tattoo concept in minimal style"
-            description="Looking for cool simplicity ideas of lion."
-            prizeAmount={150}
-            deadlineDate={new Date('2020-06-01')}
-          />
-          <ContestCard 
-            imageUrl="https://i.imgur.com/kZ8lO0B.png"
-            title="Flowers tattoo for arm"
-            description="Need something beautiful!"
-            prizeAmount={300}
-            deadlineDate={new Date('2020-05-20')}
-          />
+          {
+            myContests ? 
+            myContests.map(contest => {
+              return (
+                <ContestCard 
+                  imageUrl="https://i.imgur.com/Bl6triT.png" //placeholder
+                  title={contest.title}
+                  description={contest.description}
+                  prizeAmount={contest.prize_amount}
+                  deadlineDate={new Date(contest.deadline_date)}
+                />
+              )
+            })
+            :
+            ''
+          }
         </Paper>
       </TabPanel>
       <TabPanel value={currentTab} index={1}>

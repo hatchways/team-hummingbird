@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { 
   Typography, 
   Container, 
@@ -12,7 +12,7 @@ import {
  } from '@material-ui/core';
  import MuiAlert from '@material-ui/lab/Alert';
 
-import { Route, Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -70,6 +70,7 @@ function Login(props) {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openError, setOpenError] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
+  const [user, setUser] = useState(null);
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -98,7 +99,11 @@ function Login(props) {
       })
       .then(json => {
         console.log(json);
-        if (status < 400) setOpenSuccess(true);
+        if (status < 400) {
+          setOpenSuccess(true);
+          setUser(json.user);
+          console.log(json.user)
+        }
         else setOpenError(true);
         setResponseMessage(json.message);
       })
@@ -107,64 +112,75 @@ function Login(props) {
       });
   };
   const classes = useStyles();
-  return (
-    <Container className={classes.container} maxWidth="sm">
-      <Paper className={classes.box} square>
-      <br/>
-        <Typography className={classes.title} variant="h3">
-          Sign In
-        </Typography>
-        <div >
-            <Grid direction="column" container spacing={3} alignItems="center">
-                <Box width="50%">
+  if (openSuccess && user) {
+    return (
+      <Redirect to={{
+            pathname: '/profile',
+            state: { user: user }
+        }}
+      />
+    )
+  }
+  else {
+    return (
+      <Container className={classes.container} maxWidth="sm">
+        <Paper className={classes.box} square>
+        <br/>
+          <Typography className={classes.title} variant="h3">
+            Sign In
+          </Typography>
+          <div >
+              <Grid direction="column" container spacing={3} alignItems="center">
+                  <Box width="50%">
+                      <TextField 
+                        className={classes.textField}
+                        id="email" 
+                        label="Email" 
+                        type="email" 
+                        variant="outlined" 
+                        fullWidth 
+                        required
+                        onChange={e => setEmail(e.target.value)}
+                      />
+                  </Box>
+                  <br/>
+                  <Box width="50%">
                     <TextField 
-                      className={classes.textField}
-                      id="email" 
-                      label="Email" 
-                      type="email" 
-                      variant="outlined" 
-                      fullWidth 
-                      required
-                      onChange={e => setEmail(e.target.value)}
-                    />
-                </Box>
-                <br/>
-                <Box width="50%">
-                  <TextField 
-                      className={classes.textField}
-                      id="password" 
-                      label="Password" 
-                      type="password" 
-                      variant="outlined" 
-                      fullWidth 
-                      required
-                      onChange={e => setPassword(e.target.value)}
-                    />
-                </Box>
-            </Grid>
-            <Grid container justify="center" className={classes.grid}>
-                <Button
-                  size="large" 
-                  className={classes.button}
-                  onClick={handleSubmit}
-                >
-                Sign In
-                </Button>
-            </Grid>
-        </div>
-    </Paper>
-    <Snackbar open={openSuccess} autoHideDuration={6000} onClose={handleClose}>
-      <Alert onClose={handleClose} severity="success">
-        {responseMessage}
-      </Alert>
-    </Snackbar>
-    <Snackbar open={openError} autoHideDuration={6000} onClose={handleClose}>
-      <Alert onClose={handleClose} severity="error">
-        {responseMessage}
-      </Alert>
-    </Snackbar>
-    </Container>
-  );
+                        className={classes.textField}
+                        id="password" 
+                        label="Password" 
+                        type="password" 
+                        variant="outlined" 
+                        fullWidth 
+                        required
+                        onChange={e => setPassword(e.target.value)}
+                      />
+                  </Box>
+              </Grid>
+              <Grid container justify="center" className={classes.grid}>
+                  <Button
+                    size="large" 
+                    className={classes.button}
+                    onClick={handleSubmit}
+                  >
+                  Sign In
+                  </Button>
+              </Grid>
+          </div>
+      </Paper>
+      <Snackbar open={openSuccess} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          {responseMessage}
+        </Alert>
+      </Snackbar>
+      <Snackbar open={openError} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error">
+          {responseMessage}
+        </Alert>
+      </Snackbar>
+      </Container>
+    );
+  }
 }
 
 export default Login;
