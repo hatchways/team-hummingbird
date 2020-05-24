@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 18,
     marginTop: 40
   },
-  contestSubtitle: {
+  contestDescription: {
     color: "#718096",
     fontSize: 14,
   },
@@ -74,7 +74,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ContestCard(props) {
-  const { imageUrl, title, subtitle, amount, isCompleted } = props;
+  const { 
+    imageUrl, 
+    title, 
+    description, 
+    prizeAmount, 
+    deadlineDate
+   } = props;
+  const date = new Date();
   const classes = useStyles();
 
   return (
@@ -91,20 +98,20 @@ function ContestCard(props) {
               <Typography gutterBottom variant="subtitle1" className={classes.contestTitle}>
                 {title}
               </Typography>
-              <Typography variant="body2" gutterBottom className={classes.contestSubtitle}>
-                {subtitle}
+              <Typography variant="body2" gutterBottom className={classes.contestDescription}>
+                {description}
               </Typography>
               <Button
                 size="small" 
                 className={classes.money}
                 >
-                ${amount}
+                ${prizeAmount}
               </Button>
               <Button
                 size="small" 
-                className={isCompleted ? classes.completed : classes.inProgress}
+                className={date > deadlineDate ? classes.completed : classes.inProgress}
                 >
-                {isCompleted ? 'COMPLETED' : 'IN PROGRESS'}
+                {date > deadlineDate ? 'COMPLETED' : 'IN PROGRESS'}
               </Button>
             </Grid>
           </Grid>

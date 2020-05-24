@@ -151,16 +151,16 @@ function Profile(props) {
           <ContestCard 
             imageUrl="https://i.imgur.com/Bl6triT.png"
             title="Lion tattoo concept in minimal style"
-            subtitle="Looking for cool simplicity ideas of lion."
-            amount={150}
-            isCompleted={false}
+            description="Looking for cool simplicity ideas of lion."
+            prizeAmount={150}
+            deadlineDate={new Date('2020-06-01')}
           />
           <ContestCard 
             imageUrl="https://i.imgur.com/kZ8lO0B.png"
             title="Flowers tattoo for arm"
-            subtitle="Need something beautiful!"
-            amount={300}
-            isCompleted={true}
+            description="Need something beautiful!"
+            prizeAmount={300}
+            deadlineDate={new Date('2020-05-20')}
           />
         </Paper>
       </TabPanel>
