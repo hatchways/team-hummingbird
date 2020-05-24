@@ -109,7 +109,7 @@ function TabPanel(props) {
 
 function Profile(props) {
   const [currentTab, setCurrentTab] = useState(0);
-  const [myContests, setMyContests] = useState([]);
+  const [myContests, setMyContests] = useState(null);
   let location = useLocation();
   const user = location.state.user;
 
@@ -123,7 +123,7 @@ function Profile(props) {
   }
   
   useEffect(() => {
-    fetchData();
+    if (!myContests) fetchData();
   });
 
   function handleEditProfileClick() {
@@ -166,6 +166,7 @@ function Profile(props) {
       <TabPanel value={currentTab} index={0}>
         <Paper className={classes.box} square>
           {
+            myContests ? 
             myContests.map(contest => {
               return (
                 <ContestCard 
@@ -177,6 +178,8 @@ function Profile(props) {
                 />
               )
             })
+            :
+            ''
           }
         </Paper>
       </TabPanel>
