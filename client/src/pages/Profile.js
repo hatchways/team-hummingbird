@@ -114,8 +114,7 @@ function Profile(props) {
   const user = location.state.user;
 
   async function fetchData() {
-    const userId = '5ec6c8840afdf20c749027cb'; // placeholder
-    const res = await fetch("/api/users/contests?user_id=" + userId);
+    const res = await fetch("/api/users/contests?user_id=" + user.id);
     res
       .json()
       .then(res => setMyContests(res.contests))
