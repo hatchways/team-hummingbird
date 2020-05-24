@@ -111,7 +111,7 @@ function Profile(props) {
   const [currentTab, setCurrentTab] = useState(0);
   const [myContests, setMyContests] = useState(null);
   let location = useLocation();
-  const user = location.state.user;
+  const user = location.state ? location.state.user : null;
 
   async function fetchData() {
     const res = await fetch("/api/users/contests?user_id=" + user.id);
@@ -122,7 +122,7 @@ function Profile(props) {
   }
   
   useEffect(() => {
-    if (!myContests) fetchData();
+    if (user && !myContests) fetchData();
   });
 
   function handleEditProfileClick() {
@@ -136,11 +136,11 @@ function Profile(props) {
         <div className={classes.imageCropper}>
           <img 
             className={classes.profilePic}
-            src={user.profile_image_url}
+            src={user ? user.profile_image_url : ''}
           ></img>
         </div>
         <Typography className={classes.title} variant="h1">
-          {user.name}
+          {user ? user.name : ''}
         </Typography>
         <Button
           size="large" 
