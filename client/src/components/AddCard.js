@@ -44,12 +44,12 @@ function CheckoutForm() {
             console.log(paymentMethod)
             const _user = user
             _user.hasPaymentInfoSaved = true
-            _user.paymentInfo = {cardType: paymentMethod.card.brand, last4: paymentMethod.card.last4}
+            _user.paymentInfo = { cardType: paymentMethod.card.brand, last4: paymentMethod.card.last4 }
             _user.paymentId = paymentMethod.id
             setAuthTokens({
                 "token": authTokens.token,
                 "user": _user
-              })
+            })
             handleAlert(`Your ${paymentMethod?.card?.brand} card ending in ${paymentMethod?.card?.last4} was added successfully`, "success")
         }
     }
