@@ -30,27 +30,33 @@ contestRouter.get("/:id", auth, (req, res) => {
 
 contestRouter.post("/", auth, (req, res) => {
   const { title, description, prize_amount, deadline_date } = req.body;
-  const user_id = req.user.id;
-  const newContest = new ContestModel({
-    title,
-    description,
-    prize_amount,
-    deadline_date,
-    user_id,
-  });
-
-  newContest
-    .save()
-    .then((result) => {
-      res.json({
-        message: "Contest created successfully",
-      });
-    })
-    .catch((err) => {
-      res.status(400).json({
-        message: err.message,
-      });
+  if (!(title && description && prize_amount && deadline_date)) {
+    res.json({
+      message: "Enter all the required fields",
     });
+  } else {
+    const user_id = req.user.id;
+    const newContest = new ContestModel({
+      title,
+      description,
+      prize_amount,
+      deadline_date,
+      user_id,
+    });
+
+    newContest
+      .save()
+      .then((result) => {
+        res.json({
+          message: "Contest created successfully",
+        });
+      })
+      .catch((err) => {
+        res.status(400).json({
+          message: err.message,
+        });
+      });
+  }
 });
 
 // Route: PUT api/contest/:id
