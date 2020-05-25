@@ -3,7 +3,7 @@ const contestRouter = express.Router();
 
 const auth = require("../../middleware/auth");
 const ContestModel = require("../../models/Contest");
-
+const SubmissionModel = require("../../models/submission");
 // Route: GET api/contest/:id
 // Desc: get contest with the id
 // access: private
@@ -91,6 +91,45 @@ contestRouter.put("/:id", auth, (req, res) => {
       message: "User not authorized to update this contest",
     });
   }
+});
+
+// Route: PUT api/contest/:id/submission
+// Desc: Add a submission
+// access: private
+
+contestRouter.put("/:id/submission", auth, (req, res) => {
+  //add to /submission
+  const { contest_id, user_id, upload_files } = req.body;
+
+  const newSubmission = new SubmissionModel({
+    contest_id,
+    user_id,
+    upload_files,
+  });
+
+  newSubmission
+    .save()
+    .then(() => {
+      res.json("Submission added successfully");
+    })
+    .catch((err) => {
+      res.status(400).json("Error: " + err.message);
+    });
+});
+
+// Route: GET api/contest/:id/submission
+// Desc: Find all submissions associated with a contest
+// access: private
+contestRouter.get("/:id/submissions", auth, (req, res) => {
+  const { contest_id } = req.body;
+
+  SubmissionModel.find({ contest_id: contest_id }, (err, submissionsFound) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(submissionsFound);
+    }
+  });
 });
 
 module.exports = contestRouter;
