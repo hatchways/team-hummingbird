@@ -28,98 +28,7 @@ import {
 function Alert(props) {
   return <MuiAlert elevation={6} variant='filled' {...props}></MuiAlert>;
 }
-const styles = makeStyles({
-  box: {
-    width: "80%",
-    margin: "auto",
-    marginTop: "30px",
-    marginBottom: "30px",
-  },
 
-  title: {
-    margin: "30px 0px 7px 0px",
-  },
-
-  designBox: {
-    padding: "10px",
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
-    overflow: "hidden",
-  },
-  textField: {
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderRadius: 0,
-        borderColor: "#e2e8f0",
-      },
-    },
-  },
-  gridList: {
-    width: 525,
-    height: 280,
-    overflow: "auto",
-    padding: "0px 15px 0px 5px",
-    margin: "15px 0px 15px 0px!important",
-    /* width */
-    "&::-webkit-scrollbar": {
-      width: "4px",
-    },
-
-    /* Track */
-    "&::-webkit-scrollbar-track": {
-      background: "#f1f1f1",
-    },
-
-    /* Handle */
-    "&::-webkit-scrollbar-thumb": {
-      background: "#555",
-    },
-
-    /* Handle on hover */
-    "&::-webkit-scrollbar-thumb:hover": {
-      background: "#000",
-    },
-  },
-  button: {
-    marginTop: "60px",
-    marginBottom: "60px",
-    backgroundColor: "black",
-    color: "white",
-    fontFamily: "Poppins",
-    fontWeight: 600,
-    borderRadius: "0",
-    padding: "15px",
-    "&:hover": {
-      background: "green",
-      cursor: "pointer",
-    },
-  },
-  imageTile: {
-    "&:hover": {
-      cursor: "pointer",
-    },
-    "&.selected": {
-      filter: "brightness(50%)",
-    },
-  },
-  checked: {
-    fontSize: "30px",
-    display: "none",
-    color: "white",
-    "&.selected": {
-      display: "block",
-      zIndex: 10,
-      position: "absolute",
-      top: "40%",
-      left: "40%",
-
-      "&:hover": {
-        cursor: "pointer",
-      },
-    },
-  },
-});
 const Contest = () => {
   const currentDate = new Date();
   const [title, setTitle] = useState("");
@@ -133,34 +42,12 @@ const Contest = () => {
   const [severity, setSeverity] = useState("error");
   const [message, setMessage] = useState("");
   const classes = styles();
-  const imageGridList = [
-    { id: 1, imageURL: "https://i.imgur.com/HFJL0eq.png" },
-    { id: 2, imageURL: "https://i.imgur.com/Nf8SsCu.png" },
-    { id: 3, imageURL: "https://i.imgur.com/GiwnXsg.png" },
-    { id: 4, imageURL: "https://i.imgur.com/ihBkO9i.png" },
-    { id: 5, imageURL: "https://i.imgur.com/mFs0fVv.png" },
-    { id: 6, imageURL: "https://i.imgur.com/YJYmGtD.png" },
-    { id: 7, imageURL: "https://i.imgur.com/AtGXbpx.png" },
-    { id: 8, imageURL: "https://i.imgur.com/hxhWXk9.png" },
-    { id: 9, imageURL: "https://i.imgur.com/02iEupb.png" },
-    { id: 10, imageURL: "https://i.imgur.com/u6v65NG.png" },
-    { id: 11, imageURL: "https://i.imgur.com/C4atyQX.png" },
-    { id: 12, imageURL: "https://i.imgur.com/Gh4Nrxo.png" },
-  ];
 
-  const selectDesign = (e, image) => {
-    let selectedImage = document.getElementById(image.id);
-    let selectedMark = document.getElementById(image.id + "done");
-    console.log(selectedImage.classList);
-    if (selectedImage.classList.contains("selected")) {
-      console.log("remove selected");
-      selectedImage.classList.remove("selected");
-      selectedMark.classList.remove("selected");
-    } else {
-      console.log("add selected");
-      selectedImage.classList.add("selected");
-      selectedMark.classList.add("selected");
-    }
+  const selectDesign = (e) => {
+    let selectedImage = e.target;
+    selectedImage.classList.contains("selected")
+      ? selectedImage.classList.remove("selected")
+      : selectedImage.classList.add("selected");
   };
   const handleSubmit = (e) => {
     if (!(title && description && prize && deadlineDate && deadlineTime)) {
@@ -199,7 +86,6 @@ const Contest = () => {
             return res.json();
           })
           .then((json) => {
-            console.log(json);
             status < 400 ? setSeverity("success") : setSeverity("error");
             setOpenAlert(true);
             setMessage(json.message);
@@ -349,18 +235,12 @@ const Contest = () => {
               spacing={10}
             >
               {imageGridList.map((image) => (
-                <GridListTile key={image.id} cols={1}>
-                  <CheckCircleOutlineIcon
-                    className={classes.checked}
-                    id={image.id + "done"}
-                    onClick={(e) => selectDesign(e, image)}
-                  />
+                <GridListTile key={image.id} cols={1} onClick={selectDesign}>
+                  <CheckCircleOutlineIcon className={classes.checked} />
                   <img
                     src={image.imageURL}
                     alt={image.id}
-                    id={image.id}
                     className={classes.imageTile}
-                    onClick={(e) => selectDesign(e, image)}
                   ></img>
                 </GridListTile>
               ))}
@@ -389,3 +269,157 @@ const Contest = () => {
 };
 
 export default Contest;
+
+//Custom Style
+const styles = makeStyles({
+  box: {
+    width: "80%",
+    margin: "auto",
+    marginTop: "30px",
+    marginBottom: "30px",
+  },
+
+  title: {
+    margin: "30px 0px 7px 0px",
+  },
+
+  designBox: {
+    padding: "10px",
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    overflow: "hidden",
+  },
+  textField: {
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderRadius: 0,
+        borderColor: "#e2e8f0",
+      },
+    },
+  },
+  gridList: {
+    width: 525,
+    height: 280,
+    overflow: "auto",
+    padding: "0px 15px 0px 5px",
+    margin: "15px 0px 15px 0px!important",
+    /* width */
+    "&::-webkit-scrollbar": {
+      width: "4px",
+    },
+
+    /* Track */
+    "&::-webkit-scrollbar-track": {
+      background: "#f1f1f1",
+    },
+
+    /* Handle */
+    "&::-webkit-scrollbar-thumb": {
+      background: "#555",
+    },
+
+    /* Handle on hover */
+    "&::-webkit-scrollbar-thumb:hover": {
+      background: "#000",
+    },
+  },
+  button: {
+    marginTop: "60px",
+    marginBottom: "60px",
+    backgroundColor: "black",
+    color: "white",
+    fontFamily: "Poppins",
+    fontWeight: 600,
+    borderRadius: "0",
+    padding: "15px",
+    "&:hover": {
+      background: "green",
+      cursor: "pointer",
+    },
+  },
+  imageTile: {
+    zIndex: 10,
+    "&:hover": {
+      cursor: "pointer",
+    },
+    "&.selected": {
+      filter: "brightness(50%)",
+      opacity: 0.7,
+      zIndex: 1,
+    },
+  },
+  checked: {
+    fontSize: "30px",
+    display: "block",
+    color: "white",
+    position: "absolute",
+    top: "40%",
+    left: "40%",
+    zIndex: 10,
+    pointerEvents: "none",
+  },
+});
+
+const imageGridList = [
+  {
+    id: 1,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/0de773f98a983912282d4a303e355329d5f592da.png",
+  },
+  {
+    id: 2,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/6de131e306e4c3bb3e6696bd5fb3dc6f4dd1b885.png",
+  },
+  {
+    id: 3,
+    imageURL:
+      "https://i.imgur.com/GiwnXsg.pnghttps://hatchways-hummingbird.s3.amazonaws.com/Assets/48bbc97ff2ad97160445538959a224e642ce5816.png",
+  },
+  {
+    id: 4,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png",
+  },
+  {
+    id: 5,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/78824b24b626ad2ae8ae89c416b1b0826e46df3f.png",
+  },
+  {
+    id: 6,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/553140e71d46dfd29da17bae491c57cffac51bd0.png",
+  },
+  {
+    id: 7,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/767456347c13c8dd9e192ed52faaf6090c6d931c.png",
+  },
+  {
+    id: 8,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/a9650901bb4fda628c17afb20236b129aba92220.png",
+  },
+  {
+    id: 9,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/c91c45b97085fa64186472d903c1d1ef475d14d1.png",
+  },
+  {
+    id: 10,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/dbb30a013fe6fea52a607300c14b486ded6fa859.png",
+  },
+  {
+    id: 11,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/e32a7389eec971770e40497ee28d8c458a042fa4.png",
+  },
+  {
+    id: 12,
+    imageURL:
+      "https://hatchways-hummingbird.s3.amazonaws.com/Assets/fb61d9c7dd33978f7274b8c47c42562a3d759e58.png",
+  },
+];
