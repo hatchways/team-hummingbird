@@ -43,19 +43,11 @@ const Contest = () => {
   const [message, setMessage] = useState("");
   const classes = styles();
 
-  const selectDesign = (e, image) => {
-    let selectedImage = document.getElementById(image.id);
-    let selectedMark = document.getElementById(image.id + "done");
-    console.log(selectedImage.classList);
-    if (selectedImage.classList.contains("selected")) {
-      console.log("remove selected");
-      selectedImage.classList.remove("selected");
-      selectedMark.classList.remove("selected");
-    } else {
-      console.log("add selected");
-      selectedImage.classList.add("selected");
-      selectedMark.classList.add("selected");
-    }
+  const selectDesign = (e) => {
+    let selectedImage = e.target;
+    selectedImage.classList.contains("selected")
+      ? selectedImage.classList.remove("selected")
+      : selectedImage.classList.add("selected");
   };
   const handleSubmit = (e) => {
     if (!(title && description && prize && deadlineDate && deadlineTime)) {
@@ -94,7 +86,6 @@ const Contest = () => {
             return res.json();
           })
           .then((json) => {
-            console.log(json);
             status < 400 ? setSeverity("success") : setSeverity("error");
             setOpenAlert(true);
             setMessage(json.message);
@@ -244,18 +235,12 @@ const Contest = () => {
               spacing={10}
             >
               {imageGridList.map((image) => (
-                <GridListTile key={image.id} cols={1}>
-                  <CheckCircleOutlineIcon
-                    className={classes.checked}
-                    id={image.id + "done"}
-                    onClick={(e) => selectDesign(e, image)}
-                  />
+                <GridListTile key={image.id} cols={1} onClick={selectDesign}>
+                  <CheckCircleOutlineIcon className={classes.checked} />
                   <img
                     src={image.imageURL}
                     alt={image.id}
-                    id={image.id}
                     className={classes.imageTile}
-                    onClick={(e) => selectDesign(e, image)}
                   ></img>
                 </GridListTile>
               ))}
@@ -354,28 +339,25 @@ const styles = makeStyles({
     },
   },
   imageTile: {
+    zIndex: 10,
     "&:hover": {
       cursor: "pointer",
     },
     "&.selected": {
       filter: "brightness(50%)",
+      opacity: 0.7,
+      zIndex: 1,
     },
   },
   checked: {
     fontSize: "30px",
-    display: "none",
+    display: "block",
     color: "white",
-    "&.selected": {
-      display: "block",
-      zIndex: 10,
-      position: "absolute",
-      top: "40%",
-      left: "40%",
-
-      "&:hover": {
-        cursor: "pointer",
-      },
-    },
+    position: "absolute",
+    top: "40%",
+    left: "40%",
+    zIndex: 10,
+    pointerEvents: "none",
   },
 });
 
