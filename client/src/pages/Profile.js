@@ -9,76 +9,21 @@ import {
   Box,
   AppBar,
   Tabs,
-  Tab
+  Tab,
+  Snackbar
  } from '@material-ui/core';
 
  import {
   useLocation
 } from "react-router-dom";
+import MuiAlert from '@material-ui/lab/Alert';
+import S3 from 'react-s3-uploader';
 
 import ContestCard from '../components/ContestCard';
 
-const useStyles = makeStyles({
-  container: {
-    marginTop: "80px"
-  },
-  box: {
-    boxShadow: "0 0 20px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-    borderWidth: "1px",
-    borderColor: "#edf2f7",
-    marginTop: "-23px",
-    marginLeft: "-23px",
-    marginRight: "-23px"
-  },
-  title: {
-    marginTop: "20px",
-    marginBottom: "40px",
-    fontFamily: 'Poppins',
-    fontSize: "26px",
-    fontWeight: 600,
-    textAlign: "center"
-  },
-  text: {
-    fontFamily: 'Poppins'
-  },
-  grid: {
-    marginTop: "20px",
-    marginBottom: "20px"
-  },
-  button: {
-    marginBottom: "100px",
-    backgroundColor: "white",
-    color: "black",
-    fontFamily: 'Poppins',
-    fontWeight: 600,
-    padding: "0.8rem 2rem",
-    borderRadius: "0",
-    border: "1px solid #e2e8f0",
-    textTransform: "none"
-  },
-  imageCropper: {
-    width: "150px",
-    height: "150px",
-    position: "relative",
-    overflow: "hidden",
-    borderRadius: "50%",
-  },
-  profilePic: {
-    display: "inline",
-    margin: "0 auto",
-    height: "100%",
-    width: "auto",
-  },
-  tabBar: {
-    backgroundColor: "white",
-    color: "black",
-    boxShadow: "none",
-  },
-  tabs: {
-    fontWeight: 600,
-    fontSize: "14px"
-  }
-});
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function a11yProps(index) {
   return {
@@ -111,8 +56,14 @@ function Profile(props) {
   const [currentTab, setCurrentTab] = useState(0);
   const [myContests, setMyContests] = useState(null);
   const [enteredContests, setEnteredContests] = useState(null);
+  const [openAlert, setOpenAlert] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("WARNING")
+  const [severity, setSeverity] = useState("error") //allowed: error, warning, success, info
+  
+
   let location = useLocation();
-  const user = location.state ? location.state.user : null;
+  const [user, setUser] = useState(location.state ? location.state.user : null);
+  //const user = location.state ? location.state.user : null;
 
   async function fetchData() {
     const resMyContests = await fetch("/api/users/contests?user_id=" + user.id);
@@ -138,9 +89,34 @@ function Profile(props) {
     if (user && !myContests && !enteredContests) fetchData();
   });
 
-  function handleEditProfileClick() {
+  async function handleUpdateProfileImage(url) {
+    let request = await fetch(`/api/users`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": user.token
+        },
+        body: JSON.stringify({
+            user_id: user.id,
+            url: url
+        }),
+    });
+    let requestJson = await request.json();
+    console.log(requestJson)
+    if (requestJson.error) {
+        handleAlert('Error updating profile image', 'error');
+    } else {
+        handleAlert('Uploaded successfully', 'success');
+        user.profile_image_url = url;
 
+    }
   }
+
+  const handleAlert = (message, severity) => {
+    setOpenAlert(true)
+    setSeverity(severity)
+    setAlertMessage(message)
+}
 
   const classes = useStyles();
   return (
@@ -155,13 +131,46 @@ function Profile(props) {
         <Typography className={classes.title} variant="h1">
           {user ? user.name : ''}
         </Typography>
-        <Button
-          size="large" 
-          className={classes.button}
-          onClick={handleEditProfileClick}
-          >
-          Edit Profile
-        </Button>
+        <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            open={openAlert}
+            autoHideDuration={5000}
+            onClose={() => setOpenAlert(false)}
+        >
+            <Alert
+                severity={severity}
+                onClose={() => setOpenAlert(false)}
+            >
+                {alertMessage}
+            </Alert>
+        </Snackbar>
+        <div>
+          <S3
+              accept="image/*"
+              multiple={false}
+              signingUrl="/s3/sign"
+              signingUrlWithCredentials={true}
+              className={classes.uploadButton}
+              id="s3"
+              scrubFilename={(name) => Date.now() + '-' + name.replace(/[^\w\d_\-.]+/ig, '')}
+              onFinish={e => handleUpdateProfileImage(e["uploadUrl"])} 
+            />
+          <label htmlFor="s3" >
+            <Button
+              component="span"
+              size="large" 
+              className={classes.button}
+            >
+              Update Profile Image
+            </Button>
+          </label>
+          <div style={{ marginTop: '0.5rem', marginBottom: '6rem' }}>
+              <Typography
+                  display="block"
+                  className={classes.instructions}
+                  variant="caption">PNG, JPG</Typography>
+          </div>
+        </div>
       </Grid>
       <AppBar position="static" className={classes.tabBar}>
         <Tabs 
@@ -218,5 +227,75 @@ function Profile(props) {
     </Container>
   );
 }
+
+const useStyles = makeStyles({
+  container: {
+    marginTop: "80px"
+  },
+  box: {
+    boxShadow: "0 0 20px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+    borderWidth: "1px",
+    borderColor: "#edf2f7",
+    marginTop: "-23px",
+    marginLeft: "-23px",
+    marginRight: "-23px"
+  },
+  title: {
+    marginTop: "20px",
+    marginBottom: "40px",
+    fontFamily: 'Poppins',
+    fontSize: "26px",
+    fontWeight: 600,
+    textAlign: "center"
+  },
+  text: {
+    fontFamily: 'Poppins'
+  },
+  grid: {
+    marginTop: "20px",
+    marginBottom: "20px"
+  },
+  button: {
+    // marginBottom: "100px",
+    backgroundColor: "white",
+    color: "black",
+    fontFamily: 'Poppins',
+    fontWeight: 600,
+    padding: "0.8rem 2rem",
+    borderRadius: "0",
+    border: "1px solid #e2e8f0",
+    textTransform: "none"
+  },
+  imageCropper: {
+    width: "150px",
+    height: "150px",
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "50%",
+  },
+  profilePic: {
+    display: "inline",
+    margin: "0 auto",
+    height: "100%",
+    width: "auto",
+  },
+  tabBar: {
+    backgroundColor: "white",
+    color: "black",
+    boxShadow: "none",
+  },
+  tabs: {
+    fontWeight: 600,
+    fontSize: "14px"
+  },
+  uploadButton: {
+    display: 'none',
+  },
+  instructions: {
+    color: 'gray',
+    fontWeight: 'lighter',
+    textAlign: 'center'
+},
+});
 
 export default Profile;
