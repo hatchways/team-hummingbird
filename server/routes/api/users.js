@@ -7,7 +7,8 @@ const config = require("config");
 const jwt = require("jsonwebtoken");
 
 const auth = require("../../middleware/auth");
-const ContestModel = require("../../models/Contest");
+const Contest = require("../../models/Contest");
+const Submission = require("../../models/submission");
 const User = require("../../models/User");
 
 // @route   POST api/users/register
@@ -77,9 +78,42 @@ router.post("/register", function(req, res, next) {
 router.get("/contests", (req, res) => {
   const { user_id } = req.query;
 
-  ContestModel.find({ user_id })
+  Contest.find({ user_id })
     .sort({ deadline_date: -1 })
     .then((contests) => res.json({ contests }))
+    .catch((err) => {
+      res.status(500).json({
+        message: err.message,
+      });
+    });
+});
+
+// @route   GET api/user/submissions/
+// @desc    Get all contests that a user submitted to
+// @access  Private
+router.get("/submissions", auth, (req, res) => {
+  const { user_id } = req.query;
+  let result = {};
+
+  Submission.find({ user_id })
+    .then((submissions) => {
+      let contestIds = [];
+      submissions.forEach(submission => contestIds.push(submission.contest_id));
+      result.submissions = submissions;
+      Contest.find({
+        _id: { $in: contestIds }
+      })
+        .sort({ deadline_date: -1 })
+        .then((contests) => {
+          result.contests = contests;
+          res.json(result);
+        })
+        .catch((err) => {
+          res.status(500).json({
+            message: err.message,
+          });
+        });
+    })
     .catch((err) => {
       res.status(500).json({
         message: err.message,

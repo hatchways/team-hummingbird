@@ -44,7 +44,10 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 14,
     textTransform: "none",
     borderRadius: "0",
-    marginTop: 20
+    marginTop: 20,
+    '&:hover': {
+      backgroundColor: "black",
+    }
   },
   inProgress: {
     backgroundColor: "black",
@@ -56,7 +59,10 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "0",
     marginTop: 20,
     marginLeft: 20,
-    padding: '4px 15px'
+    padding: '4px 15px',
+    '&:hover': {
+      backgroundColor: "black",
+    }
   },
   completed: {
     backgroundColor: "white",
@@ -69,7 +75,10 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid #000000",
     marginTop: 20,
     marginLeft: 20,
-    padding: '4px 15px'
+    padding: '4px 15px',
+    '&:hover': {
+      backgroundColor: "white",
+    }
   },
 }));
 

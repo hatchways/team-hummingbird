@@ -101,7 +101,9 @@ function Login(props) {
         console.log(json);
         if (status < 400) {
           setOpenSuccess(true);
-          setUser(json.user);
+          let resUser = json.user;
+          resUser.token = json.token;
+          setUser(resUser);
           console.log(json.user)
         }
         else setOpenError(true);
