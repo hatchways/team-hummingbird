@@ -33,7 +33,7 @@ export default function SubmitSubmission(props) {
                     uploadedFiles
                 }
             }
-            let request = await fetch(`/contest/:id/submission`, {
+            let request = await fetch(`/api/contest/:id/submission`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
