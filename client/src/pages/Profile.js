@@ -212,26 +212,6 @@ function Profile(props) {
             }
           </Paper>
         </TabPanel>
-        <TabPanel value={currentTab} index={1}>
-          <Paper className={classes.box} square>
-          {
-            myContests ? 
-            myContests.map(contest => {
-              return (
-                <ContestCard 
-                  imageUrl="https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png" //placeholder
-                  title={contest.title}
-                  description={contest.description}
-                  prizeAmount={contest.prize_amount}
-                  deadlineDate={new Date(contest.deadline_date)}
-                />
-              )
-            })
-            :
-            ''
-          }
-        </Paper>
-      </TabPanel>
       <TabPanel value={currentTab} index={1}>
         <Paper className={classes.box} square>
         {
