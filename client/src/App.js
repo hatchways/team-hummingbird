@@ -18,23 +18,23 @@ import "./App.css";
 function App() {
   const existingTokens = JSON.parse(localStorage.getItem("tokens"));
   const [authTokens, setAuthTokens] = useState(existingTokens);
-  
+
   const setTokens = (data) => {
     localStorage.setItem("tokens", JSON.stringify(data));
     setAuthTokens(data);
-  }
+  };
 
   return (
     <MuiThemeProvider theme={theme}>
       <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
         <BrowserRouter>
-          <Route path='/' component={Header} />
-          <Route exact path='/' render={(props) => <Redirect to='/login' />} />
-          <Route path='/register' component={Register} />
-          <Route path='/login' component={Login} />
-          <Route path='/profile' component={Profile} />
-          <Route path='/contest' component={Contest} />
-          <Route path='/submission' component={Submission} />
+          <Route path="/" component={Header} />
+          <Route exact path="/" render={(props) => <Redirect to="/login" />} />
+          <Route path="/register" component={Register} />
+          <Route path="/login" component={Login} />
+          <Route path="/profile" component={Profile} />
+          <Route path="/contest" component={Contest} />
+          <Route path="/submission" component={Submission} />
         </BrowserRouter>
       </AuthContext.Provider>
     </MuiThemeProvider>
