@@ -4,15 +4,16 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
+import { Link } from 'react-router-dom'
 
 function ContestCard(props) {
-  const { 
-    imageUrl, 
-    title, 
-    description, 
-    prizeAmount, 
+  const {
+    imageUrl,
+    title,
+    description,
+    prizeAmount,
     deadlineDate
-   } = props;
+  } = props;
   const date = new Date();
   const classes = useStyles();
 
@@ -34,15 +35,15 @@ function ContestCard(props) {
                 {description}
               </Typography>
               <Button
-                size="small" 
+                size="small"
                 className={classes.money}
-                >
+              >
                 ${prizeAmount}
               </Button>
               <Button
-                size="small" 
+                size="small"
                 className={date > deadlineDate ? classes.completed : classes.inProgress}
-                >
+              >
                 {date > deadlineDate ? 'COMPLETED' : 'IN PROGRESS'}
               </Button>
             </Grid>
@@ -129,5 +130,56 @@ const useStyles = makeStyles((theme) => ({
     }
   },
 }));
+
+function ContestCard(props) {
+  const {
+    imageUrl,
+    title,
+    description,
+    prizeAmount,
+    deadlineDate,
+    contest_id
+  } = props;
+  const date = new Date();
+  const classes = useStyles();
+
+  return (
+    <div className={classes.root}>
+      <Grid container spacing={2}>
+        <Grid item>
+          <ButtonBase className={classes.image}>
+            <img className={classes.img} alt="complex" src={imageUrl} />
+          </ButtonBase>
+        </Grid>
+        <Grid item xs={12} sm container>
+          <Grid item xs container direction="column" spacing={2}>
+            <Grid item xs>
+              <Typography gutterBottom variant="subtitle1" className={classes.contestTitle}>
+                <Link to={`/contest/${contest_id}`}>
+                  {title}
+                </Link>
+              </Typography>
+              <Typography variant="body2" gutterBottom className={classes.contestDescription}>
+                {description}
+              </Typography>
+              <Button
+                size="small"
+                className={classes.money}
+              >
+                ${prizeAmount}
+              </Button>
+              <Button
+                size="small"
+                className={date > deadlineDate ? classes.completed : classes.inProgress}
+              >
+                {date > deadlineDate ? 'COMPLETED' : 'IN PROGRESS'}
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+    </div>
+  );
+}
 
 export default ContestCard;

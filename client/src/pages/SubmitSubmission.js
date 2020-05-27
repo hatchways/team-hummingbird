@@ -11,6 +11,7 @@ import Alert from '@material-ui/lab/Alert'
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
 
 import S3 from 'react-s3-uploader'
+import { useAuth } from '../components/UserContext'
 
 export default function SubmitSubmission(props) {
     const [uploadedFiles, setUploadedFiles] = useState([])
@@ -20,21 +21,21 @@ export default function SubmitSubmission(props) {
     const [alertMessage, setAlertMessage] = useState("WARNING")
     const [severity, setSeverity] = useState("error") //allowed: error, warning, success, info
 
-    //get userID from future state manager
-    const userId = props.userId
-    const contestId = props.contestId
-
+    const contestId = props.match.params.id
+    const { authTokens } = useAuth();
+    const [user] = useState(authTokens ? authTokens.user : null);
     const handleSubmit = async () => {
         if (uploadedFiles.length > 0) {
             const submission = {
-                contestId,
-                userId,
+                contest_id: contestId,
+                user_id: user.id,
                 upload_files: uploadedFiles
             }
             let request = await fetch(`/api/contest/:id/submission`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "x-auth-token": authTokens.token
                 },
                 body: JSON.stringify({
                     submission

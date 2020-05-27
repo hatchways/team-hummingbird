@@ -15,7 +15,7 @@ import {
     useStripe,
     useElements,
 } from '@stripe/react-stripe-js'
-import { useAuth } from "../components/UserContext";
+import { useAuth } from "./UserContext";
 const stripeKey = require('../config/default.json').stripeKey
 
 function CheckoutForm() {
