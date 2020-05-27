@@ -12,8 +12,11 @@ import Profile from "./pages/Profile";
 import Submission from "./pages/SubmitSubmission";
 import Settings from './pages/Settings'
 import ContestSubmissions from './pages/ContestSubmissions'
+<<<<<<< HEAD
 
 import { AuthContext } from "./components/UserContext";
+=======
+>>>>>>> created layout for contest submissions page
 
 import "./App.css";
 

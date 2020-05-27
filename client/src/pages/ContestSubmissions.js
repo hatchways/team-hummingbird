@@ -26,7 +26,7 @@ export default function ContestSubmissions(props) {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         console.log(props)
         console.log(authTokens)
     }, [user])
