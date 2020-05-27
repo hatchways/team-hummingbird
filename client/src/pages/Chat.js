@@ -29,7 +29,7 @@ const Chat = (props) => {
   useEffect(() => {
     socket = socketIoClient(ENDPOINT);
 
-    socket.emit("join", { chatWithUser, currentUser }, () => {});
+    socket.emit("join", { chatWithUser, currentUser, chatRoomId }, () => {});
     socket.on("pass-message-hist", (msgHistory) => {
       console.log(msgHistory);
       setMessageList([...msgHistory]);

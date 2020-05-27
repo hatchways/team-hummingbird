@@ -2,41 +2,39 @@ const moment = require("moment");
 const {
   createPersonalChatRoom,
   getPersonalChatRoom,
-  getAllPersonalChatRooms,
   addMessageToChatRoom,
-  getMessageHistory,
 } = require("./rooms");
+
+let currentRoom = {};
 const connection = (io, socket) => {
-  // console.log("client connected");
-  socket.on("join", ({ chatWithUser, currentUser }, callback) => {
-    console.log(
-      `${chatWithUser.username} chatting with ${currentUser.username}`
-    );
-    const roomId = chatWithUser.id + currentUser.id;
-
-    if (getPersonalChatRoom(roomId) === -1) {
-      createPersonalChatRoom(chatWithUser, currentUser);
-    } else {
-      const messageHistory = getMessageHistory(roomId);
-      console.log(messageHistory);
-      socket.emit("pass-message-hist", messageHistory);
-    }
-
-    //  console.log(getAllPersonalChatRooms());
-    socket.join(roomId);
+  socket.on("join", ({ chatWithUser, currentUser, chatRoomId }, callback) => {
+    getPersonalChatRoom(chatRoomId)
+      .then((room) => {
+        if (room.length === 0) {
+          //create room
+          createPersonalChatRoom(chatWithUser, currentUser);
+        } else {
+          currentRoom = room[0];
+          const messageHistory = room[0].roomMessages;
+          socket.emit("pass-message-hist", messageHistory);
+        }
+        socket.join(chatRoomId);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
   socket.on(
     "send-message",
     ({ chatRoomId, chatMessage, currentUser }, callback) => {
       //save chatmessage to message list
-
       addMessageToChatRoom(
         {
           text: chatMessage,
           sender: currentUser.username,
           time: moment().format("h:mm:ss a"),
         },
-        chatRoomId
+        currentRoom
       );
       io.to(chatRoomId).emit("receive-message", {
         text: chatMessage,
@@ -44,7 +42,6 @@ const connection = (io, socket) => {
         sender: currentUser.username,
         time: moment().format("h:mm:ss a"),
       });
-      //console.log(chatMessage);
 
       callback();
     }

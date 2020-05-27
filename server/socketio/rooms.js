@@ -1,3 +1,4 @@
+const ChatRooms = require("../models/chatrooms");
 const personalChatRooms = [];
 
 const createPersonalChatRoom = (user1, user2) => {
@@ -7,28 +8,43 @@ const createPersonalChatRoom = (user1, user2) => {
   const roomUser1 = user1;
   const roomUser2 = user2;
 
-  const personalChatRoomInstance = {
+  const newChatRoom = new ChatRooms({
     roomId,
     roomId2,
     roomMessages,
     roomUser1,
     roomUser2,
-  };
-  personalChatRooms.push(personalChatRoomInstance);
-};
-
-const getPersonalChatRoom = (roomId) => {
-  return personalChatRooms.findIndex(
-    (room) => room.roomId === roomId || room.roomId2 === roomId
-  );
-};
-
-const addMessageToChatRoom = (msg, roomId) => {
-  personalChatRooms.map((room) => {
-    if (room.roomId === roomId || room.roomId2 === roomId) {
-      room.roomMessages.push(msg);
-    }
   });
+  newChatRoom
+    .save()
+    .then((result) => {
+      console.log("Chat Room Created");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const getPersonalChatRoom = async (roomId) => {
+  const room = await ChatRooms.find({
+    $or: [{ roomId: roomId }, { roomId2: roomId }],
+  }).exec();
+
+  return room;
+};
+
+const addMessageToChatRoom = (msg, currentRoom) => {
+  ChatRooms.findByIdAndUpdate(
+    currentRoom.id,
+    {
+      roomMessages: [...currentRoom.roomMessages, msg],
+    },
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
 };
 
 const getMessageHistory = (roomId) => {
@@ -47,29 +63,3 @@ module.exports = {
   addMessageToChatRoom,
   getMessageHistory,
 };
-// const addUser = ({ chatWithUser, currentUser }) => {
-
-//   const existingUser = users.find(
-//     (user) => user.room === room && user.name === name
-//   );
-
-//   //if (!name || !room) return { error: "Username and room are required." };
-//   if (!existingUser) {
-//     const user = { id, name, room };
-//     users.push(user);
-//   }
-
-//   return { user };
-// };
-
-// const removeUser = (id) => {
-//   const index = users.findIndex((user) => user.id === id);
-
-//   if (index !== -1) return users.splice(index, 1)[0];
-// };
-
-// const getUser = (id) => users.find((user) => user.id === id);
-
-// const getUsersInRoom = (room) => users.filter((user) => user.room === room);
-
-// module.exports = { addUser, removeUser, getUser, getUsersInRoom };

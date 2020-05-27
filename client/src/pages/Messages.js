@@ -30,11 +30,11 @@ const Messages = () => {
             <Typography variant='h4' className={classes.header}>
               Inbox Messages
             </Typography>
-            <List>
+            <List className={classes.list}>
               {userList.map((user) => (
                 <ListItem
                   onClick={() => setChatWithUser(user)}
-                  className={classes.list}
+                  className={classes.listItem}
                   key={user.id}
                 >
                   User {user.username}
@@ -69,6 +69,10 @@ const useStyles = makeStyles({
     height: "100%",
   },
   list: {
+    padding: "0px",
+  },
+  listItem: {
+    borderBottom: "1px solid #f1f1f1",
     "&:hover": {
       background: "#f1f1f1",
       cursor: "pointer",
