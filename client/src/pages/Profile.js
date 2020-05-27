@@ -56,6 +56,7 @@ function Profile(props) {
   const [currentTab, setCurrentTab] = useState(0);
   const [myContests, setMyContests] = useState(null);
   const [enteredContests, setEnteredContests] = useState(null);
+  const [mySubmissions, setMySubmissions] = useState(null);
   const [openAlert, setOpenAlert] = useState(false)
   const [alertMessage, setAlertMessage] = useState("WARNING")
   const [severity, setSeverity] = useState("error") //allowed: error, warning, success, info
@@ -81,7 +82,10 @@ function Profile(props) {
     });
     resEnteredContests
       .json()
-      .then(res => setEnteredContests(res.contests))
+      .then(res => {
+        setEnteredContests(res.contests);
+        setMySubmissions(res.submissions);
+      })
       .catch(err => console.error(err));
   }
   
@@ -207,11 +211,11 @@ function Profile(props) {
       <TabPanel value={currentTab} index={1}>
         <Paper className={classes.box} square>
         {
-            enteredContests ? 
+            enteredContests && mySubmissions ? 
             enteredContests.map(contest => {
               return (
                 <ContestCard 
-                  imageUrl="https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png" //placeholder
+                  imageUrl={mySubmissions.filter(s => s.contest_id === contest._id)[0].upload_files[0]}
                   title={contest.title}
                   description={contest.description}
                   prizeAmount={contest.prize_amount}
