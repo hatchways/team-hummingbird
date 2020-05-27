@@ -109,19 +109,35 @@ function TabPanel(props) {
 function Profile(props) {
   const [currentTab, setCurrentTab] = useState(0);
   const [myContests, setMyContests] = useState(null);
+  const [enteredContests, setEnteredContests] = useState(null);
   let location = useLocation();
   const user = location.state ? location.state.user : null;
 
   async function fetchData() {
-    const res = await fetch("/api/users/contests?user_id=" + user.id);
-    res
+    const resMyContests = await fetch("/api/users/contests?user_id=" + user.id);
+    resMyContests
       .json()
       .then((res) => setMyContests(res.contests))
+      .catch((err) => console.error(err));
+
+    const resEnteredContests = await fetch(
+      "/api/users/submissions?user_id=" + user.id,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": user.token,
+        },
+      }
+    );
+    resEnteredContests
+      .json()
+      .then((res) => setEnteredContests(res.contests))
       .catch((err) => console.error(err));
   }
 
   useEffect(() => {
-    if (user && !myContests) fetchData();
+    if (user && !myContests && !enteredContests) fetchData();
   });
 
   function handleEditProfileClick() {}
@@ -133,7 +149,11 @@ function Profile(props) {
         <div className={classes.imageCropper}>
           <img
             className={classes.profilePic}
-            src={user ? user.profile_image_url : ""}
+            src={
+              user && user.profile_image_url
+                ? user.profile_image_url
+                : "https://i.imgur.com/PoCp1VS.png"
+            }
           ></img>
         </div>
         <Typography className={classes.title} variant='h1'>
@@ -171,7 +191,7 @@ function Profile(props) {
             ? myContests.map((contest) => {
                 return (
                   <ContestCard
-                    imageUrl='https://i.imgur.com/Bl6triT.png' //placeholder
+                    imageUrl='https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png' //placeholder
                     title={contest.title}
                     description={contest.description}
                     prizeAmount={contest.prize_amount}
@@ -183,7 +203,21 @@ function Profile(props) {
         </Paper>
       </TabPanel>
       <TabPanel value={currentTab} index={1}>
-        <Paper className={classes.box} square></Paper>
+        <Paper className={classes.box} square>
+          {enteredContests
+            ? enteredContests.map((contest) => {
+                return (
+                  <ContestCard
+                    imageUrl='https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png' //placeholder
+                    title={contest.title}
+                    description={contest.description}
+                    prizeAmount={contest.prize_amount}
+                    deadlineDate={new Date(contest.deadline_date)}
+                  />
+                );
+              })
+            : ""}
+        </Paper>
       </TabPanel>
     </Container>
   );

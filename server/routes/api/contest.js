@@ -93,11 +93,11 @@ contestRouter.put("/:id", auth, (req, res) => {
   }
 });
 
-// Route: PUT api/contest/:id/submission
+// Route: POST api/contest/:id/submission
 // Desc: Add a submission
 // access: private
 
-contestRouter.put("/:id/submission", auth, (req, res) => {
+contestRouter.post("/:id/submission", auth, (req, res) => {
   //add to /submission
   const { contest_id, user_id, upload_files } = req.body;
 
