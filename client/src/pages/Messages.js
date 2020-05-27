@@ -23,10 +23,13 @@ const Messages = () => {
   const [chatWithUser, setChatWithUser] = useState(userList[0]);
 
   return (
-    <Box>
+    <Box className={classes.messagesComp}>
       <Grid direction='row' container spacing={0}>
         <Grid item sm={4}>
-          <Paper elevation={2}>
+          <Paper elevation={2} className={classes.userPanel}>
+            <Typography variant='h4' className={classes.header}>
+              Inbox Messages
+            </Typography>
             <List>
               {userList.map((user) => (
                 <ListItem
@@ -51,13 +54,27 @@ const Messages = () => {
 export default Messages;
 
 const useStyles = makeStyles({
+  messagesComp: {
+    height: window.innerHeight - 80,
+  },
+  header: {
+    height: "4rem",
+    borderBottom: "1px solid #f1f1f1",
+    paddingLeft: "10px",
+    lineHeight: "60px",
+    fontSize: "20px",
+    fontWeight: "bold",
+  },
+  userPanel: {
+    height: "100%",
+  },
   list: {
     "&:hover": {
-      background: "grey",
+      background: "#f1f1f1",
       cursor: "pointer",
     },
     "&:active": {
-      background: "grey",
+      background: "#f1f1f1",
     },
   },
   button: {
