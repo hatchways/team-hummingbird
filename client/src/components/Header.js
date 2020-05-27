@@ -55,24 +55,17 @@ function Header(props) {
               </Typography>
             </a>
           </Grid>
-          {
-            !authTokens ?
-            <React.Fragment>
-              <Grid item xs={3}></Grid>
-              <Grid item xs={3}></Grid>
-              <Grid item xs={3}>
-                <Button 
-                  variant='outlined' 
-                  className={classes.button} 
-                  href={path === '/login' ? '/register' : '/login'}
-                >
-                  {path === '/login' ? 'SIGN UP' : 'SIGN IN'}
-                </Button>
-              </Grid>
-            </React.Fragment>
-            :
-            ''
-          }
+          <Grid item xs={3}></Grid>
+            <Grid item xs={3}></Grid>
+            <Grid item xs={3}>
+              <Button 
+                variant='outlined' 
+                className={classes.button} 
+                href={authTokens ? '/contest' : path === '/login' ? '/register' : '/login'}
+              >
+                {authTokens ? 'CREATE CONTEST' : path === '/login' ? 'SIGN UP' : 'SIGN IN'}
+              </Button>
+            </Grid>
         </Grid>
       </Toolbar>
     </AppBar>
