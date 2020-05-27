@@ -8,6 +8,8 @@ import {
   Grid,
 } from "@material-ui/core";
 
+import { useAuth } from "./UserContext";
+
 const useStyles = makeStyles({
   bar: {
     backgroundColor: "black",
@@ -39,6 +41,8 @@ const useStyles = makeStyles({
 });
 
 function Header(props) {
+  const { authTokens } = useAuth();
+  const path = window.location.pathname;
   const classes = useStyles();
   return (
     <AppBar position='static' className={classes.bar}>
@@ -51,13 +55,24 @@ function Header(props) {
               </Typography>
             </a>
           </Grid>
-          <Grid item xs={3}></Grid>
-          <Grid item xs={3}></Grid>
-          <Grid item xs={3}>
-            <Button variant='outlined' className={classes.button} href='/login'>
-              SIGN IN
-            </Button>
-          </Grid>
+          {
+            !authTokens ?
+            <React.Fragment>
+              <Grid item xs={3}></Grid>
+              <Grid item xs={3}></Grid>
+              <Grid item xs={3}>
+                <Button 
+                  variant='outlined' 
+                  className={classes.button} 
+                  href={path === '/login' ? '/register' : '/login'}
+                >
+                  {path === '/login' ? 'SIGN UP' : 'SIGN IN'}
+                </Button>
+              </Grid>
+            </React.Fragment>
+            :
+            ''
+          }
         </Grid>
       </Toolbar>
     </AppBar>

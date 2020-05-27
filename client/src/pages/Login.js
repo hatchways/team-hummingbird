@@ -67,9 +67,6 @@ function Login(props) {
           });
           setLoggedIn(true);
           setOpenSuccess(true);
-          let resUser = json.user;
-          resUser.token = json.token;
-          setUser(resUser);
           console.log(json.user)
         }
         else setOpenError(true);
@@ -80,7 +77,7 @@ function Login(props) {
       });
   };
   const classes = useStyles();
-  if (isLoggedIn && user) {
+  if (isLoggedIn) {
     return (
       <Redirect to={referer}
       />
