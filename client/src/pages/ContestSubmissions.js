@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import {
     Typography,
@@ -14,12 +14,22 @@ import {
     Tabs,
     useMediaQuery
 } from '@material-ui/core'
+import { useAuth } from "../components/UserContext";
+
 
 export default function ContestSubmissions(props) {
+    const { authTokens } = useAuth();
+    const [user] = useState(authTokens ? authTokens.user : null);
+
     const isMobile = useMediaQuery(theme => theme.breakpoints.down('xs'));
-    const [submissions, setSubmission] = useState(imageGridList)
+    const [submissions] = useState(imageGridList)
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
+
+    React.useEffect(()=>{
+        console.log(props)
+        console.log(authTokens)
+    }, [user])
     return (
         <Container>
             <Box size="large" className={classes.breadcrumbWrapper}>
@@ -41,10 +51,10 @@ export default function ContestSubmissions(props) {
                     >
                         <Grid item>
                             <Avatar alt="user profile image"
-                                src={props?.user?.profile_image_url || "https://hatchways-hummingbird.s3.amazonaws.com/1590245137718image-2.png"} />
+                                src={user?.profile_image_url || "https://hatchways-hummingbird.s3.amazonaws.com/1590245137718image-2.png"} />
                         </Grid>
                         <Grid item>
-                            <Typography variant="body1">By {props?.user?.name || "Placeholder Paul"}</Typography>
+                            <Typography variant="body1">By {user?.name || "Placeholder Paul"}</Typography>
                         </Grid>
                     </Grid>
                 </Grid>

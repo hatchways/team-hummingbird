@@ -15,7 +15,7 @@ import {
     useStripe,
     useElements,
 } from '@stripe/react-stripe-js'
-
+import { useAuth } from "../components/UserContext";
 const stripeKey = require('../config/default.json').stripeKey
 
 function CheckoutForm() {
@@ -26,6 +26,9 @@ function CheckoutForm() {
     const [openAlert, setOpenAlert] = useState(false)
     const [severity, setSeverity] = useState("success") //success, error, info
     const [alertMessage, setAlertMessage] = useState("")
+
+    const { authTokens, setAuthTokens } = useAuth();
+    const [user] = useState(authTokens ? authTokens.user : null);
 
     const handleSubmit = async (event) => {
         event.preventDefault()
@@ -39,6 +42,14 @@ function CheckoutForm() {
         }
         if (paymentMethod) {
             console.log(paymentMethod)
+            const _user = user
+            _user.hasPaymentInfoSaved = true
+            _user.paymentInfo = {cardType: paymentMethod.card.brand, last4: paymentMethod.card.last4}
+            _user.paymentId = paymentMethod.id
+            setAuthTokens({
+                "token": authTokens.token,
+                "user": _user
+              })
             handleAlert(`Your ${paymentMethod?.card?.brand} card ending in ${paymentMethod?.card?.last4} was added successfully`, "success")
         }
     }

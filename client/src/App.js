@@ -28,7 +28,6 @@ function App() {
 
   return (
     <MuiThemeProvider theme={theme}>
-<<<<<<< HEAD
       <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
         <BrowserRouter>
           <Route path='/' component={Header} />
@@ -39,21 +38,9 @@ function App() {
           <Route path='/contest' component={Contest} />
           <Route path='/submission' component={Submission} />
           <Route path='/settings' component={Settings} />
+          <Route path='/contestsubmissions' component={ContestSubmissions} />
         </BrowserRouter>
       </AuthContext.Provider>
-=======
-      <BrowserRouter>
-        <Route path='/' component={Header} />
-        <Route exact path='/' render={(props) => <Redirect to='/register' />} />
-        <Route path='/register' component={Register} />
-        <Route path='/login' component={Login} />
-        <Route path='/profile' component={Profile} />
-        <Route path='/contest' component={Contest} />
-        <Route path='/submission' component={Submission} />
-        <Route path='/settings' component={Settings} />
-        <Route path='/contestsubmissions' component={ContestSubmissions} />
-      </BrowserRouter>
->>>>>>> dd4859a... created layout for contest submissions page
     </MuiThemeProvider>
   );
 }

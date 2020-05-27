@@ -6,9 +6,10 @@ import {
     Box,
     makeStyles,
     Container,
-    useMediaQuery
+    useMediaQuery,
+    Typography
 } from '@material-ui/core'
-
+import { useAuth } from "../components/UserContext";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -28,7 +29,8 @@ function TabPanel(props) {
 
 export default function Settings(props) {
     const isMobile = useMediaQuery(theme => theme.breakpoints.down('xs'));
-    const { user } = props
+    const { authTokens, setAuthTokens } = useAuth();
+    const [user] = useState(authTokens ? authTokens.user : null);
     const classes = useStyles()
     const [value, setValue] = useState(2) //defaults to payment details for
     return (
@@ -46,7 +48,11 @@ export default function Settings(props) {
                 <Tab label="Notifications" />
                 <Tab label="Password" />
             </Tabs>
-            <TabPanel className={classes.tabPanel} value={value} index={0}></TabPanel>
+            <TabPanel className={classes.tabPanel} value={value} index={0}>
+                <Typography variant="body1">Name: {user?.name}</Typography>
+                <Typography variant="body1">Email: {user?.email}</Typography>
+                <Typography variant="body1">Payment: {user.hasPaymentInfoSaved ? `Current card saved: ${user?.paymentInfo?.cardType} ending in ${user?.paymentInfo?.last4}` : 'No card has been saved yet.'}</Typography>
+            </TabPanel>
             <TabPanel className={classes.tabPanel} value={value} index={1}></TabPanel>
             <TabPanel className={classes.tabPanel} value={value} index={2}>
                 <AddCard />
