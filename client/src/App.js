@@ -10,7 +10,7 @@ import Login from "./pages/Login";
 import Contest from "./pages/Contest";
 import Profile from "./pages/Profile";
 import Submission from "./pages/SubmitSubmission";
-
+import Messages from "./pages/Messages";
 import "./App.css";
 
 function App() {
@@ -24,6 +24,7 @@ function App() {
         <Route path='/profile' component={Profile} />
         <Route path='/contest' component={Contest} />
         <Route path='/submission' component={Submission} />
+        <Route path='/messages' component={Messages} />
       </BrowserRouter>
     </MuiThemeProvider>
   );
