@@ -77,7 +77,6 @@ router.post("/register", function(req, res, next) {
 // @access  Private
 router.put("/", auth, (req, res) => {
   const { user_id, url } = req.body;
-  console.log(req.user)
   if (user_id === req.user.id) {
     User.findByIdAndUpdate(
       req.user.id,
@@ -86,7 +85,7 @@ router.put("/", auth, (req, res) => {
       },
       (err, result) => {
         if (err) {
-          res.status(400).json({
+          res.status(500).json({
             message: err.message,
           });
         }
