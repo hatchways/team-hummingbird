@@ -2,23 +2,46 @@ const express = require("express");
 const contestRouter = express.Router();
 
 const auth = require("../../middleware/auth");
-const ContestModel = require("../../models/Contest");
-const SubmissionModel = require("../../models/submission");
+const Contest = require("../../models/Contest");
+const Submission = require("../../models/submission");
 // Route: GET api/contest/:id
 // Desc: get contest with the id
 // access: private
 
 contestRouter.get("/:id", auth, (req, res) => {
-  ContestModel.findById(req.params.id)
+  let submissionQuery, result = {};
+  Contest.findById(req.params.id)
     .then((contest) => {
       if (contest) {
-        res.json({ contest });
+        result.contest = contest;
+        
+        if (contest.user_id === req.user.id) {
+          submissionQuery = {
+            contest_id: contest._id
+          }
+        }
+        else {
+          submissionQuery = {
+            contest_id: contest._id,
+            user_id: req.user.id
+          }
+        }
+        Submission.find({ contest_id: contest._id })
+          .then(submissions => {
+            result.submissions = submissions;
+            res.status(200).json(result);
+          })
+          .catch((err) => {
+            res.status(500).json({
+              message: err.message,
+            });
+          });
       } else {
         res.json({ message: "No Contest Found" });
       }
     })
     .catch((err) => {
-      res.status(400).json({
+      res.status(500).json({
         message: err.message,
       });
     });
@@ -36,7 +59,7 @@ contestRouter.post("/", auth, (req, res) => {
     });
   } else {
     const user_id = req.user.id;
-    const newContest = new ContestModel({
+    const newContest = new Contest({
       title,
       description,
       prize_amount,
@@ -67,7 +90,7 @@ contestRouter.put("/:id", auth, (req, res) => {
   const { title, description, prize_amount, deadline_date, user_id } = req.body;
 
   if (user_id === req.user.id) {
-    ContestModel.findByIdAndUpdate(
+    Contest.findByIdAndUpdate(
       req.params.id,
       {
         title,
@@ -101,7 +124,7 @@ contestRouter.post("/:id/submission", auth, (req, res) => {
   //add to /submission
   const { contest_id, user_id, upload_files } = req.body;
 
-  const newSubmission = new SubmissionModel({
+  const newSubmission = new Submission({
     contest_id,
     user_id,
     upload_files,
@@ -123,7 +146,7 @@ contestRouter.post("/:id/submission", auth, (req, res) => {
 contestRouter.get("/:id/submissions", auth, (req, res) => {
   const { contest_id } = req.body;
 
-  SubmissionModel.find({ contest_id: contest_id }, (err, submissionsFound) => {
+  Submission.find({ contest_id: contest_id }, (err, submissionsFound) => {
     if (err) {
       console.log(err);
     } else {
