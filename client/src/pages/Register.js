@@ -13,56 +13,11 @@ import {
 import MuiAlert from "@material-ui/lab/Alert";
 import { Redirect } from "react-router-dom";
 
+import { useAuth } from "../components/UserContext";
+
 function Alert(props) {
   return <MuiAlert elevation={6} variant='filled' {...props} />;
 }
-
-const useStyles = makeStyles({
-  container: {
-    marginTop: "80px",
-  },
-  box: {
-    boxShadow:
-      "0 0 20px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-    borderWidth: "1px",
-    borderColor: "#edf2f7",
-  },
-  title: {
-    marginTop: "40px",
-    marginBottom: "60px",
-    fontFamily: "Poppins",
-    fontWeight: 600,
-    textAlign: "center",
-  },
-  text: {
-    fontFamily: "Poppins",
-  },
-  grid: {
-    marginTop: "20px",
-    marginBottom: "20px",
-  },
-  button: {
-    marginTop: "60px",
-    marginBottom: "60px",
-    backgroundColor: "black",
-    color: "white",
-    fontFamily: "Poppins",
-    fontWeight: 600,
-    paddingTop: "1rem",
-    paddingBottom: "1rem",
-    paddingLeft: "4rem",
-    paddingRight: "4rem",
-    borderRadius: "0",
-  },
-  textField: {
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderRadius: 0,
-        borderColor: "#e2e8f0",
-      },
-    },
-  },
-});
 
 function Register(props) {
   const [name, setName] = useState("");
@@ -217,6 +172,53 @@ function Register(props) {
       </Container>
     );
   }
-}
+};
+
+const useStyles = makeStyles({
+  container: {
+    marginTop: "80px",
+  },
+  box: {
+    boxShadow:
+      "0 0 20px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+    borderWidth: "1px",
+    borderColor: "#edf2f7",
+  },
+  title: {
+    marginTop: "40px",
+    marginBottom: "60px",
+    fontFamily: "Poppins",
+    fontWeight: 600,
+    textAlign: "center",
+  },
+  text: {
+    fontFamily: "Poppins",
+  },
+  grid: {
+    marginTop: "20px",
+    marginBottom: "20px",
+  },
+  button: {
+    marginTop: "60px",
+    marginBottom: "60px",
+    backgroundColor: "black",
+    color: "white",
+    fontFamily: "Poppins",
+    fontWeight: 600,
+    paddingTop: "1rem",
+    paddingBottom: "1rem",
+    paddingLeft: "4rem",
+    paddingRight: "4rem",
+    borderRadius: "0",
+  },
+  textField: {
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderRadius: 0,
+        borderColor: "#e2e8f0",
+      },
+    },
+  },
+});
 
 export default Register;

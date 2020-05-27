@@ -72,6 +72,35 @@ router.post("/register", function(req, res, next) {
   }
 });
 
+// @route   PUT api/user/
+// @desc    Update a user profile
+// @access  Private
+router.put("/", auth, (req, res) => {
+  const { user_id, url } = req.body;
+  if (user_id === req.user.id) {
+    User.findByIdAndUpdate(
+      req.user.id,
+      {
+        profile_image_url: url
+      },
+      (err, result) => {
+        if (err) {
+          res.status(500).json({
+            message: err.message,
+          });
+        }
+        res.json({
+          message: "Profile updated successfully",
+        });
+      }
+    );
+  } else {
+    res.status(401).json({
+      message: "Unauthorized to update this profile",
+    });
+  }
+});
+
 // @route   GET api/user/contests/
 // @desc    Get all contests owned by a user
 // @access  Public
