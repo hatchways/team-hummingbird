@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { MuiThemeProvider } from "@material-ui/core";
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
 
@@ -11,20 +11,32 @@ import Contest from "./pages/Contest";
 import Profile from "./pages/Profile";
 import Submission from "./pages/SubmitSubmission";
 
+import { AuthContext } from "./components/UserContext";
+
 import "./App.css";
 
 function App() {
+  const existingTokens = JSON.parse(localStorage.getItem("tokens"));
+  const [authTokens, setAuthTokens] = useState(existingTokens);
+  
+  const setTokens = (data) => {
+    localStorage.setItem("tokens", JSON.stringify(data));
+    setAuthTokens(data);
+  }
+
   return (
     <MuiThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Route path='/' component={Header} />
-        <Route exact path='/' render={(props) => <Redirect to='/register' />} />
-        <Route path='/register' component={Register} />
-        <Route path='/login' component={Login} />
-        <Route path='/profile' component={Profile} />
-        <Route path='/contest' component={Contest} />
-        <Route path='/submission' component={Submission} />
-      </BrowserRouter>
+      <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
+        <BrowserRouter>
+          <Route path='/' component={Header} />
+          <Route exact path='/' render={(props) => <Redirect to='/login' />} />
+          <Route path='/register' component={Register} />
+          <Route path='/login' component={Login} />
+          <Route path='/profile' component={Profile} />
+          <Route path='/contest' component={Contest} />
+          <Route path='/submission' component={Submission} />
+        </BrowserRouter>
+      </AuthContext.Provider>
     </MuiThemeProvider>
   );
 }
