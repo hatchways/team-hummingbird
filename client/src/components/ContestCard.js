@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
+import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -83,13 +84,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ContestCard(props) {
-  const { 
-    imageUrl, 
-    title, 
-    description, 
-    prizeAmount, 
-    deadlineDate
-   } = props;
+  const {
+    imageUrl,
+    title,
+    description,
+    prizeAmount,
+    deadlineDate,
+    contest_id
+  } = props;
   const date = new Date();
   const classes = useStyles();
 
@@ -105,21 +107,23 @@ function ContestCard(props) {
           <Grid item xs container direction="column" spacing={2}>
             <Grid item xs>
               <Typography gutterBottom variant="subtitle1" className={classes.contestTitle}>
-                {title}
+                <Link to={`/contest/${contest_id}`}>
+                  {title}
+                </Link>
               </Typography>
               <Typography variant="body2" gutterBottom className={classes.contestDescription}>
                 {description}
               </Typography>
               <Button
-                size="small" 
+                size="small"
                 className={classes.money}
-                >
+              >
                 ${prizeAmount}
               </Button>
               <Button
-                size="small" 
+                size="small"
                 className={date > deadlineDate ? classes.completed : classes.inProgress}
-                >
+              >
                 {date > deadlineDate ? 'COMPLETED' : 'IN PROGRESS'}
               </Button>
             </Grid>

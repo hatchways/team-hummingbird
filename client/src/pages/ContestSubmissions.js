@@ -12,36 +12,70 @@ import {
     Button,
     Tab,
     Tabs,
-    useMediaQuery
+    useMediaQuery,
+    Paper
 } from '@material-ui/core'
 import { useAuth } from "../components/UserContext";
-
+import { Link } from 'react-router-dom'
 
 export default function ContestSubmissions(props) {
     const { authTokens } = useAuth();
     const [user] = useState(authTokens ? authTokens.user : null);
 
     const isMobile = useMediaQuery(theme => theme.breakpoints.down('xs'));
-    const [submissions] = useState(imageGridList)
+    const [submissions, setSubmissions] = useState(imageGridList)
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
+    const contestId = props.match.params.id
+    const [contestInfo, setContestInfo] = useState({
+        creation_date: "",
+        deadline_date: "",
+        description: "",
+        prize_amount: 0,
+        title: "",
+        user_id: "",
+        _id: contestId
+    })
+    useEffect(() => {
+        //get submissions matching contests under my id
+        //separate views for contest creators and submitters
+        const getInfo = async () => {
+            const contestInfo = await fetch(`/api/contest/${contestId}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-auth-token": authTokens.token
+                },
+            })
+            let jsonContestInfo = await contestInfo.json()
+            setContestInfo(jsonContestInfo.contest)
 
-    React.useEffect(()=>{
+            const submissionInfo = await fetch(`/api/contest/${contestId}/submissions`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-auth-token": authTokens.token
+                },
+            })
+            let submissionInfoJson = await submissionInfo.json()
+            setSubmissions(submissionInfoJson)
+        }
+        getInfo()
         console.log(props)
-        console.log(authTokens)
+        //console.log(authTokens)
     }, [user])
     return (
         <Container>
             <Box size="large" className={classes.breadcrumbWrapper}>
-                <Typography variant="caption" className={classes.breadcrumb}>Back to contents list</Typography>
+                <Link to="/profile">
+                    <Typography variant="caption" className={classes.breadcrumb}>Back to profile</Typography>
+                </Link>
             </Box>
 
             <Grid
                 container>
                 <Grid container direction="column" item sm={8} justifyContent="center">
                     <div className={classes.titleWrapper}>
-                        <Typography variant="h4">Contest Title </Typography>
-                        <span className={classes.price}>$150</span>
+                        <Typography variant="h4">{contestInfo.title}</Typography>
+                        <span className={classes.price}>${contestInfo.prize_amount}</span>
                     </div>
                     <Grid
                         item
@@ -59,11 +93,12 @@ export default function ContestSubmissions(props) {
                     </Grid>
                 </Grid>
                 <Grid item container xs={12} sm={4} justify="center">
-                    <Button
-                        size="large"
-                        className={classes.submitButton}
-                        variant="outlined"
-                    >Submit A Design</Button>
+                    <Link style={{ textDecoration: 'none' }} to={`/submit/${contestId}`}>
+                        <Button
+                            size="large"
+                            className={classes.submitButton}
+                            variant="outlined"
+                        >Submit A Design</Button></Link>
                 </Grid>
             </Grid>
             <Tabs
@@ -80,15 +115,16 @@ export default function ContestSubmissions(props) {
                     cellHeight={isMobile ? 300 : 180}
                     className={classes.gridList}
                     cols={isMobile ? 1 : 4}
-                    spacing={10}
+                    spacing={2}
                 >
                     {submissions.map((submission, index) => (
                         <GridListTile key={index} cols={1}>
                             <div
                                 style={{
+                                    margin: '5px',
                                     width: '100%',
                                     height: '100%',
-                                    backgroundImage: `url(${submission.imageURL})`,
+                                    backgroundImage: `url(${submission.upload_files[0]})`,
                                     backgroundSize: 'cover',
                                     backgroundRepeat: 'no-repeat',
                                     display: 'flex',
@@ -100,13 +136,21 @@ export default function ContestSubmissions(props) {
                                     alignSelf: 'flex-end',
                                     fontWeight: 'bold',
                                     textShadow: '0px 0px 3px black'
-                                }}>By @<span style={{ textDecoration: 'underline' }}>{submission?.user_name || 'artist'}</span></Typography>
+                                }}>By @<span style={{ textDecoration: 'underline' }}>{submission?.userId || 'artist'}</span></Typography>
                             </div>
                         </GridListTile>
                     ))}
                 </GridList>
             </TabPanel>
-            <TabPanel className={classes.tabPanel} value={activeTab} index={1}><p>briefs</p></TabPanel>
+            <TabPanel className={classes.tabPanel} value={activeTab} index={1}>
+
+                <Paper style={{ minHeight: '300px' }}>
+                    <Typography variant="caption">
+                        {contestInfo.description}
+                    </Typography>
+                </Paper>
+
+            </TabPanel>
 
 
         </Container>)
@@ -130,8 +174,8 @@ function TabPanel(props) {
 
 const useStyles = makeStyles(theme => ({
     breadcrumbWrapper: {
-        marginTop: '1rem',
-        marginBottom: '1rem'
+        marginTop: '2rem',
+        marginBottom: '2rem'
     },
     breadcrumb: {
         color: 'gray',
@@ -162,17 +206,26 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 //placeholders
-const imageGridList = [
-    { id: 1, imageURL: "https://i.imgur.com/HFJL0eq.png" },
-    { id: 2, imageURL: "https://i.imgur.com/Nf8SsCu.png" },
-    { id: 3, imageURL: "https://i.imgur.com/GiwnXsg.png" },
-    { id: 4, imageURL: "https://i.imgur.com/ihBkO9i.png" },
-    { id: 5, imageURL: "https://i.imgur.com/mFs0fVv.png" },
-    { id: 6, imageURL: "https://i.imgur.com/YJYmGtD.png" },
-    { id: 7, imageURL: "https://i.imgur.com/AtGXbpx.png" },
-    { id: 8, imageURL: "https://i.imgur.com/hxhWXk9.png" },
-    { id: 9, imageURL: "https://i.imgur.com/02iEupb.png" },
-    { id: 10, imageURL: "https://i.imgur.com/u6v65NG.png" },
-    { id: 11, imageURL: "https://i.imgur.com/C4atyQX.png" },
-    { id: 12, imageURL: "https://i.imgur.com/Gh4Nrxo.png" },
-];
+// const imageGridList = [
+//     { id: 1, imageURL: "https://i.imgur.com/HFJL0eq.png" },
+//     { id: 2, imageURL: "https://i.imgur.com/Nf8SsCu.png" },
+//     { id: 3, imageURL: "https://i.imgur.com/GiwnXsg.png" },
+//     { id: 4, imageURL: "https://i.imgur.com/ihBkO9i.png" },
+//     { id: 5, imageURL: "https://i.imgur.com/mFs0fVv.png" },
+//     { id: 6, imageURL: "https://i.imgur.com/YJYmGtD.png" },
+//     { id: 7, imageURL: "https://i.imgur.com/AtGXbpx.png" },
+//     { id: 8, imageURL: "https://i.imgur.com/hxhWXk9.png" },
+//     { id: 9, imageURL: "https://i.imgur.com/02iEupb.png" },
+//     { id: 10, imageURL: "https://i.imgur.com/u6v65NG.png" },
+//     { id: 11, imageURL: "https://i.imgur.com/C4atyQX.png" },
+//     { id: 12, imageURL: "https://i.imgur.com/Gh4Nrxo.png" },
+// ];
+
+//placeholder
+const imageGridList = [{
+    active: true,
+    contest_id: "",
+    creation_date: "",
+    upload_files: ["https://i.imgur.com/HFJL0eq.png"],
+    user_id: ""
+}]

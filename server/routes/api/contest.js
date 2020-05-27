@@ -29,13 +29,14 @@ contestRouter.get("/:id", auth, (req, res) => {
 // access: private
 
 contestRouter.post("/", auth, (req, res) => {
+  console.log(req.body)
   const { title, description, prize_amount, deadline_date } = req.body;
   if (!(title && description && prize_amount && deadline_date)) {
     res.json({
       message: "Enter all the required fields",
     });
   } else {
-    const user_id = req.user.id;
+    const user_id = req.body.user_id;
     const newContest = new ContestModel({
       title,
       description,
@@ -99,7 +100,8 @@ contestRouter.put("/:id", auth, (req, res) => {
 
 contestRouter.post("/:id/submission", auth, (req, res) => {
   //add to /submission
-  const { contest_id, user_id, upload_files } = req.body;
+
+  const { contest_id, user_id, upload_files } = req.body.submission;
 
   const newSubmission = new SubmissionModel({
     contest_id,
@@ -113,20 +115,22 @@ contestRouter.post("/:id/submission", auth, (req, res) => {
       res.json("Submission added successfully");
     })
     .catch((err) => {
+      console.log(err.message)
       res.status(400).json("Error: " + err.message);
     });
 });
 
-// Route: GET api/contest/:id/submission
+// Route: GET api/contest/:id/submissions
 // Desc: Find all submissions associated with a contest
 // access: private
 contestRouter.get("/:id/submissions", auth, (req, res) => {
-  const { contest_id } = req.body;
+  const contest_id = req.params.id;
 
-  SubmissionModel.find({ contest_id: contest_id }, (err, submissionsFound) => {
+  SubmissionModel.find({ contest_id }, (err, submissionsFound) => {
     if (err) {
       console.log(err);
     } else {
+      console.log(submissionsFound)
       res.json(submissionsFound);
     }
   });
