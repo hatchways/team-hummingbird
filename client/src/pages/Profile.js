@@ -255,6 +255,14 @@ function Profile(props) {
     </Container>
   );
 }
+else {
+  return (
+    <Redirect
+      to={{ pathname: "/login", state: { referer: location } }}
+    />
+  )
+}
+}
 
 const useStyles = makeStyles({
   container: {
