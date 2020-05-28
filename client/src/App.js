@@ -29,6 +29,7 @@ function App() {
     <MuiThemeProvider theme={theme}>
       <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
         <BrowserRouter>
+
           <Route path='/' component={Header} />
           <Route exact path='/' render={(props) => <Redirect to='/login' />} />
           <Route path='/register' component={Register} />
@@ -37,6 +38,7 @@ function App() {
           <Route path='/contest' component={Contest} />
           <Route path='/submission' component={Submission} />
           <Route path='/messages' component={Messages} />
+
         </BrowserRouter>
       </AuthContext.Provider>
     </MuiThemeProvider>
