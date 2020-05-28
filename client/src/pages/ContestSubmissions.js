@@ -205,21 +205,6 @@ const useStyles = makeStyles(theme => ({
         }
     }
 }))
-//placeholders
-// const imageGridList = [
-//     { id: 1, imageURL: "https://i.imgur.com/HFJL0eq.png" },
-//     { id: 2, imageURL: "https://i.imgur.com/Nf8SsCu.png" },
-//     { id: 3, imageURL: "https://i.imgur.com/GiwnXsg.png" },
-//     { id: 4, imageURL: "https://i.imgur.com/ihBkO9i.png" },
-//     { id: 5, imageURL: "https://i.imgur.com/mFs0fVv.png" },
-//     { id: 6, imageURL: "https://i.imgur.com/YJYmGtD.png" },
-//     { id: 7, imageURL: "https://i.imgur.com/AtGXbpx.png" },
-//     { id: 8, imageURL: "https://i.imgur.com/hxhWXk9.png" },
-//     { id: 9, imageURL: "https://i.imgur.com/02iEupb.png" },
-//     { id: 10, imageURL: "https://i.imgur.com/u6v65NG.png" },
-//     { id: 11, imageURL: "https://i.imgur.com/C4atyQX.png" },
-//     { id: 12, imageURL: "https://i.imgur.com/Gh4Nrxo.png" },
-// ];
 
 //placeholder
 const imageGridList = [{
