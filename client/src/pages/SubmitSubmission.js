@@ -6,10 +6,11 @@ import {
     Button,
     Typography,
     Snackbar,
+    Box
 } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
-
+import { Link } from 'react-router-dom'
 import S3 from 'react-s3-uploader'
 import { useAuth } from '../components/UserContext'
 
@@ -70,6 +71,11 @@ export default function SubmitSubmission(props) {
     }
     return (
         <div className={classes.container}>
+            <Box size="large" className={classes.breadcrumbWrapper}>
+                <Link to={`/contest/${contestId}`}>
+                    <Typography variant="caption" className={classes.breadcrumb}>Back to Contest</Typography>
+                </Link>
+            </Box>
             <Grid
                 style={{ flex: 1, height: '80%' }}
                 container
@@ -167,8 +173,19 @@ export default function SubmitSubmission(props) {
 }
 //theme components styled with useStyles, local components use inline styles
 const useStyles = makeStyles(theme => ({
+    breadcrumbWrapper: {
+        marginTop: '2rem',
+        marginBottom: '2rem',
+        position: 'absolute',
+        left: '2rem',
+    },
+    breadcrumb: {
+        color: 'gray',
+        textDecoration: 'underline',
+    },
     container: {
         flexGrow: 1,
+        flexDirection: 'column',
         height: '100vh',
         display: 'flex',
         alignItems: 'center'

@@ -15,7 +15,7 @@ import {
 } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import S3 from 'react-s3-uploader';
-
+import { Link } from 'react-router-dom';
 import ContestCard from '../components/ContestCard';
 import { useAuth } from "../components/UserContext";
 
@@ -175,11 +175,18 @@ function Profile(props) {
                 Update Profile Image
               </Button>
             </label>
-            <div style={{ marginTop: '0.5rem', marginBottom: '6rem' }}>
+            <div style={{ marginTop: '0.5rem', marginBottom: '6rem', textAlign: 'center' }}>
               <Typography
                 display="block"
                 className={classes.instructions}
                 variant="caption">PNG, JPG</Typography>
+              <Link to="/settings" >
+                <Typography
+                  style={{ color: 'black' }}
+                  display="block"
+                  variant="body1">Edit payment settings
+                </Typography>
+              </Link>
             </div>
           </div>
         </Grid>

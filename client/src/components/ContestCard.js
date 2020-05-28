@@ -106,11 +106,14 @@ function ContestCard(props) {
         <Grid item xs={12} sm container>
           <Grid item xs container direction="column" spacing={2}>
             <Grid item xs>
-              <Typography gutterBottom variant="subtitle1" className={classes.contestTitle}>
-                <Link to={`/contest/${contest_id}`}>
+              <Link
+                style={{ color: 'black' }}
+                to={`/contest/${contest_id}`}>
+                <Typography gutterBottom variant="subtitle1" className={classes.contestTitle}>
                   {title}
-                </Link>
-              </Typography>
+                </Typography>
+              </Link>
+
               <Typography variant="body2" gutterBottom className={classes.contestDescription}>
                 {description}
               </Typography>

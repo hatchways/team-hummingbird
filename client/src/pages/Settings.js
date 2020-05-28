@@ -10,6 +10,7 @@ import {
     Typography
 } from '@material-ui/core'
 import { useAuth } from "../components/UserContext";
+import { Link } from 'react-router-dom'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -19,9 +20,9 @@ function TabPanel(props) {
             id={`vertical-tab-panel-${index}`}
             {...other}>
             {value === index && (
-                <Box p={3}>
+                <div p={3}>
                     {children}
-                </Box>
+                </div>
             )}
         </div>
     );
@@ -49,9 +50,22 @@ export default function Settings(props) {
                 <Tab label="Password" />
             </Tabs>
             <TabPanel className={classes.tabPanel} value={value} index={0}>
-                <Typography variant="body1">Name: {user?.name}</Typography>
-                <Typography variant="body1">Email: {user?.email}</Typography>
-                <Typography variant="body1">Payment: {user.hasPaymentInfoSaved ? `Current card saved: ${user?.paymentInfo?.cardType} ending in ${user?.paymentInfo?.last4}` : 'No card has been saved yet.'}</Typography>
+                <Container>
+                    <div className={classes.profileInfoWrapper}>
+                        <div className={classes.profileInfoRow}>
+                            <Typography variant="body1">Name:</Typography>
+                            <Typography variant="body2">{user?.name}</Typography>
+                        </div>
+                        <div className={classes.profileInfoRow}>
+                            <Typography variant="body1">Email: </Typography>
+                            <Typography variant="body2">{user?.email}</Typography>
+                        </div>
+                        <div className={classes.profileInfoRow}>
+                            <Typography variant="body1">Payment Info: </Typography>
+                            <Typography variant="body2">{user.hasPaymentInfoSaved ? `Current card saved: ${user?.paymentInfo?.cardType} ending in ${user?.paymentInfo?.last4}` : 'No payment method on file.'}</Typography>
+                        </div>
+                    </div>
+                </Container>
             </TabPanel>
             <TabPanel className={classes.tabPanel} value={value} index={1}></TabPanel>
             <TabPanel className={classes.tabPanel} value={value} index={2}>
@@ -59,6 +73,11 @@ export default function Settings(props) {
             </TabPanel>
             <TabPanel className={classes.tabPanel} value={value} index={3}></TabPanel>
             <TabPanel className={classes.tabPanel} value={value} index={4}></TabPanel>
+            <Box size="large" className={classes.breadcrumbWrapper}>
+                <Link to="/profile">
+                    <Typography variant="caption" className={classes.breadcrumb}>Back to profile</Typography>
+                </Link>
+            </Box>
         </Container>)
 }
 
@@ -73,11 +92,32 @@ const useStyles = makeStyles(theme => ({
             flexDirection: 'column'
         }
     },
+    breadcrumbWrapper: {
+        position: 'absolute',
+        left: '2rem',
+        bottom: '2rem',
+    },
+    breadcrumb: {
+        color: 'gray',
+        textDecoration: 'underline',
+    },
     tabPanel: {
         display: 'flex',
         flexGrow: 1,
         width: '100%',
         justifyContent: 'center',
+    },
+    profileInfoWrapper: {
+        display: 'flex',
+        flexGrow: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        minWidth: '300px'
+    },
+    profileInfoRow: {
+        display: 'flex',
+        width: '100%',
+        justifyContent: 'space-between'
     },
     tabs: {
         '& .Mui-selected .MuiTab-wrapper': {

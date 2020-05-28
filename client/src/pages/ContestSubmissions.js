@@ -24,6 +24,7 @@ export default function ContestSubmissions(props) {
 
     const isMobile = useMediaQuery(theme => theme.breakpoints.down('xs'));
     const [submissions, setSubmissions] = useState(imageGridList)
+    const [namedSubmissions, setNamedSubmissions] = useState(false)
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
     const contestId = props.match.params.id
@@ -37,8 +38,6 @@ export default function ContestSubmissions(props) {
         _id: contestId
     })
     useEffect(() => {
-        //get submissions matching contests under my id
-        //separate views for contest creators and submitters
         const getInfo = async () => {
             const contestInfo = await fetch(`/api/contest/${contestId}`, {
                 headers: {
@@ -48,20 +47,34 @@ export default function ContestSubmissions(props) {
             })
             let jsonContestInfo = await contestInfo.json()
             setContestInfo(jsonContestInfo.contest)
+            setSubmissions(jsonContestInfo.submissions)
 
-            const submissionInfo = await fetch(`/api/contest/${contestId}/submissions`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-auth-token": authTokens.token
-                },
-            })
-            let submissionInfoJson = await submissionInfo.json()
-            setSubmissions(submissionInfoJson)
         }
         getInfo()
-        console.log(props)
-        //console.log(authTokens)
     }, [user])
+    useEffect(() => {
+        const getNames = async () => {
+            let withNames = submissions.slice()
+            withNames.forEach(async (submission, i) => {
+                fetch(`/api/users/name/${submission.user_id}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-auth-token": authTokens.token
+                    },
+                }).then(res => res.json())
+                    .then(resjson => setSubmissions(prev => {
+                        let copy = prev.slice()
+                        copy[i]["user_name"] = resjson["name"]
+                        return copy
+                    }))
+            })
+            setNamedSubmissions(true)
+        }
+
+        if (submissions[0].user_name == undefined && namedSubmissions === false) {
+            getNames()
+        }
+    }, [submissions])
     return (
         <Container>
             <Box size="large" className={classes.breadcrumbWrapper}>
@@ -136,7 +149,7 @@ export default function ContestSubmissions(props) {
                                     alignSelf: 'flex-end',
                                     fontWeight: 'bold',
                                     textShadow: '0px 0px 3px black'
-                                }}>By @<span style={{ textDecoration: 'underline' }}>{submission?.userId || 'artist'}</span></Typography>
+                                }}>By @<span style={{ textDecoration: 'underline' }}>{submission.user_name ? submission.user_name : 'artist'}</span></Typography>
                             </div>
                         </GridListTile>
                     ))}
@@ -144,8 +157,11 @@ export default function ContestSubmissions(props) {
             </TabPanel>
             <TabPanel className={classes.tabPanel} value={activeTab} index={1}>
 
-                <Paper style={{ minHeight: '300px' }}>
-                    <Typography variant="caption">
+                <Paper style={{ minHeight: '300px', padding: '3rem' }}>
+                    <Typography bottomGutter variant="h1">
+                        Description
+                    </Typography>
+                    <Typography variant="body1">
                         {contestInfo.description}
                     </Typography>
                 </Paper>
@@ -212,5 +228,6 @@ const imageGridList = [{
     contest_id: "",
     creation_date: "",
     upload_files: ["https://i.imgur.com/HFJL0eq.png"],
-    user_id: ""
+    user_id: "",
+    user_name: ""
 }]
