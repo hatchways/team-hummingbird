@@ -7,45 +7,51 @@ const {
 
 let currentRoom = {};
 const connection = (io, socket) => {
-  socket.on("join", ({ chatWithUser, currentUser, chatRoomId }, callback) => {
-    getPersonalChatRoom(chatRoomId)
+  socket.on("join", ({ chatWithUser, currentUser, usersChatId }, callback) => {
+    getPersonalChatRoom(usersChatId)
       .then((room) => {
         if (room.length === 0) {
           //create room
-          createPersonalChatRoom(chatWithUser, currentUser);
+
+          createPersonalChatRoom(chatWithUser, currentUser)
+            .then((newRoom) => {
+              currentRoom = newRoom;
+              socket.emit("pass-message-hist", []);
+              socket.join(newRoom.id);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         } else {
           currentRoom = room[0];
           const messageHistory = room[0].roomMessages;
           socket.emit("pass-message-hist", messageHistory);
+          socket.join(currentRoom.id);
         }
-        socket.join(chatRoomId);
       })
       .catch((err) => {
         console.log(err);
       });
   });
-  socket.on(
-    "send-message",
-    ({ chatRoomId, chatMessage, currentUser }, callback) => {
-      //save chatmessage to message list
-      addMessageToChatRoom(
-        {
-          text: chatMessage,
-          sender: currentUser.username,
-          time: moment().format("h:mm:ss a"),
-        },
-        currentRoom
-      );
-      io.to(chatRoomId).emit("receive-message", {
+  socket.on("send-message", ({ chatMessage, currentUser }, callback) => {
+    //save chatmessage to message list
+    addMessageToChatRoom(
+      {
         text: chatMessage,
-        //get user details
-        sender: currentUser.username,
+        sender: currentUser.name,
         time: moment().format("h:mm:ss a"),
-      });
+      },
+      currentRoom
+    );
+    io.to(currentRoom.id).emit("receive-message", {
+      text: chatMessage,
+      //get user details
+      sender: currentUser.name,
+      time: moment().format("h:mm:ss a"),
+    });
 
-      callback();
-    }
-  );
+    callback();
+  });
 };
 
 module.exports = connection;

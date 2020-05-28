@@ -1,39 +1,33 @@
 const ChatRooms = require("../models/chatrooms");
 const personalChatRooms = [];
 
-const createPersonalChatRoom = (user1, user2) => {
-  const roomId = user1.id + user2.id;
-  const roomId2 = user2.id + user1.id;
+const createPersonalChatRoom = async (user1, user2) => {
+  const userChatId = user1.id + user2.id;
+  const userChatId2 = user2.id + user1.id;
   const roomMessages = [];
   const roomUser1 = user1;
   const roomUser2 = user2;
 
   const newChatRoom = new ChatRooms({
-    roomId,
-    roomId2,
+    userChatId,
+    userChatId2,
     roomMessages,
     roomUser1,
     roomUser2,
   });
-  newChatRoom
-    .save()
-    .then((result) => {
-      console.log("Chat Room Created");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  return await newChatRoom.save();
 };
 
-const getPersonalChatRoom = async (roomId) => {
+const getPersonalChatRoom = async (usersChatId) => {
   const room = await ChatRooms.find({
-    $or: [{ roomId: roomId }, { roomId2: roomId }],
+    $or: [{ userChatId: usersChatId }, { userChatId2: usersChatId }],
   }).exec();
 
   return room;
 };
 
 const addMessageToChatRoom = (msg, currentRoom) => {
+  console.log(currentRoom);
   ChatRooms.findByIdAndUpdate(
     currentRoom.id,
     {
@@ -47,19 +41,8 @@ const addMessageToChatRoom = (msg, currentRoom) => {
   );
 };
 
-const getMessageHistory = (roomId) => {
-  const roomIndex = getPersonalChatRoom(roomId);
-  return personalChatRooms[roomIndex].roomMessages;
-};
-
-const getAllPersonalChatRooms = () => {
-  return personalChatRooms;
-};
-
 module.exports = {
   createPersonalChatRoom,
   getPersonalChatRoom,
-  getAllPersonalChatRooms,
   addMessageToChatRoom,
-  getMessageHistory,
 };

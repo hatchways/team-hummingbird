@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Grid,
   Paper,
   Typography,
   makeStyles,
@@ -15,23 +14,23 @@ let socket;
 
 const Chat = (props) => {
   const classes = useStyles();
-  const currentUser = { id: "4", username: "D" };
+  const { currentUser } = props;
   const [chatMessage, setChatMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
-  const [chatWithUser, setChatWithUser] = useState(props.user);
+  const [chatWithUser, setChatWithUser] = useState(props.chatWithUser);
   const ENDPOINT = "/";
-  const chatRoomId = chatWithUser.id + currentUser.id;
+  const usersChatId = chatWithUser.id + currentUser.id;
 
   useEffect(() => {
-    setChatWithUser(props.user);
-  }, [props.user]);
+    setChatWithUser(props.chatWithUser);
+  }, [props.chatWithUser]);
 
   useEffect(() => {
     socket = socketIoClient(ENDPOINT);
+    //console.log(currentUser, chatWithUser);
 
-    socket.emit("join", { chatWithUser, currentUser, chatRoomId }, () => {});
+    socket.emit("join", { chatWithUser, currentUser, usersChatId }, () => {});
     socket.on("pass-message-hist", (msgHistory) => {
-      console.log(msgHistory);
       setMessageList([...msgHistory]);
     });
     return () => {
@@ -43,7 +42,7 @@ const Chat = (props) => {
 
   useEffect(() => {
     socket.off("receive-message").on("receive-message", (msg) => {
-      console.log(messageList);
+      //  console.log(messageList);
       setMessageList([...messageList, msg]);
     });
 
@@ -61,26 +60,22 @@ const Chat = (props) => {
   const sendChatMessage = () => {
     //sends this message to server
     if (chatMessage) {
-      socket.emit(
-        "send-message",
-        { chatRoomId, chatMessage, currentUser },
-        () => {
-          setChatMessage("");
-        }
-      );
+      socket.emit("send-message", { chatMessage, currentUser }, () => {
+        setChatMessage("");
+      });
     }
   };
   return (
     <Paper className={classes.chatComp}>
       <Typography variant='h4' className={classes.userHeader}>
-        {props.user.username}
+        {chatWithUser.name}
       </Typography>
       <Box>
         <List className={classes.list}>
           {messageList.map((msg) => (
             <ListItem
               className={
-                msg.sender === currentUser.username
+                msg.sender === currentUser.name
                   ? classes.listItem
                   : classes.listItem2
               }
@@ -139,17 +134,20 @@ const useStyles = makeStyles({
   },
   list: {
     margin: "0px 10px 0px 10px",
+    display: "flex",
   },
   listItem: {
     boxShadow: " 0px 0px 5px 1px rgba(0, 0, 0, 0.2)",
     borderRadius: "20px",
     flexDirection: "row-reverse",
-    width: "fit-content",
+
     marginBottom: "10px",
   },
   listItem2: {
     flexDirection: "row",
     width: "fit-content",
+    borderRadius: "20px",
+
     backgroundColor: "#f1f1f1",
     marginBottom: "10px",
   },

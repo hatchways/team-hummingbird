@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const isEmail = require('validator/lib/isEmail');
-const normalizeEmail = require('validator/lib/normalizeEmail');
+const isEmail = require("validator/lib/isEmail");
+const normalizeEmail = require("validator/lib/normalizeEmail");
 const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
@@ -14,26 +14,27 @@ const User = require("../../models/User");
 // @route   POST api/users/register
 // @desc    Register user
 // @access  Public
-router.post("/register", function(req, res, next) {
+router.post("/register", function (req, res, next) {
   const { name, email, password, password2 } = req.body;
   try {
     const normalizedEmail = normalizeEmail(email);
-    if (!isEmail(normalizedEmail)) throw new Error('The email you entered is invalid');
-    if (!password || !name) throw new Error('Missing field(s)');
-    if (password.length < 6) throw new Error('Password must be at least 6 characters');
-    if (password !== password2) throw new Error('Passwords do not match');
-    User.findOne({ email }).then(user => {
+    if (!isEmail(normalizedEmail))
+      throw new Error("The email you entered is invalid");
+    if (!password || !name) throw new Error("Missing field(s)");
+    if (password.length < 6)
+      throw new Error("Password must be at least 6 characters");
+    if (password !== password2) throw new Error("Passwords do not match");
+    User.findOne({ email }).then((user) => {
       if (user) {
         return res.status(400).json({ message: "Email already exists" });
-      } 
-      else {
+      } else {
         const newUser = new User({
           name,
           email,
           email_normalized: normalizedEmail,
-          password
+          password,
         });
-    
+
         // Hash password before saving in database
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -41,26 +42,26 @@ router.post("/register", function(req, res, next) {
             newUser.password = hash;
             newUser
               .save()
-              .then(user => {
+              .then((user) => {
                 jwt.sign(
                   { id: user.id },
-                  config.get('jwtSecret'),
+                  config.get("jwtSecret"),
                   { expiresIn: 3600 },
                   (err, token) => {
                     if (err) throw err;
                     res.json({
-                      message: 'Registration success',
+                      message: "Registration success",
                       token,
                       user: {
                         id: user.id,
                         name: user.name,
-                        email: user.email
-                      }
+                        email: user.email,
+                      },
                     });
                   }
-                )
+                );
               })
-              .catch(err => console.log(err));
+              .catch((err) => console.log(err));
           });
         });
       }
@@ -72,7 +73,7 @@ router.post("/register", function(req, res, next) {
   }
 });
 
-// @route   PUT api/user/
+// @route   PUT api/users/
 // @desc    Update a user profile
 // @access  Private
 router.put("/", auth, (req, res) => {
@@ -81,7 +82,7 @@ router.put("/", auth, (req, res) => {
     User.findByIdAndUpdate(
       req.user.id,
       {
-        profile_image_url: url
+        profile_image_url: url,
       },
       (err, result) => {
         if (err) {
@@ -101,7 +102,7 @@ router.put("/", auth, (req, res) => {
   }
 });
 
-// @route   GET api/user/contests/
+// @route   GET api/users/contests/
 // @desc    Get all contests owned by a user
 // @access  Public
 router.get("/contests", (req, res) => {
@@ -117,7 +118,7 @@ router.get("/contests", (req, res) => {
     });
 });
 
-// @route   GET api/user/submissions/
+// @route   GET api/users/submissions/
 // @desc    Get all contests that a user submitted to
 // @access  Private
 router.get("/submissions", auth, (req, res) => {
@@ -127,10 +128,12 @@ router.get("/submissions", auth, (req, res) => {
   Submission.find({ user_id })
     .then((submissions) => {
       let contestIds = [];
-      submissions.forEach(submission => contestIds.push(submission.contest_id));
+      submissions.forEach((submission) =>
+        contestIds.push(submission.contest_id)
+      );
       result.submissions = submissions;
       Contest.find({
-        _id: { $in: contestIds }
+        _id: { $in: contestIds },
       })
         .sort({ deadline_date: -1 })
         .then((contests) => {
@@ -142,6 +145,34 @@ router.get("/submissions", auth, (req, res) => {
             message: err.message,
           });
         });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: err.message,
+      });
+    });
+});
+
+// @route   GET api/users/:name/
+// @desc    Get users with given name
+// @access  Private
+
+router.get("/:name", auth, (req, res) => {
+  const userName = req.params.name;
+  User.find({
+    name: { $regex: new RegExp("^.*" + userName.toLowerCase() + ".*$", "i") },
+    _id: { $ne: req.user.id },
+  })
+    .then((users) => {
+      const matchedUser = [];
+      users.map((user) => {
+        matchedUser.push({
+          id: user._id,
+          name: user.name,
+        });
+      });
+      console.log(matchedUser);
+      res.json({ users: matchedUser });
     })
     .catch((err) => {
       res.status(500).json({
