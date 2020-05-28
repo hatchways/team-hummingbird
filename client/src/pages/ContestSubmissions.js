@@ -24,7 +24,6 @@ export default function ContestSubmissions(props) {
 
     const isMobile = useMediaQuery(theme => theme.breakpoints.down('xs'));
     const [submissions, setSubmissions] = useState(imageGridList)
-    const [namedSubmissions, setNamedSubmissions] = useState(false)
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
     const contestId = props.match.params.id
@@ -48,33 +47,10 @@ export default function ContestSubmissions(props) {
             let jsonContestInfo = await contestInfo.json()
             setContestInfo(jsonContestInfo.contest)
             setSubmissions(jsonContestInfo.submissions)
-
         }
         getInfo()
     }, [user])
-    useEffect(() => {
-        const getNames = async () => {
-            let withNames = submissions.slice()
-            withNames.forEach(async (submission, i) => {
-                fetch(`/api/users/name/${submission.user_id}`, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-auth-token": authTokens.token
-                    },
-                }).then(res => res.json())
-                    .then(resjson => setSubmissions(prev => {
-                        let copy = prev.slice()
-                        copy[i]["user_name"] = resjson["name"]
-                        return copy
-                    }))
-            })
-            setNamedSubmissions(true)
-        }
 
-        if (submissions[0].user_name == undefined && namedSubmissions === false) {
-            getNames()
-        }
-    }, [submissions])
     return (
         <Container>
             <Box size="large" className={classes.breadcrumbWrapper}>
@@ -147,6 +123,7 @@ export default function ContestSubmissions(props) {
                                 <Typography style={{
                                     color: 'white',
                                     alignSelf: 'flex-end',
+                                    marginBottom: '0.5rem',
                                     fontWeight: 'bold',
                                     textShadow: '0px 0px 3px black'
                                 }}>By @<span style={{ textDecoration: 'underline' }}>{submission.user_name ? submission.user_name : 'artist'}</span></Typography>
@@ -227,7 +204,7 @@ const imageGridList = [{
     active: true,
     contest_id: "",
     creation_date: "",
-    upload_files: ["https://i.imgur.com/HFJL0eq.png"],
+    upload_files: ["https://via.placeholder.com/180"],
     user_id: "",
     user_name: ""
 }]

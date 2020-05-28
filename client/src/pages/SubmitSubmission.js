@@ -30,6 +30,7 @@ export default function SubmitSubmission(props) {
             const submission = {
                 contest_id: contestId,
                 user_id: user.id,
+                user_name: user.name,
                 upload_files: uploadedFiles
             }
             let request = await fetch(`/api/contest/:id/submission`, {

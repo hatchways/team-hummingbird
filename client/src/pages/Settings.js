@@ -62,7 +62,7 @@ export default function Settings(props) {
                         </div>
                         <div className={classes.profileInfoRow}>
                             <Typography variant="body1">Payment Info: </Typography>
-                            <Typography variant="body2">{user.hasPaymentInfoSaved ? `Current card saved: ${user?.paymentInfo?.cardType} ending in ${user?.paymentInfo?.last4}` : 'No payment method on file.'}</Typography>
+                            <Typography variant="body2">{user.hasPaymentInfoSaved ? `${user?.paymentInfo?.cardType} ending in ${user?.paymentInfo?.last4}` : 'No payment method on file.'}</Typography>
                         </div>
                     </div>
                 </Container>

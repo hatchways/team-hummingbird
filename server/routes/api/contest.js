@@ -28,8 +28,16 @@ contestRouter.get("/:id", auth, (req, res) => {
         }
         Submission.find({ contest_id: contest._id })
           .then(submissions => {
-            result.submissions = submissions;
-            res.status(200).json(result);
+            if (submissionQuery.user_id) {
+              let filteredResults = submissions.filter((submission) => {
+                return submission.user_id === submissionQuery.user_id
+              })
+              result.submissions = filteredResults
+              res.status(200).json(result);
+            } else {
+              result.submissions = submissions;
+              res.status(200).json(result);
+            }
           })
           .catch((err) => {
             res.status(500).json({
@@ -124,12 +132,13 @@ contestRouter.put("/:id", auth, (req, res) => {
 contestRouter.post("/:id/submission", auth, (req, res) => {
   //add to /submission
 
-  const { contest_id, user_id, upload_files } = req.body.submission;
+  const { contest_id, user_id, upload_files, user_name } = req.body.submission;
 
   const newSubmission = new Submission({
     contest_id,
     user_id,
     upload_files,
+    user_name
   });
 
   newSubmission

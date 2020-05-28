@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import {
     Button,
@@ -28,8 +28,7 @@ function CheckoutForm() {
     const [alertMessage, setAlertMessage] = useState("")
 
     const { authTokens, setAuthTokens } = useAuth();
-    const [user] = useState(authTokens ? authTokens.user : null);
-
+    const [user, setUser] = useState(authTokens ? authTokens.user : null);
     const handleSubmit = async (event) => {
         event.preventDefault()
         const { error, paymentMethod } = await stripe.createPaymentMethod({
@@ -41,15 +40,19 @@ function CheckoutForm() {
 
         }
         if (paymentMethod) {
-            console.log(paymentMethod)
-            const _user = user
-            _user.hasPaymentInfoSaved = true
-            _user.paymentInfo = { cardType: paymentMethod.card.brand, last4: paymentMethod.card.last4 }
-            _user.paymentId = paymentMethod.id
+
+            const _user = {
+                ...user,
+                hasPaymentInfoSaved: true,
+                paymentInfo: { cardType: paymentMethod.card.brand, last4: paymentMethod.card.last4 },
+                paymentId: paymentMethod.id
+            }
+
             setAuthTokens({
-                "token": authTokens.token,
-                "user": _user
+                ...authTokens,
+                user: _user
             })
+
             handleAlert(`Your ${paymentMethod?.card?.brand} card ending in ${paymentMethod?.card?.last4} was added successfully`, "success")
         }
     }
