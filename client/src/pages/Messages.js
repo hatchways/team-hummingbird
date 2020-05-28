@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Typography,
@@ -19,13 +19,50 @@ const Messages = () => {
   const { authTokens, setAuthTokens } = useAuth();
   const [searchUser, setSearchUser] = useState("");
   const [user, setUser] = useState(authTokens ? authTokens.user : null);
-  const [userChatList, setUserChatList] = useState([{ id: "1", name: "A" }]);
+  const [userChatRooms, setUserChatRooms] = useState([]);
 
-  const [chatWithUser, setChatWithUser] = useState(userChatList[0]);
+  const [currentChatRoom, setCurrentChatRoom] = useState();
+
+  useEffect(() => {
+    fetch("/api/chatroom?user_id=" + user.id, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        setUserChatRooms([...userChatRooms, ...result.chatrooms]);
+      });
+  }, []);
+
+  // useEffect(() => {
+  //   //fetch updated roomMessages before sending currentRoom to Chat
+  //   if (currentChatRoom) {
+  //   }
+  // }, [currentChatRoom]);
+
+  const changeChatRoom = (changeRoom) => {
+    console.log(changeRoom);
+    fetch("api/chatroom/" + changeRoom._id, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        const updRoom = { ...changeRoom, roomMessages: result.roomMessages };
+        console.log(updRoom);
+        setCurrentChatRoom(updRoom);
+      });
+  };
 
   const srchUser = (e) => {
     if (e.keyCode == 13 && searchUser !== "") {
-      fetch("/api/users/" + searchUser, {
+      fetch("/api/users?username=" + searchUser, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -33,12 +70,13 @@ const Messages = () => {
         },
       }).then((res) =>
         res.json().then((result) => {
-          setUserChatList([...userChatList, ...result.users]);
+          setUserChatRooms([...userChatRooms, ...result.users]);
         })
       );
     }
   };
-
+  // console.log(authTokens);
+  // console.log(userChatRooms);
   return { user } ? (
     <Box className={classes.messagesComp}>
       <Grid direction='row' container spacing={0}>
@@ -58,21 +96,30 @@ const Messages = () => {
                 value={searchUser}
               ></TextField>
             </ListItem>
-            <List className={classes.list}>
-              {userChatList.map((user) => (
-                <ListItem
-                  onClick={() => setChatWithUser(user)}
-                  className={classes.listItem}
-                  key={user.id}
-                >
-                  User {user.name}
-                </ListItem>
-              ))}
-            </List>
+            {userChatRooms.length > 0 ? (
+              <List className={classes.list}>
+                {userChatRooms.map((chatRoom) => (
+                  <ListItem
+                    onClick={() => changeChatRoom(chatRoom)}
+                    className={classes.listItem}
+                    key={chatRoom._id}
+                  >
+                    User{" "}
+                    {chatRoom.roomUser1.id === user.id
+                      ? chatRoom.roomUser2.name
+                      : chatRoom.roomUser1.name}
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <ListItem>Search for a user to Chat with</ListItem>
+            )}
           </Paper>
         </Grid>
         <Grid item sm={8}>
-          <Chat chatWithUser={chatWithUser} currentUser={user} />
+          {currentChatRoom !== undefined && userChatRooms.length > 0 ? (
+            <Chat currentChatRoom={currentChatRoom} currentUser={user} />
+          ) : null}
         </Grid>
       </Grid>
     </Box>

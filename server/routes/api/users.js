@@ -153,14 +153,14 @@ router.get("/submissions", auth, (req, res) => {
     });
 });
 
-// @route   GET api/users/:name/
+// @route   GET api/users/
 // @desc    Get users with given name
 // @access  Private
 
-router.get("/:name", auth, (req, res) => {
-  const userName = req.params.name;
+router.get("/", auth, (req, res) => {
+  const { username } = req.query;
   User.find({
-    name: { $regex: new RegExp("^.*" + userName.toLowerCase() + ".*$", "i") },
+    name: { $regex: new RegExp("^.*" + username.toLowerCase() + ".*$", "i") },
     _id: { $ne: req.user.id },
   })
     .then((users) => {
@@ -171,7 +171,6 @@ router.get("/:name", auth, (req, res) => {
           name: user.name,
         });
       });
-      console.log(matchedUser);
       res.json({ users: matchedUser });
     })
     .catch((err) => {

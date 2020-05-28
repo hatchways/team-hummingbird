@@ -1,16 +1,14 @@
 const ChatRooms = require("../models/chatrooms");
 const personalChatRooms = [];
 
-const createPersonalChatRoom = async (user1, user2) => {
-  const userChatId = user1.id + user2.id;
-  const userChatId2 = user2.id + user1.id;
+const createPersonalChatRoom = async (chatRoom) => {
+  //const userChatId = user1.id + user2.id;
+  //const userChatId2 = user2.id + user1.id;
   const roomMessages = [];
-  const roomUser1 = user1;
-  const roomUser2 = user2;
+  const roomUser1 = chatRoom.roomUser1;
+  const roomUser2 = chatRoom.roomUser2;
 
   const newChatRoom = new ChatRooms({
-    userChatId,
-    userChatId2,
     roomMessages,
     roomUser1,
     roomUser2,
@@ -18,17 +16,15 @@ const createPersonalChatRoom = async (user1, user2) => {
   return await newChatRoom.save();
 };
 
-const getPersonalChatRoom = async (usersChatId) => {
-  const room = await ChatRooms.find({
-    $or: [{ userChatId: usersChatId }, { userChatId2: usersChatId }],
-  }).exec();
+const getPersonalChatRoom = async (chatRoom) => {
+  const room = await ChatRooms.findById(chatRoom._id).exec();
 
   return room;
 };
 
 const addMessageToChatRoom = (msg, currentRoom) => {
   ChatRooms.findByIdAndUpdate(
-    currentRoom.id,
+    currentRoom._id,
     {
       roomMessages: [...currentRoom.roomMessages, msg],
     },

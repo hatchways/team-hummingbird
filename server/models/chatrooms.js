@@ -4,11 +4,9 @@ const Schema = mongoose.Schema;
 const ChatRoomSchema = new Schema({
   userChatId: {
     type: String,
-    required: true,
   },
   userChatId2: {
     type: String,
-    required: true,
   },
   roomMessages: {
     type: Array,

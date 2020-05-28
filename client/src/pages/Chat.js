@@ -16,40 +16,36 @@ const Chat = (props) => {
   const classes = useStyles();
   const { currentUser } = props;
   const [chatMessage, setChatMessage] = useState("");
-  const [messageList, setMessageList] = useState([]);
-  const [chatWithUser, setChatWithUser] = useState(props.chatWithUser);
+  //const [messageList, setMessageList] = useState([]);
+  const [chatRoom, setChatRoom] = useState(props.currentChatRoom);
   const ENDPOINT = "/";
-  const usersChatId = chatWithUser.id + currentUser.id;
 
   useEffect(() => {
-    setChatWithUser(props.chatWithUser);
-  }, [props.chatWithUser]);
+    setChatRoom(props.currentChatRoom);
+  }, [props.currentChatRoom]);
 
   useEffect(() => {
     socket = socketIoClient(ENDPOINT);
-    //console.log(currentUser, chatWithUser);
-
-    socket.emit("join", { chatWithUser, currentUser, usersChatId }, () => {});
-    socket.on("pass-message-hist", (msgHistory) => {
-      setMessageList([...msgHistory]);
-    });
+    socket.emit("join", chatRoom, () => {});
     return () => {
       socket.emit("disconnect");
       socket.off();
       socket.close();
     };
-  }, [chatWithUser]);
+  }, [chatRoom]);
 
   useEffect(() => {
     socket.off("receive-message").on("receive-message", (msg) => {
       //  console.log(messageList);
-      setMessageList([...messageList, msg]);
+      const updRoomMessages = [...chatRoom.roomMessages, msg];
+      setChatRoom({ ...chatRoom, roomMessages: updRoomMessages });
+      // setMessageList([...messageList, msg]);
     });
 
-    socket.on("pass-message-hist", (msgHistory) => {
-      setMessageList([...msgHistory]);
-    });
-  }, [messageList]);
+    // socket.on("pass-message-hist", (msgHistory) => {
+    //   setMessageList([...msgHistory]);
+    // });
+  });
 
   const keyPress = (e) => {
     if (e.keyCode === 13) {
@@ -68,11 +64,13 @@ const Chat = (props) => {
   return (
     <Paper className={classes.chatComp}>
       <Typography variant='h4' className={classes.userHeader}>
-        {chatWithUser.name}
+        {chatRoom.roomUser1.id === currentUser.id
+          ? chatRoom.roomUser2.name
+          : chatRoom.roomUser1.name}
       </Typography>
       <Box>
         <List className={classes.list}>
-          {messageList.map((msg) => (
+          {chatRoom.roomMessages.map((msg) => (
             <ListItem
               className={
                 msg.sender === currentUser.name
@@ -134,6 +132,29 @@ const useStyles = makeStyles({
   },
   list: {
     margin: "0px 10px 0px 10px",
+    maxHeight: "364px",
+    overflow: "auto",
+    marginTop: "5px",
+    padding: "5px 10px 0px 5px",
+    /* width */
+    "&::-webkit-scrollbar": {
+      width: "4px",
+    },
+
+    /* Track */
+    "&::-webkit-scrollbar-track": {
+      background: "#f1f1f1",
+    },
+
+    /* Handle */
+    "&::-webkit-scrollbar-thumb": {
+      background: "#555",
+    },
+
+    /* Handle on hover */
+    "&::-webkit-scrollbar-thumb:hover": {
+      background: "#000",
+    },
   },
   listItem: {
     boxShadow: " 0px 0px 5px 1px rgba(0, 0, 0, 0.2)",

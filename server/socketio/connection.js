@@ -7,26 +7,22 @@ const {
 
 let currentRoom = {};
 const connection = (io, socket) => {
-  socket.on("join", ({ chatWithUser, currentUser, usersChatId }, callback) => {
-    getPersonalChatRoom(usersChatId)
+  socket.on("join", (chatRoom, callback) => {
+    getPersonalChatRoom(chatRoom)
       .then((room) => {
         if (room.length === 0) {
           //create room
-
-          createPersonalChatRoom(chatWithUser, currentUser)
+          createPersonalChatRoom(chatRoom)
             .then((newRoom) => {
               currentRoom = newRoom;
-              socket.emit("pass-message-hist", []);
               socket.join(newRoom.id);
             })
             .catch((err) => {
               console.log(err);
             });
         } else {
-          currentRoom = room[0];
-          const messageHistory = room[0].roomMessages;
-          socket.emit("pass-message-hist", messageHistory);
-          socket.join(currentRoom.id);
+          currentRoom = room;
+          socket.join(currentRoom._id);
         }
       })
       .catch((err) => {
@@ -43,7 +39,7 @@ const connection = (io, socket) => {
       },
       currentRoom
     );
-    io.to(currentRoom.id).emit("receive-message", {
+    io.to(currentRoom._id).emit("receive-message", {
       text: chatMessage,
       //get user details
       sender: currentUser.name,
