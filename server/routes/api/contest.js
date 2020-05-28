@@ -144,7 +144,7 @@ contestRouter.post("/:id/submission", auth, (req, res) => {
 // Desc: Find all submissions associated with a contest
 // access: private
 contestRouter.get("/:id/submissions", auth, (req, res) => {
-  const { contest_id } = req.body;
+  const contest_id = req.params.id;
 
   Submission.find({ contest_id: contest_id }, (err, submissionsFound) => {
     if (err) {
