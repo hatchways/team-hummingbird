@@ -52,7 +52,7 @@ const Chat = (props) => {
   }, [messageList]);
 
   const keyPress = (e) => {
-    if (e.keyCode == 13) {
+    if (e.keyCode === 13) {
       sendChatMessage();
     }
   };
@@ -134,20 +134,17 @@ const useStyles = makeStyles({
   },
   list: {
     margin: "0px 10px 0px 10px",
-    display: "flex",
   },
   listItem: {
     boxShadow: " 0px 0px 5px 1px rgba(0, 0, 0, 0.2)",
     borderRadius: "20px",
     flexDirection: "row-reverse",
-
     marginBottom: "10px",
   },
   listItem2: {
     flexDirection: "row",
     width: "fit-content",
     borderRadius: "20px",
-
     backgroundColor: "#f1f1f1",
     marginBottom: "10px",
   },

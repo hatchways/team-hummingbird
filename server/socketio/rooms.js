@@ -27,7 +27,6 @@ const getPersonalChatRoom = async (usersChatId) => {
 };
 
 const addMessageToChatRoom = (msg, currentRoom) => {
-  console.log(currentRoom);
   ChatRooms.findByIdAndUpdate(
     currentRoom.id,
     {
