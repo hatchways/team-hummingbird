@@ -1,6 +1,6 @@
 const express = require("express");
 const chatRoomRouter = express.Router();
-const ChatRoomModel = require("../../models/chatrooms");
+const ChatRoomModel = require("../../models/chatRooms");
 const auth = require("../../middleware/auth");
 
 // Route: GET api/chatroom
@@ -31,6 +31,48 @@ chatRoomRouter.get("/:id", auth, (req, res) => {
     .select("roomMessages")
     .then((result) => {
       res.json({ roomMessages: result.roomMessages });
+    });
+});
+
+// Route: POST api/chatroom/
+// Desc: Create new chatroom
+// access: private
+chatRoomRouter.post("/", auth, (req, res) => {
+  const { roomUser1, roomUser2 } = req.body;
+  const newRoom = new ChatRoomModel({
+    roomMessages: [],
+    roomUser1,
+    roomUser2,
+  });
+
+  ChatRoomModel.find({
+    $or: [
+      {
+        $and: [
+          { "roomUser1.id": roomUser1.id },
+          { "roomUser2.id": roomUser2.id },
+        ],
+      },
+      {
+        $and: [
+          { "roomUser1.id": roomUser2.id },
+          { "roomUser2.id": roomUser1.id },
+        ],
+      },
+    ],
+  })
+    .then((roomExists) => {
+      if (roomExists.length > 0) {
+        res.json({ roomExists: true, roomCreated: false, room: roomExists });
+      } else {
+        newRoom.save().then((roomCreated) => {
+          console.log(roomCreated);
+          res.json({ roomExists: false, roomCreated: true, room: roomCreated });
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
     });
 });
 

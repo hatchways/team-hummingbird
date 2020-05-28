@@ -9,6 +9,11 @@ import {
   List,
   ListItem,
   Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@material-ui/core";
 
 import Chat from "./Chat";
@@ -20,6 +25,20 @@ const Messages = () => {
   const [searchUser, setSearchUser] = useState("");
   const [user, setUser] = useState(authTokens ? authTokens.user : null);
   const [userChatRooms, setUserChatRooms] = useState([]);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [matchedUser, setMatchedUser] = React.useState([]);
+  const [responseMessage, setResponseMessage] = React.useState("");
+
+  const handleClickOpen = () => {
+    setResponseMessage("");
+    setSearchUser("");
+    setMatchedUser([]);
+    setOpenDialog(true);
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
 
   const [currentChatRoom, setCurrentChatRoom] = useState();
 
@@ -36,12 +55,6 @@ const Messages = () => {
         setUserChatRooms([...userChatRooms, ...result.chatrooms]);
       });
   }, []);
-
-  // useEffect(() => {
-  //   //fetch updated roomMessages before sending currentRoom to Chat
-  //   if (currentChatRoom) {
-  //   }
-  // }, [currentChatRoom]);
 
   const changeChatRoom = (changeRoom) => {
     console.log(changeRoom);
@@ -61,7 +74,7 @@ const Messages = () => {
   };
 
   const srchUser = (e) => {
-    if (e.keyCode == 13 && searchUser !== "") {
+    if (searchUser !== "") {
       fetch("/api/users?username=" + searchUser, {
         method: "GET",
         headers: {
@@ -70,10 +83,39 @@ const Messages = () => {
         },
       }).then((res) =>
         res.json().then((result) => {
-          setUserChatRooms([...userChatRooms, ...result.users]);
+          console.log(result);
+          setMatchedUser(result.users);
         })
       );
     }
+  };
+
+  const openNewChat = (matchedUser) => {
+    fetch("api/chatroom", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
+      body: JSON.stringify({
+        roomUser1: matchedUser,
+        roomUser2: {
+          id: user.id,
+          name: user.name,
+        },
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.roomExists) {
+          setResponseMessage(
+            "User already present in existing chats, please search!"
+          );
+        } else if (result.roomCreated) {
+          setUserChatRooms([...userChatRooms, result.room]);
+          setOpenDialog(false);
+        }
+      });
   };
   // console.log(authTokens);
   // console.log(userChatRooms);
@@ -85,8 +127,9 @@ const Messages = () => {
             <Typography variant='h4' className={classes.header}>
               Inbox Messages
             </Typography>
+
             <ListItem className={classes.messageBox}>
-              <TextField
+              {/* <TextField
                 type='text'
                 variant='outlined'
                 fullWidth
@@ -94,7 +137,7 @@ const Messages = () => {
                 onKeyDown={srchUser}
                 onChange={(e) => setSearchUser(e.target.value)}
                 value={searchUser}
-              ></TextField>
+              ></TextField> */}
             </ListItem>
             {userChatRooms.length > 0 ? (
               <List className={classes.list}>
@@ -104,7 +147,6 @@ const Messages = () => {
                     className={classes.listItem}
                     key={chatRoom._id}
                   >
-                    User{" "}
                     {chatRoom.roomUser1.id === user.id
                       ? chatRoom.roomUser2.name
                       : chatRoom.roomUser1.name}
@@ -114,6 +156,47 @@ const Messages = () => {
             ) : (
               <ListItem>Search for a user to Chat with</ListItem>
             )}
+
+            <div>
+              <Button
+                variant='outlined'
+                onClick={handleClickOpen}
+                className={classes.button}
+              >
+                New Chat
+              </Button>
+              <Dialog
+                open={openDialog}
+                onClose={handleClose}
+                aria-labelledby='form-dialog-title'
+              >
+                <DialogTitle id='form-dialog-title'>Search User</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    autoFocus
+                    margin='dense'
+                    id='name'
+                    label='Name'
+                    type='text'
+                    fullWidth
+                    onChange={(e) => setSearchUser(e.target.value)}
+                    value={searchUser}
+                  />
+                  <List>
+                    {matchedUser.map((user) => (
+                      <ListItem key={user.id} onClick={() => openNewChat(user)}>
+                        {user.name}
+                      </ListItem>
+                    ))}
+                  </List>
+                  <Typography variant='subtitle1'>{responseMessage}</Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose}>Cancel</Button>
+                  <Button onClick={srchUser}>Search</Button>
+                </DialogActions>
+              </Dialog>
+            </div>
           </Paper>
         </Grid>
         <Grid item sm={8}>
@@ -144,6 +227,19 @@ const useStyles = makeStyles({
   },
   userPanel: {
     height: "100%",
+  },
+  button: {
+    margin: "20px 0px 20px 20px",
+    backgroundColor: "black",
+    color: "white",
+    fontFamily: "Poppins",
+    fontWeight: 600,
+    borderRadius: "0",
+    padding: "10px",
+    "&:hover": {
+      background: "green",
+      cursor: "pointer",
+    },
   },
   messageBox: {
     display: "flex",

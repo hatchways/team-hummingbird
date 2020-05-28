@@ -56,7 +56,8 @@ const Chat = (props) => {
   const sendChatMessage = () => {
     //sends this message to server
     if (chatMessage) {
-      socket.emit("send-message", { chatMessage, currentUser }, () => {
+      socket.emit("send-message", chatMessage, currentUser, () => {
+        console.log("Ever executes?");
         setChatMessage("");
       });
     }

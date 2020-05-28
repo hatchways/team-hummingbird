@@ -29,7 +29,7 @@ const connection = (io, socket) => {
         console.log(err);
       });
   });
-  socket.on("send-message", ({ chatMessage, currentUser }, callback) => {
+  socket.on("send-message", (chatMessage, currentUser, callback) => {
     //save chatmessage to message list
     addMessageToChatRoom(
       {
