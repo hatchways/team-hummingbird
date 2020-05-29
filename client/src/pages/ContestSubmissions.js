@@ -37,6 +37,7 @@ export default function ContestSubmissions(props) {
         _id: contestId
     })
     useEffect(() => {
+        console.log(user)
         const getInfo = async () => {
             const contestInfo = await fetch(`/api/contest/${contestId}`, {
                 headers: {
@@ -71,6 +72,7 @@ export default function ContestSubmissions(props) {
                         container
                         spacing={2}
                         alignItems="center"
+                        style={{ opacity: user.id == contestInfo.user_id ? 1 : 0 }}
                     >
                         <Grid item>
                             <Avatar alt="user profile image"

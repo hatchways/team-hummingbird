@@ -29,7 +29,7 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant='filled' {...props}></MuiAlert>;
 }
 
-const Contest = () => {
+const Contest = (props) => {
   const { authTokens, setAuthTokens } = useAuth();
   const [user] = useState(authTokens ? authTokens.user : null);
   const currentDate = new Date();
@@ -92,6 +92,12 @@ const Contest = () => {
             status < 400 ? setSeverity("success") : setSeverity("error");
             setOpenAlert(true);
             setMessage(json.message);
+
+            setTimeout(() => {
+              props.history.push('/profile')
+            }, 1000)
+
+
           })
           .catch((err) => {
             console.log(err);
