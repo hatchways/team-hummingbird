@@ -16,6 +16,7 @@
     "react-router-dom": "^5.0.1",
     "react-s3-uploader": "^4.9.3",
     "react-scripts": "3.0.1",
+    "socket.io-client": "^2.3.0",
     "webpack": "4.29.6"
   },
   "scripts": {
