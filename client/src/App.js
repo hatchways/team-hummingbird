@@ -11,6 +11,8 @@ import Contest from "./pages/Contest";
 import Profile from "./pages/Profile";
 import Submission from "./pages/SubmitSubmission";
 import Messages from "./pages/Messages";
+import Settings from "./pages/Settings";
+import ContestSubmissions from "./pages/ContestSubmissions";
 
 import { AuthContext } from "./components/UserContext";
 
@@ -34,7 +36,10 @@ function App() {
           <Route path='/register' component={Register} />
           <Route path='/login' component={Login} />
           <Route path='/profile' component={Profile} />
-          <Route path='/contest' component={Contest} />
+          <Route exact path='/contest' component={Contest} />
+          <Route exact path='/contest/:id' component={ContestSubmissions} />
+          <Route path='/submit/:id' component={Submission} />
+          <Route path='/settings' component={Settings} />
           <Route path='/submission' component={Submission} />
           <Route path='/messages' component={Messages} />
         </BrowserRouter>

@@ -10,6 +10,10 @@ const SubmissionSchema = new Schema({
     type: String,
     required: true,
   },
+  user_name: {
+    type: String,
+    default: ""
+  },
   active: {
     type: Boolean,
     default: true,
