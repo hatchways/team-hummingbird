@@ -11,6 +11,8 @@ import Contest from "./pages/Contest";
 import Profile from "./pages/Profile";
 import Submission from "./pages/SubmitSubmission";
 import Messages from "./pages/Messages";
+import Settings from "./pages/Settings";
+import ContestSubmissions from "./pages/ContestSubmissions";
 
 import { AuthContext } from "./components/UserContext";
 
@@ -37,6 +39,9 @@ function App() {
           <Route path='/contest' component={Contest} />
           <Route path='/submission' component={Submission} />
           <Route path='/messages' component={Messages} />
+          <Route exact path='/contest/:id' component={ContestSubmissions} />
+          <Route path='/submit/:id' component={Submission} />
+          <Route path='/settings' component={Settings} />
         </BrowserRouter>
       </AuthContext.Provider>
     </MuiThemeProvider>

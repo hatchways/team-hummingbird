@@ -15,7 +15,7 @@ import {
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import S3 from "react-s3-uploader";
-
+import { Link } from "react-router-dom";
 import ContestCard from "../components/ContestCard";
 import { useAuth } from "../components/UserContext";
 
@@ -69,7 +69,10 @@ function Profile(props) {
     const resMyContests = await fetch("/api/users/contests?user_id=" + user.id);
     resMyContests
       .json()
-      .then((res) => setMyContests(res.contests))
+      .then((res) => {
+        setMyContests(res.contests);
+        console.log(res.contests);
+      })
       .catch((err) => console.error(err));
 
     const resEnteredContests = await fetch(
@@ -174,7 +177,13 @@ function Profile(props) {
                 Update Profile Image
               </Button>
             </label>
-            <div style={{ marginTop: "0.5rem", marginBottom: "6rem" }}>
+            <div
+              style={{
+                marginTop: "0.5rem",
+                marginBottom: "6rem",
+                textAlign: "center",
+              }}
+            >
               <Typography
                 display='block'
                 className={classes.instructions}
@@ -182,6 +191,15 @@ function Profile(props) {
               >
                 PNG, JPG
               </Typography>
+              <Link to='/settings'>
+                <Typography
+                  style={{ color: "black" }}
+                  display='block'
+                  variant='body1'
+                >
+                  Edit payment settings
+                </Typography>
+              </Link>
             </div>
           </div>
         </Grid>
@@ -215,6 +233,7 @@ function Profile(props) {
               ? myContests.map((contest) => {
                   return (
                     <ContestCard
+                      contest_id={contest._id}
                       imageUrl='https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png' //placeholder
                       title={contest.title}
                       description={contest.description}
@@ -232,6 +251,7 @@ function Profile(props) {
               ? enteredContests.map((contest) => {
                   return (
                     <ContestCard
+                      contest_id={contest._id}
                       imageUrl={
                         mySubmissions.filter(
                           (s) => s.contest_id === contest._id

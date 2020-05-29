@@ -102,7 +102,18 @@ router.put("/", auth, (req, res) => {
   }
 });
 
-// @route   GET api/users/contests/
+// @route   GET api/user/:id
+// @desc    Get a user's name by their ID.
+// @access  Public
+router.get("/name/:id", (req, res) => {
+  const user_id = req.params.id;
+  User.findById(user_id)
+    .select("name")
+    .then((user) => res.json(user))
+    .catch((err) => res.status(404));
+});
+
+// @route   GET api/user/contests/
 // @desc    Get all contests owned by a user
 // @access  Public
 router.get("/contests", (req, res) => {
