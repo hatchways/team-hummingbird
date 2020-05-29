@@ -6,11 +6,13 @@ import {
     Button,
     Typography,
     Snackbar,
+    Box
 } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
-
+import { Link } from 'react-router-dom'
 import S3 from 'react-s3-uploader'
+import { useAuth } from '../components/UserContext'
 
 export default function SubmitSubmission(props) {
     const [uploadedFiles, setUploadedFiles] = useState([])
@@ -20,21 +22,22 @@ export default function SubmitSubmission(props) {
     const [alertMessage, setAlertMessage] = useState("WARNING")
     const [severity, setSeverity] = useState("error") //allowed: error, warning, success, info
 
-    //get userID from future state manager
-    const userId = props.userId
-    const contestId = props.contestId
-
+    const contestId = props.match.params.id
+    const { authTokens } = useAuth();
+    const [user] = useState(authTokens ? authTokens.user : null);
     const handleSubmit = async () => {
         if (uploadedFiles.length > 0) {
             const submission = {
-                contestId,
-                userId,
+                contest_id: contestId,
+                user_id: user.id,
+                user_name: user.name,
                 upload_files: uploadedFiles
             }
             let request = await fetch(`/api/contest/:id/submission`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "x-auth-token": authTokens.token
                 },
                 body: JSON.stringify({
                     submission
@@ -69,6 +72,11 @@ export default function SubmitSubmission(props) {
     }
     return (
         <div className={classes.container}>
+            <Box size="large" className={classes.breadcrumbWrapper}>
+                <Link to={`/contest/${contestId}`}>
+                    <Typography variant="caption" className={classes.breadcrumb}>Back to Contest</Typography>
+                </Link>
+            </Box>
             <Grid
                 style={{ flex: 1, height: '80%' }}
                 container
@@ -166,8 +174,19 @@ export default function SubmitSubmission(props) {
 }
 //theme components styled with useStyles, local components use inline styles
 const useStyles = makeStyles(theme => ({
+    breadcrumbWrapper: {
+        marginTop: '2rem',
+        marginBottom: '2rem',
+        position: 'absolute',
+        left: '2rem',
+    },
+    breadcrumb: {
+        color: 'gray',
+        textDecoration: 'underline',
+    },
     container: {
         flexGrow: 1,
+        flexDirection: 'column',
         height: '100vh',
         display: 'flex',
         alignItems: 'center'

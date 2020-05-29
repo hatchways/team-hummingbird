@@ -18,18 +18,20 @@ import MuiAlert from "@material-ui/lab/Alert";
 import AttachMoneyOutlinedIcon from "@material-ui/icons/AttachMoneyOutlined";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import DateFnsUtils from "@date-io/date-fns";
-
+import { useAuth } from "../components/UserContext";
 import {
   MuiPickersUtilsProvider,
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-
+import { Redirect } from 'react-router-dom'
 function Alert(props) {
   return <MuiAlert elevation={6} variant='filled' {...props}></MuiAlert>;
 }
 
 const Contest = () => {
+  const { authTokens, setAuthTokens } = useAuth();
+  const [user] = useState(authTokens ? authTokens.user : null);
   const currentDate = new Date();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -72,13 +74,14 @@ const Contest = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            //set x-auth-token
+            "x-auth-token": authTokens.token
           },
           body: JSON.stringify({
             title,
             description,
-            prize,
-            deadlineDateToSubmit,
+            prize_amount: prize,
+            deadline_date: deadlineDateToSubmit,
+            user_id: user.id
           }),
         })
           .then((res) => {

@@ -14,7 +14,7 @@ const User = require("../../models/User");
 // @route   POST api/users/register
 // @desc    Register user
 // @access  Public
-router.post("/register", function(req, res, next) {
+router.post("/register", function (req, res, next) {
   const { name, email, password, password2 } = req.body;
   try {
     const normalizedEmail = normalizeEmail(email);
@@ -25,7 +25,7 @@ router.post("/register", function(req, res, next) {
     User.findOne({ email }).then(user => {
       if (user) {
         return res.status(400).json({ message: "Email already exists" });
-      } 
+      }
       else {
         const newUser = new User({
           name,
@@ -33,7 +33,7 @@ router.post("/register", function(req, res, next) {
           email_normalized: normalizedEmail,
           password
         });
-    
+
         // Hash password before saving in database
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -99,6 +99,17 @@ router.put("/", auth, (req, res) => {
       message: "Unauthorized to update this profile",
     });
   }
+});
+
+// @route   GET api/user/:id
+// @desc    Get a user's name by their ID.
+// @access  Public
+router.get('/name/:id', (req, res) => {
+  const user_id = req.params.id;
+  User.findById(user_id)
+    .select('name')
+    .then(user => res.json(user))
+    .catch(err => res.status(404))
 });
 
 // @route   GET api/user/contests/
