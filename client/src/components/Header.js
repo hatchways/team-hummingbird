@@ -38,6 +38,12 @@ const useStyles = makeStyles({
     textDecoration: "none",
     color: "white",
   },
+  links: {
+    color: "white",
+    marginTop: "60px",
+    marginBottom: "60px",
+    marginLeft: "30px",
+  },
 });
 
 function Header(props) {
@@ -56,16 +62,32 @@ function Header(props) {
             </a>
           </Grid>
           <Grid item xs={3}></Grid>
-            <Grid item xs={3}></Grid>
-            <Grid item xs={3}>
-              <Button 
-                variant='outlined' 
-                className={classes.button} 
-                href={authTokens ? '/contest' : path === '/login' ? '/register' : '/login'}
-              >
-                {authTokens ? 'CREATE CONTEST' : path === '/login' ? 'SIGN UP' : 'SIGN IN'}
-              </Button>
-            </Grid>
+          <Grid item xs={3}>
+            <a className={classes.link} href='/messages'>
+              <Typography variant='subtitle1' className={classes.links}>
+                Messages
+              </Typography>
+            </a>
+          </Grid>
+          <Grid item xs={3}>
+            <Button
+              variant='outlined'
+              className={classes.button}
+              href={
+                authTokens
+                  ? "/contest"
+                  : path === "/login"
+                  ? "/register"
+                  : "/login"
+              }
+            >
+              {authTokens
+                ? "CREATE CONTEST"
+                : path === "/login"
+                ? "SIGN UP"
+                : "SIGN IN"}
+            </Button>
+          </Grid>
         </Grid>
       </Toolbar>
     </AppBar>
