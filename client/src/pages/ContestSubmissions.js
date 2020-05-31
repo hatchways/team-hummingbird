@@ -122,13 +122,23 @@ export default function ContestSubmissions(props) {
                                     justifyContent: 'center'
                                 }}
                             >
-                                <Typography style={{
-                                    color: 'white',
-                                    alignSelf: 'flex-end',
-                                    marginBottom: '0.5rem',
-                                    fontWeight: 'bold',
-                                    textShadow: '0px 0px 3px black'
-                                }}>By @<span style={{ textDecoration: 'underline' }}>{submission.user_name ? submission.user_name : 'artist'}</span></Typography>
+                                <Link
+                                    style={{
+                                        color: 'white',
+                                        alignSelf: 'flex-end',
+                                        marginBottom: '0.5rem',
+                                        fontWeight: 'bold',
+                                        textShadow: '0px 0px 3px black'
+                                    }}
+                                    to="/messages">
+                                    <Typography style={{
+                                        color: 'white',
+                                        alignSelf: 'flex-end',
+                                        marginBottom: '0.5rem',
+                                        fontWeight: 'bold',
+                                        textShadow: '0px 0px 3px black'
+                                    }}>By @<span style={{ textDecoration: 'underline' }}>{submission.user_name ? submission.user_name : 'artist'}</span></Typography>
+                                </Link>
                             </div>
                         </GridListTile>
                     ))}
