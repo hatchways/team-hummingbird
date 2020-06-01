@@ -8,8 +8,12 @@ import {
   List,
   ListItem,
   Box,
+  useMediaQuery,
 } from "@material-ui/core";
 import socketIoClient from "socket.io-client";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+
 let socket;
 
 const Chat = (props) => {
@@ -17,6 +21,9 @@ const Chat = (props) => {
   const { currentUser } = props;
   const [chatMessage, setChatMessage] = useState("");
   const [chatRoom, setChatRoom] = useState(props.currentChatRoom);
+  const [showMore, setShowMore] = useState(true);
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+
   /* Connect to chatrooms namespace */
   const ENDPOINT = "/chatrooms";
 
@@ -62,13 +69,39 @@ const Chat = (props) => {
       });
     }
   };
+  const toggleChatList = () => {
+    setShowMore(!showMore);
+    props.toggleChatList();
+  };
   return (
     <Paper className={classes.chatComp}>
-      <Typography variant='h4' className={classes.userHeader}>
-        {chatRoom.roomUser1.id === currentUser.id
-          ? chatRoom.roomUser2.name
-          : chatRoom.roomUser1.name}
-      </Typography>
+      <Box className={classes.userHeader}>
+        <Typography variant='h4'>
+          {chatRoom.roomUser1.id === currentUser.id
+            ? chatRoom.roomUser2.name
+            : chatRoom.roomUser1.name}
+        </Typography>
+        <ExpandMoreIcon
+          className={
+            isMobile
+              ? showMore
+                ? classes.hideMobileMenu
+                : classes.mobileMenu
+              : classes.hideMobileMenu
+          }
+          onClick={toggleChatList}
+        ></ExpandMoreIcon>
+        <ExpandLessIcon
+          className={
+            isMobile
+              ? showMore
+                ? classes.mobileMenu
+                : classes.hideMobileMenu
+              : classes.hideMobileMenu
+          }
+          onClick={toggleChatList}
+        ></ExpandLessIcon>
+      </Box>
       <Box>
         <List className={classes.list}>
           {chatRoom.roomMessages.map((msg) => (
@@ -112,10 +145,19 @@ const useStyles = makeStyles({
     position: "relative",
   },
   userHeader: {
+    display: "flex",
+    alignItems: "center",
     backgroundColor: "#f1f1f1",
     height: "4rem",
-    paddingLeft: "10px",
-    lineHeight: "60px",
+    paddingLeft: "20px",
+  },
+  mobileMenu: {
+    position: "absolute",
+    right: "20px",
+    fontSize: "40px",
+  },
+  hideMobileMenu: {
+    display: "none",
   },
   button: {
     marginTop: "60px",
@@ -137,6 +179,7 @@ const useStyles = makeStyles({
     overflow: "auto",
     marginTop: "5px",
     padding: "5px 10px 0px 5px",
+    position: "relative",
     /* width */
     "&::-webkit-scrollbar": {
       width: "4px",
@@ -173,6 +216,7 @@ const useStyles = makeStyles({
   messageBox: {
     display: "flex",
     position: "absolute",
+    bottom: "0px",
     width: "100%",
     borderTop: "1px solid #f1f1f1",
     bottom: "0px",

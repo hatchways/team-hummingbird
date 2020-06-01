@@ -12,9 +12,10 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
+  useMediaQuery,
 } from "@material-ui/core";
+import MenuIcon from "@material-ui/icons/Menu";
 
 import Chat from "./Chat";
 import Notifications from "../components/Notifications";
@@ -30,6 +31,8 @@ const Messages = () => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [matchedUser, setMatchedUser] = React.useState([]);
   const [responseMessage, setResponseMessage] = React.useState("");
+  const userPanelRef = React.useRef();
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   const handleClickOpen = () => {
     setResponseMessage("");
@@ -116,19 +119,33 @@ const Messages = () => {
         }
       });
   };
-  // console.log(authTokens);
-  // console.log(userChatRooms);
+
+  const toggleChatList = (e) => {
+    if (userPanelRef.current.classList.contains(classes.userPanelMobile)) {
+      userPanelRef.current.classList.remove(classes.userPanelMobile);
+    } else {
+      userPanelRef.current.classList.add(classes.userPanelMobile);
+    }
+  };
   return { user } ? (
     <Box className={classes.messagesComp}>
       <Grid direction='row' container spacing={0}>
-        <Grid item sm={4}>
-          <Paper elevation={2} className={classes.userPanel}>
-            <Typography variant='h4' className={classes.header}>
-              Inbox Messages
-            </Typography>
+        <Grid item md={4} xs={12}>
+          <Paper elevation={2} className={classes.userPanel} ref={userPanelRef}>
+            <Box className={classes.chatList}>
+              <Typography variant='h4' className={classes.header}>
+                Inbox Messages
+              </Typography>
+              {/* <MenuIcon
+                className={
+                  isMobile ? classes.mobileMenu : classes.hideMobileMenu
+                }
+                onClick={toggleChatList}
+              ></MenuIcon> */}
+            </Box>
 
-            <ListItem className={classes.messageBox}>
-              {/* <TextField
+            {/* <ListItem className={classes.messageBox}>
+              <TextField
                 type='text'
                 variant='outlined'
                 fullWidth
@@ -136,8 +153,8 @@ const Messages = () => {
                 onKeyDown={srchUser}
                 onChange={(e) => setSearchUser(e.target.value)}
                 value={searchUser}
-              ></TextField> */}
-            </ListItem>
+              ></TextField>
+            </ListItem> */}
             {userChatRooms.length > 0 ? (
               <List className={classes.list}>
                 {userChatRooms.map((chatRoom) => (
@@ -198,9 +215,13 @@ const Messages = () => {
             </div>
           </Paper>
         </Grid>
-        <Grid item sm={8}>
+        <Grid item md={8} xs={12}>
           {currentChatRoom !== undefined && userChatRooms.length > 0 ? (
-            <Chat currentChatRoom={currentChatRoom} currentUser={user} />
+            <Chat
+              currentChatRoom={currentChatRoom}
+              currentUser={user}
+              toggleChatList={toggleChatList}
+            />
           ) : null}
         </Grid>
       </Grid>
@@ -217,16 +238,31 @@ const useStyles = makeStyles({
   messagesComp: {
     height: window.innerHeight - 80,
   },
-  header: {
+  chatList: {
+    position: "relative",
     height: "4rem",
+    display: "flex",
     borderBottom: "1px solid #f1f1f1",
-    paddingLeft: "10px",
+    padding: "0px 20px 0px 20px",
     lineHeight: "60px",
-    fontSize: "20px",
-    fontWeight: "bold",
   },
+  header: {
+    paddingTop: "10px",
+  },
+  // mobileMenu: {
+  //   position: "absolute",
+  //   right: "20px",
+  //   fontSize: "40px",
+  //   paddingTop: "10px",
+  // },
+  // hideMobileMenu: {
+  //   display: "none",
+  // },
   userPanel: {
     height: "100%",
+  },
+  userPanelMobile: {
+    display: "none",
   },
   button: {
     margin: "20px 0px 20px 20px",
