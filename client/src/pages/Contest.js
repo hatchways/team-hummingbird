@@ -13,6 +13,7 @@ import {
   Typography,
   InputAdornment,
   Snackbar,
+  useMediaQuery,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import AttachMoneyOutlinedIcon from "@material-ui/icons/AttachMoneyOutlined";
@@ -24,7 +25,7 @@ import {
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { Redirect } from 'react-router-dom'
+import { Redirect } from "react-router-dom";
 function Alert(props) {
   return <MuiAlert elevation={6} variant='filled' {...props}></MuiAlert>;
 }
@@ -43,6 +44,7 @@ const Contest = () => {
   const [openAlert, setOpenAlert] = useState(false);
   const [severity, setSeverity] = useState("error");
   const [message, setMessage] = useState("");
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const classes = styles();
 
   const selectDesign = (e) => {
@@ -74,14 +76,14 @@ const Contest = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-auth-token": authTokens.token
+            "x-auth-token": authTokens.token,
           },
           body: JSON.stringify({
             title,
             description,
             prize_amount: prize,
             deadline_date: deadlineDateToSubmit,
-            user_id: user.id
+            user_id: user.id,
           }),
         })
           .then((res) => {
@@ -152,7 +154,7 @@ const Contest = () => {
         </Box>
         <Box width='60%' margin='auto' display='flex'>
           <Grid container spacing={3}>
-            <Grid item xs={3}>
+            <Grid item md={3}>
               <Typography className={classes.title} variant='subtitle1'>
                 Prize amount*
               </Typography>
@@ -176,7 +178,7 @@ const Contest = () => {
                 onChange={(e) => setPrize(e.target.value)}
               />
             </Grid>
-            <Grid item xs={9}>
+            <Grid item md={9}>
               <Typography
                 className={classes.title}
                 variant='subtitle1'
@@ -232,9 +234,9 @@ const Contest = () => {
 
           <Box border={1} borderColor='grey.300' className={classes.designBox}>
             <GridList
-              cellHeight={140}
+              cellHeight={isMobile ? 70 : 140}
               className={classes.gridList}
-              cols={4}
+              cols={isMobile ? 2 : 4}
               spacing={10}
             >
               {imageGridList.map((image) => (

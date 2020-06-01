@@ -177,5 +177,6 @@ const useStyles = makeStyles({
     borderTop: "1px solid #f1f1f1",
     bottom: "0px",
     alignItems: "center",
+    zIndex: "2",
   },
 });
