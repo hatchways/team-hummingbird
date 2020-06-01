@@ -26,12 +26,22 @@ app.set("port", port);
 var server = http.createServer(app);
 //const server = http.createServer(app);
 const io = socketIo(server);
+const chatRoomsNameSpace = io.of("/chatrooms");
+
+//default Connection Handler
 io.on("connection", (socket) => {
-  connection(io, socket);
+  console.log("Client connected to Default connection");
   socket.on("disconnect", () => {
-    // socket.removeAllListeners();
-    // io.removeAllListeners();
-    console.log("client disconnected");
+    console.log("Client disconnected from default namespace");
+  });
+});
+
+//Chat Room Messages Connection Handler
+chatRoomsNameSpace.on("connection", (socket) => {
+  console.log("Client connected to Chat Room Messages NameSpace");
+  connection(chatRoomsNameSpace, socket);
+  socket.on("disconnect", () => {
+    console.log("client disconnected from chat room message namespace");
   });
 });
 

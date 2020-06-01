@@ -17,11 +17,13 @@ import {
 } from "@material-ui/core";
 
 import Chat from "./Chat";
-import { useAuth } from "../components/UserContext";
+import Notifications from "../components/Notifications";
+import { useAuth, useNotification } from "../components/UserContext";
 
 const Messages = () => {
   const classes = useStyles();
   const { authTokens, setAuthTokens } = useAuth();
+  const { openNotification } = useNotification();
   const [searchUser, setSearchUser] = useState("");
   const [user, setUser] = useState(authTokens ? authTokens.user : null);
   const [userChatRooms, setUserChatRooms] = useState([]);
@@ -57,7 +59,6 @@ const Messages = () => {
   }, []);
 
   const changeChatRoom = (changeRoom) => {
-    console.log(changeRoom);
     fetch("api/chatroom/" + changeRoom._id, {
       method: "GET",
       headers: {
@@ -68,7 +69,6 @@ const Messages = () => {
       .then((res) => res.json())
       .then((result) => {
         const updRoom = { ...changeRoom, roomMessages: result.roomMessages };
-        console.log(updRoom);
         setCurrentChatRoom(updRoom);
       });
   };
@@ -83,7 +83,6 @@ const Messages = () => {
         },
       }).then((res) =>
         res.json().then((result) => {
-          console.log(result);
           setMatchedUser(result.users);
         })
       );
@@ -205,6 +204,7 @@ const Messages = () => {
           ) : null}
         </Grid>
       </Grid>
+      {openNotification ? <Notifications /> : null}
     </Box>
   ) : (
     <Typography variant='h3'>Please SignIn</Typography>

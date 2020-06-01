@@ -16,9 +16,9 @@ const Chat = (props) => {
   const classes = useStyles();
   const { currentUser } = props;
   const [chatMessage, setChatMessage] = useState("");
-  //const [messageList, setMessageList] = useState([]);
   const [chatRoom, setChatRoom] = useState(props.currentChatRoom);
-  const ENDPOINT = "/";
+  /* Connect to chatrooms namespace */
+  const ENDPOINT = "/chatrooms";
 
   useEffect(() => {
     setChatRoom(props.currentChatRoom);
