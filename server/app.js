@@ -14,6 +14,7 @@ const authRouter = require("./routes/api/auth");
 const contestRouter = require("./routes/api/contest");
 const contestsRouter = require("./routes/api/contests");
 const chatRoomRouter = require("./routes/api/chatroom");
+const notificationsRouter = require("./routes/api/notifications");
 const db = config.get("mongoURI");
 
 const { json, urlencoded } = express;
@@ -26,6 +27,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   })
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
@@ -43,6 +45,7 @@ app.use("/api/contests", contestsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/chatroom", chatRoomRouter);
+app.use("/api/notifications", notificationsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
