@@ -25,9 +25,9 @@ const Messages = () => {
   const [searchUser, setSearchUser] = useState("");
   const [user, setUser] = useState(authTokens ? authTokens.user : null);
   const [userChatRooms, setUserChatRooms] = useState([]);
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [matchedUser, setMatchedUser] = React.useState([]);
-  const [responseMessage, setResponseMessage] = React.useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [matchedUser, setMatchedUser] = useState([]);
+  const [responseMessage, setResponseMessage] = useState("");
 
   const handleClickOpen = () => {
     setResponseMessage("");
@@ -121,10 +121,10 @@ const Messages = () => {
   // console.log(userChatRooms);
   return { user } ? (
     <Box className={classes.messagesComp}>
-      <Grid direction='row' container spacing={0}>
+      <Grid direction="row" container spacing={0}>
         <Grid item sm={4}>
           <Paper elevation={2} className={classes.userPanel}>
-            <Typography variant='h4' className={classes.header}>
+            <Typography variant="h4" className={classes.header}>
               Inbox Messages
             </Typography>
 
@@ -159,7 +159,7 @@ const Messages = () => {
 
             <div>
               <Button
-                variant='outlined'
+                variant="outlined"
                 onClick={handleClickOpen}
                 className={classes.button}
               >
@@ -168,16 +168,16 @@ const Messages = () => {
               <Dialog
                 open={openDialog}
                 onClose={handleClose}
-                aria-labelledby='form-dialog-title'
+                aria-labelledby="form-dialog-title"
               >
-                <DialogTitle id='form-dialog-title'>Search User</DialogTitle>
+                <DialogTitle id="form-dialog-title">Search User</DialogTitle>
                 <DialogContent>
                   <TextField
                     autoFocus
-                    margin='dense'
-                    id='name'
-                    label='Name'
-                    type='text'
+                    margin="dense"
+                    id="name"
+                    label="Name"
+                    type="text"
                     fullWidth
                     onChange={(e) => setSearchUser(e.target.value)}
                     value={searchUser}
@@ -189,7 +189,7 @@ const Messages = () => {
                       </ListItem>
                     ))}
                   </List>
-                  <Typography variant='subtitle1'>{responseMessage}</Typography>
+                  <Typography variant="subtitle1">{responseMessage}</Typography>
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleClose}>Cancel</Button>
@@ -207,7 +207,7 @@ const Messages = () => {
       </Grid>
     </Box>
   ) : (
-    <Typography variant='h3'>Please SignIn</Typography>
+    <Typography variant="h3">Please SignIn</Typography>
   );
 };
 

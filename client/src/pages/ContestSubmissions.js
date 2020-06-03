@@ -14,7 +14,13 @@ import {
   Tabs,
   useMediaQuery,
   Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@material-ui/core";
+import { CheckCircle } from "@material-ui/icons";
 import { useAuth } from "../components/UserContext";
 import { Link } from "react-router-dom";
 
@@ -23,6 +29,7 @@ export default function ContestSubmissions(props) {
   const [user] = useState(authTokens ? authTokens.user : null);
   const date = new Date();
 
+  const [openDialog, setOpenDialog] = useState(false);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("xs"));
   const [submissions, setSubmissions] = useState(imageGridList);
   const classes = useStyles();
@@ -37,6 +44,16 @@ export default function ContestSubmissions(props) {
     user_id: "",
     _id: contestId,
   });
+  const [contestOwner, setContestOwner] = useState(null);
+
+  const handleClickOpen = () => {
+    setOpenDialog(true);
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
+
   useEffect(() => {
     console.log(user);
     const getInfo = async () => {
@@ -50,6 +67,7 @@ export default function ContestSubmissions(props) {
       console.log(jsonContestInfo);
       setContestInfo(jsonContestInfo.contest);
       setSubmissions(jsonContestInfo.submissions);
+      setContestOwner(jsonContestInfo.owner);
     };
     getInfo();
   }, [user]);
@@ -74,27 +92,25 @@ export default function ContestSubmissions(props) {
               ${contestInfo ? contestInfo.prize_amount : ""}
             </span>
           </div>
-          <Grid
-            item
-            container
-            spacing={2}
-            alignItems="center"
-            style={{
-              opacity: user.id == contestInfo && contestInfo.user_id ? 1 : 0,
-            }}
-          >
+          <Grid item container spacing={2} alignItems="center">
             <Grid item>
               <Avatar
                 alt="user profile image"
                 src={
-                  user?.profile_image_url ||
-                  "https://hatchways-hummingbird.s3.amazonaws.com/1590245137718image-2.png"
+                  contestOwner
+                    ? contestOwner.profile_image_url
+                    : "https://hatchways-hummingbird.s3.amazonaws.com/1590245137718image-2.png"
                 }
               />
             </Grid>
             <Grid item>
               <Typography variant="body1">
-                By {user?.name || "Placeholder Paul"}
+                Created by{" "}
+                {contestInfo && user.id == contestInfo.user_id
+                  ? "you"
+                  : contestOwner
+                  ? contestOwner.name
+                  : "Placeholder Paul"}
               </Typography>
             </Grid>
           </Grid>
@@ -143,29 +159,29 @@ export default function ContestSubmissions(props) {
           {submissions
             ? submissions.map((submission, index) => (
                 <GridListTile key={index} cols={1}>
-                  <div
+                  <a
+                    href="#"
                     style={{
-                      margin: "5px",
-                      width: "100%",
-                      height: "100%",
-                      backgroundImage: `url(${submission.upload_files[0]})`,
-                      backgroundSize: "cover",
-                      backgroundRepeat: "no-repeat",
-                      display: "flex",
-                      justifyContent: "center",
+                      "&:hover": {
+                        boxShadow:
+                          "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                      },
                     }}
+                    onClick={handleClickOpen}
                   >
-                    <Link
+                    <div
                       style={{
-                        color: "white",
-                        alignSelf: "flex-end",
-                        marginBottom: "0.5rem",
-                        fontWeight: "bold",
-                        textShadow: "0px 0px 3px black",
+                        margin: "5px",
+                        width: "100%",
+                        height: "100%",
+                        backgroundImage: `url(${submission.upload_files[0]})`,
+                        backgroundSize: "cover",
+                        backgroundRepeat: "no-repeat",
+                        display: "flex",
+                        justifyContent: "center",
                       }}
-                      to="/messages"
                     >
-                      <Typography
+                      <Link
                         style={{
                           color: "white",
                           alignSelf: "flex-end",
@@ -173,16 +189,33 @@ export default function ContestSubmissions(props) {
                           fontWeight: "bold",
                           textShadow: "0px 0px 3px black",
                         }}
+                        to="/messages"
                       >
-                        By @
-                        <span style={{ textDecoration: "underline" }}>
-                          {submission.user_name
-                            ? submission.user_name
-                            : "artist"}
-                        </span>
-                      </Typography>
-                    </Link>
-                  </div>
+                        <Typography
+                          style={{
+                            color: "white",
+                            alignSelf: "flex-end",
+                            marginBottom: "0.5rem",
+                            fontWeight: "bold",
+                            textShadow: "0px 0px 3px black",
+                          }}
+                        >
+                          by @
+                          <span style={{ textDecoration: "underline" }}>
+                            {submission.user_name
+                              ? submission.user_name
+                              : "artist"}
+                          </span>
+                        </Typography>
+                      </Link>
+                      {/* <IconButton
+                      aria-label={`info about ${submission.title}`}
+                      style={{ color: "green", float: "right" }}
+                    >
+                      <CheckCircle />
+                    </IconButton> */}
+                    </div>
+                  </a>
                 </GridListTile>
               ))
             : ""}
@@ -198,6 +231,20 @@ export default function ContestSubmissions(props) {
           </Typography>
         </Paper>
       </TabPanel>
+      <Dialog
+        open={openDialog}
+        onClose={handleClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">
+          Mark as winner and pay?
+        </DialogTitle>
+        <DialogContent></DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={() => console.log("test")}>Confirm & Pay</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
@@ -245,6 +292,15 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
     fontWeight: 600,
     maxHeight: 50,
+  },
+  winnerButton: {
+    borderRadius: 0,
+    borderColor: "green",
+    backgroundColor: "green",
+    color: "white",
+    fontWeight: 600,
+    maxHeight: 50,
+    marginTop: 10,
   },
   tabs: {
     "& .MuiTabs-indicator": {

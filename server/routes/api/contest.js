@@ -9,35 +9,44 @@ const Submission = require("../../models/submission");
 // access: private
 
 contestRouter.get("/:id", auth, (req, res) => {
-  let submissionQuery, result = {};
+  let submissionQuery,
+    result = {};
   Contest.findById(req.params.id)
     .then((contest) => {
       if (contest) {
         result.contest = contest;
-
-        if (contest.user_id === req.user.id) {
-          submissionQuery = {
-            contest_id: contest._id
-          }
-        }
-        else {
-          submissionQuery = {
-            contest_id: contest._id,
-            user_id: req.user.id
-          }
-        }
-        Submission.find({ contest_id: contest._id })
-          .then(submissions => {
-            if (submissionQuery.user_id) {
-              let filteredResults = submissions.filter((submission) => {
-                return submission.user_id === submissionQuery.user_id
-              })
-              result.submissions = filteredResults
-              res.status(200).json(result);
+        User.findById(contest.user_id)
+          .then((user) => {
+            result.owner = user;
+            console.log(result);
+            if (contest.user_id === req.user.id) {
+              submissionQuery = {
+                contest_id: contest._id,
+              };
             } else {
-              result.submissions = submissions;
-              res.status(200).json(result);
+              submissionQuery = {
+                contest_id: contest._id,
+                user_id: req.user.id,
+              };
             }
+            Submission.find({ contest_id: contest._id })
+              .then((submissions) => {
+                if (submissionQuery.user_id) {
+                  let filteredResults = submissions.filter((submission) => {
+                    return submission.user_id === submissionQuery.user_id;
+                  });
+                  result.submissions = filteredResults;
+                  res.status(200).json(result);
+                } else {
+                  result.submissions = submissions;
+                  res.status(200).json(result);
+                }
+              })
+              .catch((err) => {
+                res.status(500).json({
+                  message: err.message,
+                });
+              });
           })
           .catch((err) => {
             res.status(500).json({
@@ -60,7 +69,7 @@ contestRouter.get("/:id", auth, (req, res) => {
 // access: private
 
 contestRouter.post("/", auth, (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
   const { title, description, prize_amount, deadline_date } = req.body;
   if (!(title && description && prize_amount && deadline_date)) {
     res.json({
@@ -138,7 +147,7 @@ contestRouter.post("/:id/submission", auth, (req, res) => {
     contest_id,
     user_id,
     upload_files,
-    user_name
+    user_name,
   });
 
   newSubmission
@@ -147,7 +156,7 @@ contestRouter.post("/:id/submission", auth, (req, res) => {
       res.json("Submission added successfully");
     })
     .catch((err) => {
-      console.log(err.message)
+      console.log(err.message);
       res.status(400).json("Error: " + err.message);
     });
 });
@@ -162,7 +171,7 @@ contestRouter.get("/:id/submissions", auth, (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      console.log(submissionsFound)
+      console.log(submissionsFound);
       res.json(submissionsFound);
     }
   });
