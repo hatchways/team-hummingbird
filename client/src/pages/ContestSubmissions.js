@@ -45,9 +45,12 @@ export default function ContestSubmissions(props) {
     _id: contestId,
   });
   const [contestOwner, setContestOwner] = useState(null);
+  const [chosenSubmission, setChosenSubmission] = useState(null);
+  const [contestWinner, setContestWinner] = useState(null);
 
-  const handleClickOpen = () => {
+  const handleClickOpen = (submissionId) => {
     setOpenDialog(true);
+    setChosenSubmission(submissionId);
   };
 
   const handleClose = () => {
@@ -68,9 +71,35 @@ export default function ContestSubmissions(props) {
       setContestInfo(jsonContestInfo.contest);
       setSubmissions(jsonContestInfo.submissions);
       setContestOwner(jsonContestInfo.owner);
+      setContestWinner(
+        jsonContestInfo.submissions.filter((submission) => submission.winner)[0]
+      );
     };
     getInfo();
   }, [user]);
+
+  const handleChooseWinner = (submissionId) => {
+    fetch(`/api/contest/${contestId}/submission/${submissionId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
+      body: JSON.stringify({
+        winner: true,
+      }),
+    })
+      .then((response) => response.json())
+      .then((json) => {
+        //   handleAlert("Uploaded successfully", "success");
+        console.log(json.message);
+        handleClose();
+      })
+      .catch((err) => {
+        console.log(err);
+        //   handleAlert("Error updating profile image", "error");
+      });
+  };
 
   return (
     <Container>
@@ -167,7 +196,11 @@ export default function ContestSubmissions(props) {
                           "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
                       },
                     }}
-                    onClick={handleClickOpen}
+                    onClick={() =>
+                      user.id === contestInfo.user_id && !contestWinner
+                        ? handleClickOpen(submission._id)
+                        : null
+                    }
                   >
                     <div
                       style={{
@@ -236,13 +269,13 @@ export default function ContestSubmissions(props) {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">
-          Mark as winner and pay?
-        </DialogTitle>
+        <DialogTitle id="form-dialog-title">Choose winner and pay?</DialogTitle>
         <DialogContent></DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={() => console.log("test")}>Confirm & Pay</Button>
+          <Button onClick={() => handleChooseWinner(chosenSubmission)}>
+            Confirm & Pay
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>

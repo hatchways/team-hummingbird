@@ -93,7 +93,7 @@ contestRouter.post("/", auth, (req, res) => {
         });
       })
       .catch((err) => {
-        res.status(400).json({
+        res.status(500).json({
           message: err.message,
         });
       });
@@ -118,7 +118,7 @@ contestRouter.put("/:id", auth, (req, res) => {
       },
       (err, result) => {
         if (err) {
-          res.status(400).json({
+          res.status(500).json({
             message: err.message,
           });
         }
@@ -128,7 +128,7 @@ contestRouter.put("/:id", auth, (req, res) => {
       }
     );
   } else {
-    res.status(403).json({
+    res.status(401).json({
       message: "User not authorized to update this contest",
     });
   }
@@ -153,12 +153,60 @@ contestRouter.post("/:id/submission", auth, (req, res) => {
   newSubmission
     .save()
     .then(() => {
-      res.json("Submission added successfully");
+      res.status(201).json("Submission added successfully");
     })
     .catch((err) => {
       console.log(err.message);
-      res.status(400).json("Error: " + err.message);
+      res.status(500).json("Error: " + err.message);
     });
+});
+
+// Route: PUT api/contest/:id/submission
+// Desc: Update a submission
+// access: private
+
+contestRouter.put("/:id/submission/:submission_id", auth, (req, res) => {
+  const { winner } = req.body;
+  console.log(req.body);
+  Contest.findById(req.params.id)
+    .then((contest) => {
+      if (contest) {
+        Submission.findById(req.params.submission_id)
+          .then((submission) => {
+            if (submission && contest.user_id === req.user.id) {
+              Submission.findByIdAndUpdate(
+                req.params.submission_id,
+                {
+                  winner,
+                },
+                (err, result) => {
+                  if (err) {
+                    res.status(500).json({
+                      message: "Error: " + err.message,
+                    });
+                  } else {
+                    res.status(200).json({
+                      message: "Submission updated successfully",
+                    });
+                  }
+                }
+              );
+            } else {
+              res.status(401).json({
+                message: "User not authorized to update this submission",
+              });
+            }
+          })
+          .catch((err) =>
+            res.status(500).json({ message: "Error: " + err.message })
+          );
+      } else {
+        res.status(400).json({
+          message: "Contest not found",
+        });
+      }
+    })
+    .catch((err) => res.status(500).json({ message: "Error: " + err.message }));
 });
 
 // Route: GET api/contest/:id/submissions
