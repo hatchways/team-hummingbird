@@ -14,10 +14,13 @@ import {
   DialogContent,
   DialogTitle,
 } from "@material-ui/core";
+import socketIoClient from "socket.io-client";
 
 import Chat from "./Chat";
 import Notifications from "../components/Notifications";
 import { useAuth, useNotification } from "../components/UserContext";
+
+let socket;
 
 const Messages = (props) => {
   const classes = useStyles();
@@ -29,7 +32,10 @@ const Messages = (props) => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [matchedUser, setMatchedUser] = React.useState([]);
   const [responseMessage, setResponseMessage] = React.useState("");
+  const [currentChatRoom, setCurrentChatRoom] = useState();
+
   const userPanelRef = React.useRef();
+  const ENDPOINT = "/chatrooms";
 
   const handleClickOpen = () => {
     setResponseMessage("");
@@ -41,8 +47,6 @@ const Messages = (props) => {
   const handleClose = () => {
     setOpenDialog(false);
   };
-
-  const [currentChatRoom, setCurrentChatRoom] = useState();
 
   useEffect(() => {
     fetch("/api/chatroom?user_id=" + user.id, {
@@ -69,6 +73,13 @@ const Messages = (props) => {
       .then((res) => res.json())
       .then((result) => {
         const updRoom = { ...changeRoom, roomMessages: result.roomMessages };
+        if (socket) {
+          socket.emit("disconnect");
+          socket.off();
+          socket.close();
+        }
+        socket = socketIoClient(ENDPOINT);
+        socket.emit("join", updRoom, () => {});
         setCurrentChatRoom(updRoom);
       });
   };
@@ -213,11 +224,14 @@ const Messages = (props) => {
           </Paper>
         </Grid>
         <Grid item md={8} xs={12}>
-          {currentChatRoom !== undefined && userChatRooms.length > 0 ? (
+          {currentChatRoom !== undefined &&
+          socket !== undefined &&
+          userChatRooms.length > 0 ? (
             <Chat
               currentChatRoom={currentChatRoom}
               currentUser={user}
               toggleChatList={toggleChatList}
+              socket={socket}
             />
           ) : null}
         </Grid>

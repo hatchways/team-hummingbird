@@ -34,6 +34,7 @@ function App() {
   };
 
   useEffect(() => {
+    //connect to default socket
     socketNotify = socketIoClient(ENDPOINT);
     if (authTokens) {
       socketNotify.emit("login", authTokens.user);

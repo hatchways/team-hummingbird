@@ -10,11 +10,8 @@ import {
   Box,
   useMediaQuery,
 } from "@material-ui/core";
-import socketIoClient from "socket.io-client";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-
-let socket;
 
 const Chat = (props) => {
   const classes = useStyles();
@@ -23,23 +20,23 @@ const Chat = (props) => {
   const [chatRoom, setChatRoom] = useState(props.currentChatRoom);
   const [showMore, setShowMore] = useState(true);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
-
+  let socket = props.socket;
   /* Connect to chatrooms namespace */
-  const ENDPOINT = "/chatrooms";
+  // const ENDPOINT = "/chatrooms";
 
   useEffect(() => {
     setChatRoom(props.currentChatRoom);
   }, [props.currentChatRoom]);
 
-  useEffect(() => {
-    socket = socketIoClient(ENDPOINT);
-    socket.emit("join", chatRoom, () => {});
-    return () => {
-      socket.emit("disconnect");
-      socket.off();
-      socket.close();
-    };
-  }, [chatRoom]);
+  // useEffect(() => {
+  //   socket = socketIoClient(ENDPOINT);
+  //   socket.emit("join", chatRoom, () => {});
+  //   return () => {
+  //     socket.emit("disconnect");
+  //     socket.off();
+  //     socket.close();
+  //   };
+  // }, [chatRoom]);
 
   useEffect(() => {
     socket.off("receive-message").on("receive-message", (msg) => {
