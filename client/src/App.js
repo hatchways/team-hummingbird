@@ -40,21 +40,9 @@ function App() {
       socketNotify.emit("login", authTokens.user);
     }
     socketNotify.on("send-user-notifications", (fetchNotification) => {
-      //set this in notification context
-      let newList = [];
-      let oldList = [];
-      fetchNotification.notifications.map((notification) => {
-        if (!notification.read_status) {
-          newList.push(notification);
-        } else {
-          oldList.push(notification);
-        }
-      });
       setUserNotifications({
         ...userNotifications,
         ...fetchNotification,
-        newList: newList.sort((a, b) => a.time > b.time),
-        oldList: oldList.sort((a, b) => a.time > b.time),
       });
     });
     return () => {

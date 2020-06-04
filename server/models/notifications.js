@@ -7,15 +7,15 @@ const NotificationSchema = new Schema({
     required: true,
     unique: true,
   },
-  notifications: {
+  new_notifications: {
     type: Array,
     required: true,
     default: [],
   },
-  new_notification: {
-    type: Boolean,
+  old_notifications: {
+    type: Array,
     required: true,
-    default: false,
+    default: [],
   },
 });
 

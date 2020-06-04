@@ -41,13 +41,11 @@ const addMessageToChatRoom = async (msg, currentRoom, currentUser) => {
         updateNotification[0].id,
         {
           $set: {
-            new_notification: true,
-            notifications: [
-              ...updateNotification[0].notifications,
+            new_notifications: [
+              ...updateNotification[0].new_notifications,
               {
                 user: currentUser,
                 text: `${currentUser.name} sent you a message`,
-                read_status: false,
                 time: moment().format("YYYY-MM-DDTHH:mm:ss"),
               },
             ],
