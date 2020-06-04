@@ -54,13 +54,13 @@ export default function Discover() {
         {!user ? (
           <Typography
             style={{
-              margin: "1rem",
+              margin: "1rem 0.5rem",
               textAlign: "center",
             }}
             variant="h6"
           >
-            Tattoo Art is a platform that for tattoo artists and seekers. <br />
-            Find inspiration, create a contest, get inked!
+            The platform for tattoo pros & fans. <br />
+            Find ideas, start a contest, get ink!
           </Typography>
         ) : null}
         <Typography variant="h1">Open Contests</Typography>

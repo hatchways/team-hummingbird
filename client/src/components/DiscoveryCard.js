@@ -6,6 +6,7 @@ import {
   CardMedia,
   CardContent,
   Typography,
+  makeStyles,
 } from "@material-ui/core";
 
 export default function DiscoveryCard(props) {
@@ -21,7 +22,7 @@ export default function DiscoveryCard(props) {
     firstImage,
   } = props;
   const [countdown, setCountdown] = useState(0);
-
+  const classes = useStyles();
   useEffect(() => {
     const dateHelper = () => {
       const deadline = Date.parse(deadline_date);
@@ -40,12 +41,16 @@ export default function DiscoveryCard(props) {
     dateHelper();
   }, []);
   return (
-    <Card style={{ width: 350, marginBottom: "1.5rem" }}>
+    <Card className={classes.root}>
       <CardHeader
         avatar={<Avatar src={profile_image_url}>N</Avatar>}
         disableTypography
         title={<Typography variant="h6">{title}</Typography>}
-        subheader={<Typography variant="body2">By {name}</Typography>}
+        subheader={
+          <Typography variant="body2">
+            By <span style={{ textDecoration: "underline" }}>@{name}</span>
+          </Typography>
+        }
       />
       <CardMedia style={{ height: 0, paddingTop: "75%" }} image={firstImage} />
       <CardContent>
@@ -73,3 +78,13 @@ export default function DiscoveryCard(props) {
     </Card>
   );
 }
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: 600,
+    marginBottom: "1.5rem",
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+    },
+  },
+}));
