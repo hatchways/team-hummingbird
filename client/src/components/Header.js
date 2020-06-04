@@ -51,27 +51,33 @@ function Header(props) {
   const path = window.location.pathname;
   const classes = useStyles();
   return (
-    <AppBar position='static' className={classes.bar}>
+    <AppBar position="static" className={classes.bar}>
       <Toolbar>
         <Grid container>
           <Grid item xs={3}>
-            <a className={classes.link} href='/'>
-              <Typography variant='h6' className={classes.title}>
+            <a className={classes.link} href="/">
+              <Typography variant="h6" className={classes.title}>
                 TATTOO ART
               </Typography>
             </a>
           </Grid>
-          <Grid item xs={3}></Grid>
           <Grid item xs={3}>
-            <a className={classes.link} href='/messages'>
-              <Typography variant='subtitle1' className={classes.links}>
+            <a className={classes.link} href="/">
+              <Typography variant="subtitle1" className={classes.links}>
+                Discover
+              </Typography>
+            </a>
+          </Grid>
+          <Grid item xs={3}>
+            <a className={classes.link} href="/messages">
+              <Typography variant="subtitle1" className={classes.links}>
                 Messages
               </Typography>
             </a>
           </Grid>
           <Grid item xs={3}>
             <Button
-              variant='outlined'
+              variant="outlined"
               className={classes.button}
               href={
                 authTokens
