@@ -37,7 +37,8 @@ const connection = (io, socket) => {
         sender: currentUser.name,
         time: moment().format("h:mm:ss a"),
       },
-      currentRoom
+      currentRoom,
+      currentUser
     );
     io.to(currentRoom._id).emit("receive-message", {
       text: chatMessage,

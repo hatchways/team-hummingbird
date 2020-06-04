@@ -12,6 +12,7 @@ var http = require("http");
 const socketIo = require("socket.io");
 
 const connection = require("../socketio/connection");
+const notification = require("../socketio/notification");
 /**
  * Get port from environment and store in Express.
  */
@@ -31,6 +32,7 @@ const chatRoomsNameSpace = io.of("/chatrooms");
 //default Connection Handler
 io.on("connection", (socket) => {
   console.log("Client connected to Default connection");
+  notification(io, socket);
   socket.on("disconnect", () => {
     console.log("Client disconnected from default namespace");
   });

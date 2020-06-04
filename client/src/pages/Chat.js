@@ -43,15 +43,10 @@ const Chat = (props) => {
 
   useEffect(() => {
     socket.off("receive-message").on("receive-message", (msg) => {
-      //  console.log(messageList);
       const updRoomMessages = [...chatRoom.roomMessages, msg];
       setChatRoom({ ...chatRoom, roomMessages: updRoomMessages });
-      // setMessageList([...messageList, msg]);
+      setChatMessage("");
     });
-
-    // socket.on("pass-message-hist", (msgHistory) => {
-    //   setMessageList([...msgHistory]);
-    // });
   });
 
   const keyPress = (e) => {

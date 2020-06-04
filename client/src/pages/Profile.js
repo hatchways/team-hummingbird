@@ -65,13 +65,11 @@ function Profile(props) {
   const [user, setUser] = useState(authTokens ? authTokens.user : null);
 
   async function fetchData() {
-    console.log(user);
     const resMyContests = await fetch("/api/users/contests?user_id=" + user.id);
     resMyContests
       .json()
       .then((res) => {
         setMyContests(res.contests);
-        console.log(res.contests);
       })
       .catch((err) => console.error(err));
 

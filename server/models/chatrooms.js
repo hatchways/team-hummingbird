@@ -2,12 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ChatRoomSchema = new Schema({
-  // userChatId: {
-  //   type: String,
-  // },
-  // userChatId2: {
-  //   type: String,
-  // },
   roomMessages: {
     type: Array,
     default: [],

@@ -22,7 +22,9 @@ import "./App.css";
 function App() {
   const existingTokens = JSON.parse(localStorage.getItem("tokens"));
   const [authTokens, setAuthTokens] = useState(existingTokens);
-  const [openNotification, setOpenNotification] = useState(false);
+  const [userNotifications, setUserNotifications] = useState({
+    openNotification: false,
+  });
   const ENDPOINT = "/";
   let socketNotify;
 
@@ -33,7 +35,27 @@ function App() {
 
   useEffect(() => {
     socketNotify = socketIoClient(ENDPOINT);
-
+    if (authTokens) {
+      socketNotify.emit("login", authTokens.user);
+    }
+    socketNotify.on("send-user-notifications", (fetchNotification) => {
+      //set this in notification context
+      let newList = [];
+      let oldList = [];
+      fetchNotification.notifications.map((notification) => {
+        if (!notification.read_status) {
+          newList.push(notification);
+        } else {
+          oldList.push(notification);
+        }
+      });
+      setUserNotifications({
+        ...userNotifications,
+        ...fetchNotification,
+        newList: newList.sort((a, b) => a.time > b.time),
+        oldList: oldList.sort((a, b) => a.time > b.time),
+      });
+    });
     return () => {
       socketNotify.emit("disconnect");
       socketNotify.off();
@@ -45,7 +67,7 @@ function App() {
     <MuiThemeProvider theme={theme}>
       <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
         <NotificationContext.Provider
-          value={{ openNotification, setOpenNotification }}
+          value={{ userNotifications, setUserNotifications }}
         >
           <BrowserRouter>
             <Route path='/' component={Header} />
@@ -59,7 +81,11 @@ function App() {
             <Route path='/profile' component={Profile} />
             <Route path='/contest' component={Contest} />
             <Route path='/submission' component={Submission} />
-            <Route path='/messages' component={Messages} />
+            <Route
+              path='/messages'
+              component={Messages}
+              socketNotify={socketNotify}
+            />
             <Route exact path='/contest/:id' component={ContestSubmissions} />
             <Route path='/submit/:id' component={Submission} />
             <Route path='/settings' component={Settings} />

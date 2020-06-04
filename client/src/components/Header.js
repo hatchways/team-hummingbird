@@ -9,7 +9,6 @@ import {
 } from "@material-ui/core";
 
 import { useAuth, useNotification } from "./UserContext";
-import Notifications from "./Notifications";
 
 const useStyles = makeStyles({
   bar: {
@@ -52,12 +51,15 @@ const useStyles = makeStyles({
 
 function Header(props) {
   const { authTokens } = useAuth();
-  const { openNotification, setOpenNotification } = useNotification();
+  const { userNotifications, setUserNotifications } = useNotification();
   const path = window.location.pathname;
   const classes = useStyles();
 
   const showNotifications = () => {
-    setOpenNotification(!openNotification);
+    setUserNotifications({
+      ...userNotifications,
+      openNotification: !userNotifications.openNotification,
+    });
   };
   return (
     <>

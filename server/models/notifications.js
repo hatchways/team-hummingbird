@@ -9,10 +9,12 @@ const NotificationSchema = new Schema({
   },
   notifications: {
     type: Array,
+    required: true,
     default: [],
   },
   new_notification: {
     type: Boolean,
+    required: true,
     default: false,
   },
 });

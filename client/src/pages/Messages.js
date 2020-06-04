@@ -13,18 +13,16 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  useMediaQuery,
 } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
 
 import Chat from "./Chat";
 import Notifications from "../components/Notifications";
 import { useAuth, useNotification } from "../components/UserContext";
 
-const Messages = () => {
+const Messages = (props) => {
   const classes = useStyles();
   const { authTokens, setAuthTokens } = useAuth();
-  const { openNotification } = useNotification();
+  const { userNotifications } = useNotification();
   const [searchUser, setSearchUser] = useState("");
   const [user, setUser] = useState(authTokens ? authTokens.user : null);
   const [userChatRooms, setUserChatRooms] = useState([]);
@@ -32,7 +30,6 @@ const Messages = () => {
   const [matchedUser, setMatchedUser] = React.useState([]);
   const [responseMessage, setResponseMessage] = React.useState("");
   const userPanelRef = React.useRef();
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   const handleClickOpen = () => {
     setResponseMessage("");
@@ -225,7 +222,9 @@ const Messages = () => {
           ) : null}
         </Grid>
       </Grid>
-      {openNotification ? <Notifications /> : null}
+      {userNotifications.openNotification ? (
+        <Notifications socketNotify={props.socketNotify} />
+      ) : null}
     </Box>
   ) : (
     <Typography variant='h3'>Please SignIn</Typography>
