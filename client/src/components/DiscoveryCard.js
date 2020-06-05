@@ -8,10 +8,9 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import { FormatQuoteSharp } from "@material-ui/icons";
 
 export default function DiscoveryCard(props) {
-  //get a list of all open contests
-  //display a list of all open contests
   const {
     deadline_date,
     title,
@@ -52,18 +51,30 @@ export default function DiscoveryCard(props) {
           </Typography>
         }
       />
-      <CardMedia style={{ height: 0, paddingTop: "75%" }} image={firstImage} />
-      <CardContent>
-        <Typography style={{ color: "gray" }} variant="caption">
-          Brief
-        </Typography>
-        <Typography variant="body2">{description}</Typography>
-      </CardContent>
+      <CardMedia style={{ height: "75%" }} src={firstImage} component="img" />
       <CardContent>
         <Typography>
+          <FormatQuoteSharp
+            style={{
+              color: "gray",
+              transform: "rotateY(180deg)",
+            }}
+          />
+          {description}
+          <FormatQuoteSharp
+            style={{
+              color: "gray",
+              transform: "translate(0, 0.5rem)",
+            }}
+          />
+        </Typography>
+      </CardContent>
+      <CardContent style={{ textAlign: "right" }}>
+        <Typography gutterBottom>
           <span
             style={{
-              padding: "4px",
+              padding: "0.5rem",
+              fontWeight: "bold",
               backgroundColor: "black",
               color: "white",
             }}

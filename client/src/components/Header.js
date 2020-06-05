@@ -10,7 +10,11 @@ import {
 } from "@material-ui/core";
 
 import { useAuth } from "./UserContext";
-import { MailOutline, PublicOutlined } from "@material-ui/icons";
+import {
+  MailOutline,
+  PublicOutlined,
+  AccountCircleRounded,
+} from "@material-ui/icons";
 
 function Header() {
   const { authTokens } = useAuth();
@@ -33,7 +37,7 @@ function Header() {
           </Grid>
           {authTokens ? (
             <>
-              <Grid className={classes.linkWrapper} item xs={3}>
+              <Grid className={classes.linkWrapper} item xs={2}>
                 <a className={classes.link} href="/">
                   {isMobile ? (
                     <PublicOutlined fontSize="large" />
@@ -44,7 +48,18 @@ function Header() {
                   )}
                 </a>
               </Grid>
-              <Grid className={classes.linkWrapper} item xs={3}>
+              <Grid className={classes.linkWrapper} item xs={2}>
+                <a className={classes.link} href="/profile">
+                  {isMobile ? (
+                    <AccountCircleRounded fontSize="large" />
+                  ) : (
+                    <Typography variant="subtitle1" className={classes.links}>
+                      Profile
+                    </Typography>
+                  )}
+                </a>
+              </Grid>
+              <Grid className={classes.linkWrapper} item xs={2}>
                 <a className={classes.link} href="/messages">
                   {isMobile ? (
                     <MailOutline fontSize="large" />

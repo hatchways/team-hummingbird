@@ -66,17 +66,23 @@ export default function Discover() {
         <Typography variant="h1">Open Contests</Typography>
       </div>
 
-      {list.map((contest, index) => {
+      {list.map((contest) => {
         return (
-          <DiscoveryCard
-            deadline_date={contest.deadline_date}
-            title={contest.title}
-            description={contest.description}
-            prize_amount={contest.prize_amount}
-            name={contest.name}
-            profile_image_url={contest.profile_image_url}
-            firstImage={contest.firstImage}
-          />
+          <a
+            style={{ textDecoration: "none" }}
+            href={`/contest/${contest._id}`}
+          >
+            <DiscoveryCard
+              key={contest._id}
+              deadline_date={contest.deadline_date}
+              title={contest.title}
+              description={contest.description}
+              prize_amount={contest.prize_amount}
+              name={contest.name}
+              profile_image_url={contest.profile_image_url}
+              firstImage={contest.firstImage}
+            />
+          </a>
         );
       })}
     </div>
