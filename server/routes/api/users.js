@@ -81,6 +81,7 @@ router.put("/", auth, (req, res) => {
   let updateQuery = {};
   if (payment) {
     updateQuery = {
+      hasPaymentInfo: true,
       payment,
     };
   } else {

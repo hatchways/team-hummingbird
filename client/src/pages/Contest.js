@@ -28,6 +28,9 @@ import { Redirect } from "react-router-dom";
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props}></MuiAlert>;
 }
+function Notice(props) {
+  return <MuiAlert severity="error" {...props}></MuiAlert>;
+}
 
 const Contest = (props) => {
   const { authTokens, setAuthTokens } = useAuth();
@@ -52,6 +55,7 @@ const Contest = (props) => {
       : selectedImage.classList.add("selected");
   };
   const handleSubmit = (e) => {
+    if (!user.hasPaymentInfo) return;
     if (!(title && description && prize && deadlineDate && deadlineTime)) {
       setOpenAlert(true);
       setSeverity("error");
@@ -112,13 +116,19 @@ const Contest = (props) => {
   };
   return (
     <Container maxWidth="lg">
-      <Typography variant="h1" className={classes.title} align="center">
-        Create new contest
+      <Typography variant="h3" className={classes.title} align="center">
+        New Contest
       </Typography>
       <Paper elevation={3} className={classes.box}>
         <br />
 
         <Box width="60%" margin="auto">
+          {!user.hasPaymentInfo ? (
+            <Notice>
+              Please <a href="/settings">add a payment method</a> in order to
+              create a contest.
+            </Notice>
+          ) : null}
           <Typography className={classes.title} variant="subtitle1">
             What do you need designed?
           </Typography>
@@ -259,7 +269,9 @@ const Contest = (props) => {
           <Button
             size="large"
             type="submit"
-            className={classes.button}
+            className={
+              user.hasPaymentInfo ? classes.button : classes.buttonDisabled
+            }
             onClick={handleSubmit}
           >
             CREATE CONTEST
@@ -341,8 +353,22 @@ const styles = makeStyles({
     borderRadius: "0",
     padding: "15px",
     "&:hover": {
-      background: "green",
+      background: "gray",
       cursor: "pointer",
+    },
+  },
+  buttonDisabled: {
+    marginTop: "60px",
+    marginBottom: "60px",
+    cursor: "not-allowed",
+    backgroundColor: "lightgray",
+    color: "white",
+    fontFamily: "Poppins",
+    fontWeight: 600,
+    borderRadius: "0",
+    padding: "15px",
+    "&:hover": {
+      background: "lightgray",
     },
   },
   imageTile: {

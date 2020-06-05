@@ -67,6 +67,7 @@ function CheckoutForm() {
             `Your ${paymentMethod?.card?.brand} card ending in ${paymentMethod?.card?.last4} was added successfully`,
             "success"
           );
+          window.location.reload();
         })
         .catch((err) => {
           console.log(err);
