@@ -37,6 +37,7 @@ export default function ContestSubmissions(props) {
         _id: contestId
     })
     useEffect(() => {
+        console.log(user)
         const getInfo = async () => {
             const contestInfo = await fetch(`/api/contest/${contestId}`, {
                 headers: {
@@ -71,6 +72,7 @@ export default function ContestSubmissions(props) {
                         container
                         spacing={2}
                         alignItems="center"
+                        style={{ opacity: user.id == contestInfo.user_id ? 1 : 0 }}
                     >
                         <Grid item>
                             <Avatar alt="user profile image"
@@ -120,13 +122,23 @@ export default function ContestSubmissions(props) {
                                     justifyContent: 'center'
                                 }}
                             >
-                                <Typography style={{
-                                    color: 'white',
-                                    alignSelf: 'flex-end',
-                                    marginBottom: '0.5rem',
-                                    fontWeight: 'bold',
-                                    textShadow: '0px 0px 3px black'
-                                }}>By @<span style={{ textDecoration: 'underline' }}>{submission.user_name ? submission.user_name : 'artist'}</span></Typography>
+                                <Link
+                                    style={{
+                                        color: 'white',
+                                        alignSelf: 'flex-end',
+                                        marginBottom: '0.5rem',
+                                        fontWeight: 'bold',
+                                        textShadow: '0px 0px 3px black'
+                                    }}
+                                    to="/messages">
+                                    <Typography style={{
+                                        color: 'white',
+                                        alignSelf: 'flex-end',
+                                        marginBottom: '0.5rem',
+                                        fontWeight: 'bold',
+                                        textShadow: '0px 0px 3px black'
+                                    }}>By @<span style={{ textDecoration: 'underline' }}>{submission.user_name ? submission.user_name : 'artist'}</span></Typography>
+                                </Link>
                             </div>
                         </GridListTile>
                     ))}
