@@ -45,12 +45,14 @@ export default function ContestSubmissions(props) {
     _id: contestId,
   });
   const [contestOwner, setContestOwner] = useState(null);
-  const [chosenSubmission, setChosenSubmission] = useState(null);
+  const [chosenSubmission, setChosenSubmission] = useState({});
   const [contestWinner, setContestWinner] = useState(null);
 
   const handleClickOpen = (submissionId) => {
     setOpenDialog(true);
-    setChosenSubmission(submissionId);
+    setChosenSubmission(
+      submissions.filter((submission) => submission._id === submissionId)[0]
+    );
   };
 
   const handleClose = () => {
@@ -78,8 +80,8 @@ export default function ContestSubmissions(props) {
     getInfo();
   }, [user]);
 
-  const handleChooseWinner = (submissionId) => {
-    fetch(`/api/contest/${contestId}/submission/${submissionId}`, {
+  const handleChooseWinner = (submission) => {
+    fetch(`/api/contest/${contestId}/submission/${submission._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -94,6 +96,7 @@ export default function ContestSubmissions(props) {
         //   handleAlert("Uploaded successfully", "success");
         console.log(json.message);
         handleClose();
+        window.location.reload();
       })
       .catch((err) => {
         console.log(err);
@@ -169,6 +172,16 @@ export default function ContestSubmissions(props) {
           </Link>
         </Grid>
       </Grid>
+      {contestWinner ? (
+        <Typography
+          style={{ marginTop: 30, marginBottom: 60, fontSize: 16 }}
+          variant="h3"
+        >
+          Winner: <b>@{contestWinner.user_name}</b>
+        </Typography>
+      ) : (
+        ""
+      )}
       <Tabs
         variant="fullWidth"
         value={activeTab}
@@ -269,7 +282,10 @@ export default function ContestSubmissions(props) {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Choose winner and pay?</DialogTitle>
+        <DialogTitle id="form-dialog-title">
+          Choose @{chosenSubmission.user_name || "artist"} as winner and send
+          payment?
+        </DialogTitle>
         <DialogContent></DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
