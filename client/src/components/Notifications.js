@@ -13,6 +13,7 @@ import { useAuth, useNotification } from "./UserContext";
 
 const Notifications = (props) => {
   let { socketNotify } = props;
+  //const [socketNotify]=useState(props)
   const classes = useStyles();
   const { authTokens } = useAuth();
   const { userNotifications, setUserNotifications } = useNotification();
@@ -20,15 +21,12 @@ const Notifications = (props) => {
   const [oldList, setOldList] = useState([]);
 
   useEffect(() => {
-    console.log(userNotifications);
     setNewList(userNotifications.new_notifications);
     setOldList(userNotifications.old_notifications);
-  }, []);
+  }, [userNotifications]);
 
   useEffect(() => {
     return () => {
-      console.log(userNotifications.new_notifications.length);
-      console.log(newList.length);
       if (
         userNotifications.new_notifications.length !== newList.length &&
         (newList.length > 0 || oldList.length > 0)
@@ -47,7 +45,6 @@ const Notifications = (props) => {
           .then((response) => response.json())
           .then((result) => {
             console.log(result);
-            // socketNotify.emit("mark_notifications_read");
           });
       }
     };
@@ -55,7 +52,9 @@ const Notifications = (props) => {
 
   const markNotificationRead = (index) => {
     let moveToOldList = newList[index];
-    newList.splice(index, 1);
+    let updNewList = [...newList];
+    updNewList.splice(index, 1);
+    setNewList([...updNewList]);
     setOldList([...oldList, moveToOldList]);
   };
   return (

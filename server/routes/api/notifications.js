@@ -13,7 +13,8 @@ const router = express.Router();
 // access:  private
 router.put("/contest/submit/:id", auth, async (req, res) => {
   const contest_id = req.params.id;
-  const fromUser = req.user;
+  const fromUser = req.body.user;
+  console.log(fromUser);
   try {
     let contest = await Contest.findById(contest_id);
     let updateNotification = await Notifications.find({
@@ -27,7 +28,7 @@ router.put("/contest/submit/:id", auth, async (req, res) => {
             ...updateNotification[0].new_notifications,
             {
               user: fromUser,
-              text: `submitted design to your contest ${contest.title}`,
+              text: `${fromUser.name} submitted design to your ${contest.title} contest`,
               time: moment().format("YYYY-MM-DDTHH:mm:ss"),
             },
           ],

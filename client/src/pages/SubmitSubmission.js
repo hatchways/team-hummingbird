@@ -56,6 +56,9 @@ export default function SubmitSubmission(props) {
               "Content-Type": "application/json",
               "x-auth-token": authTokens.token,
             },
+            body: JSON.stringify({
+              user: authTokens.user,
+            }),
           }
         );
         let resultJson = await result.json();

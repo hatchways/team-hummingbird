@@ -49,6 +49,7 @@ const Messages = (props) => {
   };
 
   useEffect(() => {
+    console.log(authTokens.user);
     fetch("/api/chatroom?user_id=" + user.id, {
       method: "GET",
       headers: {
@@ -144,25 +145,7 @@ const Messages = (props) => {
               <Typography variant='h4' className={classes.header}>
                 Inbox Messages
               </Typography>
-              {/* <MenuIcon
-                className={
-                  isMobile ? classes.mobileMenu : classes.hideMobileMenu
-                }
-                onClick={toggleChatList}
-              ></MenuIcon> */}
             </Box>
-
-            {/* <ListItem className={classes.messageBox}>
-              <TextField
-                type='text'
-                variant='outlined'
-                fullWidth
-                placeholder='Search User'
-                onKeyDown={srchUser}
-                onChange={(e) => setSearchUser(e.target.value)}
-                value={searchUser}
-              ></TextField>
-            </ListItem> */}
             {userChatRooms.length > 0 ? (
               <List className={classes.list}>
                 {userChatRooms.map((chatRoom) => (
