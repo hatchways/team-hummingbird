@@ -25,6 +25,9 @@ const UserSchema = new Schema({
   profile_image_url: {
     type: String,
   },
+  hasPayment: {
+    type: Boolean,
+  },
   payment: {
     type: Object,
   },

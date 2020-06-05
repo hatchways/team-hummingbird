@@ -55,7 +55,7 @@ const Contest = (props) => {
       : selectedImage.classList.add("selected");
   };
   const handleSubmit = (e) => {
-    if (!user.hasPaymentInfo) return;
+    if (!user.hasPayment) return;
     if (!(title && description && prize && deadlineDate && deadlineTime)) {
       setOpenAlert(true);
       setSeverity("error");
@@ -123,7 +123,7 @@ const Contest = (props) => {
         <br />
 
         <Box width="60%" margin="auto">
-          {!user.hasPaymentInfo ? (
+          {!user.hasPayment ? (
             <Notice>
               Please <a href="/settings">add a payment method</a> in order to
               create a contest.
@@ -270,7 +270,7 @@ const Contest = (props) => {
             size="large"
             type="submit"
             className={
-              user.hasPaymentInfo ? classes.button : classes.buttonDisabled
+              user.hasPayment ? classes.button : classes.buttonDisabled
             }
             onClick={handleSubmit}
           >

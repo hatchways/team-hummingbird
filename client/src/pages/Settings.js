@@ -60,7 +60,7 @@ export default function Settings(props) {
             <div className={classes.profileInfoRow}>
               <Typography className={classes.profileText} variant="body1">
                 <b>Payment Info:</b>&nbsp;&nbsp;&nbsp;
-                {user.hasPaymentInfo
+                {user.hasPayment
                   ? `${user?.payment?.cardType?.toUpperCase()} ending in ${
                       user?.payment?.last4
                     }`

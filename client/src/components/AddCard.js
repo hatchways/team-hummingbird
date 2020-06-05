@@ -37,7 +37,7 @@ function CheckoutForm() {
     if (paymentMethod) {
       const _user = {
         ...user,
-        hasPaymentInfo: true,
+        hasPayment: true,
         payment: {
           id: paymentMethod.id,
           cardType: paymentMethod.card.brand,
