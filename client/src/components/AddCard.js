@@ -27,34 +27,50 @@ function CheckoutForm() {
   const [user, setUser] = useState(authTokens ? authTokens.user : null);
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: "card",
-      card: elements.getElement(CardNumberElement),
-    });
+
+    //create stripe user with future payment intent
+    const { error, initialIntent } = await fetch("/api/stripe/initialIntent");
     if (error) {
       handleAlert(error.message, "error");
     }
-    if (paymentMethod) {
-      const _user = {
-        ...user,
-        hasPaymentInfoSaved: true,
-        paymentInfo: {
-          cardType: paymentMethod.card.brand,
-          last4: paymentMethod.card.last4,
-        },
-        paymentId: paymentMethod.id,
-      };
+    if (initialIntent) {
+      const intentJson = await initialIntent.json();
 
-      setAuthTokens({
-        ...authTokens,
-        user: _user,
-      });
-
-      handleAlert(
-        `Your ${paymentMethod?.card?.brand} card ending in ${paymentMethod?.card?.last4} was added successfully`,
-        "success"
+      const { error, cardSaved } = await stripe.confirmCardSetup(
+        intentJson["client_secret"],
+        {
+          payment_method: {
+            card: elements.getElement(CardNumberElement),
+            billing_details: {
+              name: user.name,
+            },
+          },
+        }
       );
+
+      if (error) {
+        handleAlert(error.message, "error");
+      } 
+
+      if(cardSaved) 
+        handleAlert("Your card info was saved successfully", "success");
+           //   const _user = {
+    //     ...user,
+    //     hasPaymentInfoSaved: true,
+    //     paymentInfo: {
+    //       cardType: paymentMethod.card.brand,
+    //       last4: paymentMethod.card.last4,
+    //     },
+    //     paymentId: paymentMethod.id,
+    //   };
+
+    //   setAuthTokens({
+    //     ...authTokens,
+    //     user: _user,
+    //   });
+      }
     }
+
   };
 
   const handleAlert = (message, severity) => {
