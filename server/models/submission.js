@@ -12,7 +12,7 @@ const SubmissionSchema = new Schema({
   },
   user_name: {
     type: String,
-    default: ""
+    default: "",
   },
   active: {
     type: Boolean,
@@ -24,6 +24,9 @@ const SubmissionSchema = new Schema({
   },
   upload_files: {
     type: Array,
+  },
+  winner: {
+    type: Boolean,
   },
 });
 

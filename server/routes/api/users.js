@@ -5,6 +5,7 @@ const normalizeEmail = require("validator/lib/normalizeEmail");
 const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
+const STRIPE_KEY = require("../../config/default.json").stripeKey;
 
 const auth = require("../../middleware/auth");
 const Contest = require("../../models/Contest");
@@ -77,24 +78,29 @@ router.post("/register", function (req, res, next) {
 // @desc    Update a user profile
 // @access  Private
 router.put("/", auth, (req, res) => {
-  const { user_id, url } = req.body;
+  const { user_id, url, payment } = req.body;
+  let updateQuery = {};
+  if (payment) {
+    updateQuery = {
+      hasPayment: true,
+      payment,
+    };
+  } else {
+    updateQuery = {
+      profile_image_url: url,
+    };
+  }
   if (user_id === req.user.id) {
-    User.findByIdAndUpdate(
-      req.user.id,
-      {
-        profile_image_url: url,
-      },
-      (err, result) => {
-        if (err) {
-          res.status(500).json({
-            message: err.message,
-          });
-        }
-        res.json({
-          message: "Profile updated successfully",
+    User.findByIdAndUpdate(req.user.id, updateQuery, (err, result) => {
+      if (err) {
+        res.status(500).json({
+          message: err.message,
         });
       }
-    );
+      res.json({
+        message: "Profile updated successfully",
+      });
+    });
   } else {
     res.status(401).json({
       message: "Unauthorized to update this profile",

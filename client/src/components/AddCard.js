@@ -37,23 +37,42 @@ function CheckoutForm() {
     if (paymentMethod) {
       const _user = {
         ...user,
-        hasPaymentInfoSaved: true,
-        paymentInfo: {
+        hasPayment: true,
+        payment: {
+          id: paymentMethod.id,
           cardType: paymentMethod.card.brand,
           last4: paymentMethod.card.last4,
         },
-        paymentId: paymentMethod.id,
       };
 
-      setAuthTokens({
-        ...authTokens,
-        user: _user,
-      });
-
-      handleAlert(
-        `Your ${paymentMethod?.card?.brand} card ending in ${paymentMethod?.card?.last4} was added successfully`,
-        "success"
-      );
+      fetch(`/api/users`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": authTokens.token,
+        },
+        body: JSON.stringify({
+          user_id: _user.id,
+          payment: _user.payment,
+        }),
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          setAuthTokens({
+            ...authTokens,
+            user: _user,
+          });
+          setUser(_user);
+          handleAlert(
+            `Your ${paymentMethod?.card?.brand} card ending in ${paymentMethod?.card?.last4} was added successfully`,
+            "success"
+          );
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.log(err);
+          handleAlert("Error adding payment method", "error");
+        });
     }
   };
 
@@ -110,7 +129,7 @@ function CheckoutForm() {
           disabled={!stripe}
           className={classes.button}
         >
-          Add Card
+          Update
         </Button>
       </form>
     </div>
