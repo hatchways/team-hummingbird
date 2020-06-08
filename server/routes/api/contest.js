@@ -2,6 +2,7 @@ const express = require("express");
 const contestRouter = express.Router();
 
 const auth = require("../../middleware/auth");
+const User = require("../../models/User");
 const Contest = require("../../models/Contest");
 const Submission = require("../../models/submission");
 // Route: GET api/contest/:id
@@ -174,23 +175,41 @@ contestRouter.put("/:id/submission/:submission_id", auth, (req, res) => {
         Submission.findById(req.params.submission_id)
           .then((submission) => {
             if (submission && contest.user_id === req.user.id) {
-              Submission.findByIdAndUpdate(
-                req.params.submission_id,
-                {
-                  winner,
-                },
-                (err, result) => {
-                  if (err) {
-                    res.status(500).json({
-                      message: "Error: " + err.message,
+              Submission.findByIdAndUpdate(req.params.submission_id, {
+                winner,
+              })
+                .then((r) => {
+                  User.findById(submission.user_id)
+                    .then((user) => {
+                      User.findByIdAndUpdate(submission.user_id, {
+                        earnings_total:
+                          user.earnings_total + contest.prize_amount,
+                      })
+                        .then((r) => {
+                          res.status(200).json({
+                            message: "Submission updated successfully",
+                          });
+                        })
+                        .catch((err) => {
+                          console.log(err.message);
+                          res.status(500).json({
+                            message: "Error: " + err.message,
+                          });
+                        });
+                    })
+                    .catch((err) => {
+                      console.log(err.message);
+                      res.status(500).json({
+                        message: "Error: " + err.message,
+                      });
                     });
-                  } else {
-                    res.status(200).json({
-                      message: "Submission updated successfully",
-                    });
-                  }
-                }
-              );
+                })
+                .catch((err) => {
+                  console.log(err.message);
+                  res.status(500).json({
+                    message: "Error: " + err.message,
+                  });
+                });
             } else {
               res.status(401).json({
                 message: "User not authorized to update this submission",

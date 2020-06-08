@@ -5,6 +5,7 @@ const normalizeEmail = require("validator/lib/normalizeEmail");
 const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
+const STRIPE_KEY = require("../../config/default.json").stripeKey;
 
 const auth = require("../../middleware/auth");
 const Contest = require("../../models/Contest");
