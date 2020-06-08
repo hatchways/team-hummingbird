@@ -35,7 +35,7 @@ stripeRouter.post("/initialIntent", auth, (req, res) => {
 // Desc: Charge a saved card
 // access:  private
 
-stripeRouter.post("/chargeSavedCard", (req, res) => {
+stripeRouter.post("/chargeSavedCard", auth, (req, res) => {
   //payment amount is in cents i.e $10.00 = 1000
   let { customer_id, payment_method, amount } = req.query;
   const charge = async () => {
@@ -132,7 +132,7 @@ stripeRouter.post("/saveBankAccount", auth, (req, res) => {
 //desc Pay out to a saved bank account
 //access private
 
-stripeRouter.post("/payContestWinner", (req, res) => {
+stripeRouter.post("/payContestWinner", auth, (req, res) => {
   const { payoutAmount = 100, userWithBankId } = req.query;
   console.log(res.query);
   //Balance needs to come from our platform balance.
