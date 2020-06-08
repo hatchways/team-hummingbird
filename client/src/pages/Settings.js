@@ -67,6 +67,12 @@ export default function Settings(props) {
                   : "No payment method on file."}
               </Typography>
             </div>
+            <div className={classes.profileInfoRow}>
+              <Typography className={classes.profileText} variant="body1">
+                <b>Earnings Total:</b>&nbsp;&nbsp;&nbsp;
+                {user.earnings_total ? `$${user.earnings_total}` : "$0"}
+              </Typography>
+            </div>
           </div>
         </Container>
       </TabPanel>
