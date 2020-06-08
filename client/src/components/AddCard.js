@@ -29,14 +29,19 @@ function CheckoutForm() {
     event.preventDefault();
 
     //create stripe user with future payment intent
-    const { error, initialIntent } = await fetch("/api/stripe/initialIntent");
-    if (error) {
-      handleAlert(error.message, "error");
-    }
-    if (initialIntent) {
+    const initialIntent = await fetch("/api/stripe/initialIntent", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
+    });
+    if (initialIntent.error) {
+      handleAlert(initialIntent.error.message, "error");
+    } else if (initialIntent) {
       const intentJson = await initialIntent.json();
-
-      const { error, cardSaved } = await stripe.confirmCardSetup(
+      const customer = await intentJson["customer"];
+      const cardSaved = await stripe.confirmCardSetup(
         intentJson["client_secret"],
         {
           payment_method: {
@@ -48,29 +53,26 @@ function CheckoutForm() {
         }
       );
 
-      if (error) {
-        handleAlert(error.message, "error");
-      } 
-
-      if(cardSaved) 
+      if (cardSaved.error) {
+        handleAlert(cardSaved.error.message, "error");
+      } else if (cardSaved) {
         handleAlert("Your card info was saved successfully", "success");
-           //   const _user = {
-    //     ...user,
-    //     hasPaymentInfoSaved: true,
-    //     paymentInfo: {
-    //       cardType: paymentMethod.card.brand,
-    //       last4: paymentMethod.card.last4,
-    //     },
-    //     paymentId: paymentMethod.id,
-    //   };
 
-    //   setAuthTokens({
-    //     ...authTokens,
-    //     user: _user,
-    //   });
+        //customer_id and cardSaved.payment_method is what we save to trigger the payment later
+        const _user = {
+          ...user,
+          hasPaymentInfoSaved: true,
+          paymentInfo: {
+            cardSaved,
+          },
+          customer_id: customer,
+        };
+        setAuthTokens({
+          ...authTokens,
+          user: _user,
+        });
       }
     }
-
   };
 
   const handleAlert = (message, severity) => {
