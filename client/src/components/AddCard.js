@@ -27,33 +27,51 @@ function CheckoutForm() {
   const [user, setUser] = useState(authTokens ? authTokens.user : null);
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: "card",
-      card: elements.getElement(CardNumberElement),
+
+    //create stripe user with future payment intent
+    const initialIntent = await fetch("/api/stripe/initialIntent", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
     });
-    if (error) {
-      handleAlert(error.message, "error");
-    }
-    if (paymentMethod) {
-      const _user = {
-        ...user,
-        hasPaymentInfoSaved: true,
-        paymentInfo: {
-          cardType: paymentMethod.card.brand,
-          last4: paymentMethod.card.last4,
-        },
-        paymentId: paymentMethod.id,
-      };
-
-      setAuthTokens({
-        ...authTokens,
-        user: _user,
-      });
-
-      handleAlert(
-        `Your ${paymentMethod?.card?.brand} card ending in ${paymentMethod?.card?.last4} was added successfully`,
-        "success"
+    if (initialIntent.error) {
+      handleAlert(initialIntent.error.message, "error");
+    } else if (initialIntent) {
+      const intentJson = await initialIntent.json();
+      const customer = await intentJson["customer"];
+      const cardSaved = await stripe.confirmCardSetup(
+        intentJson["client_secret"],
+        {
+          payment_method: {
+            card: elements.getElement(CardNumberElement),
+            billing_details: {
+              name: user.name,
+            },
+          },
+        }
       );
+
+      if (cardSaved.error) {
+        handleAlert(cardSaved.error.message, "error");
+      } else if (cardSaved) {
+        handleAlert("Your card info was saved successfully", "success");
+
+        //customer_id and cardSaved.payment_method is what we save to trigger the payment later
+        const _user = {
+          ...user,
+          hasPaymentInfoSaved: true,
+          paymentInfo: {
+            cardSaved,
+          },
+          customer_id: customer,
+        };
+        setAuthTokens({
+          ...authTokens,
+          user: _user,
+        });
+      }
     }
   };
 
