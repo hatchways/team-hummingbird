@@ -39,9 +39,8 @@ export default function Settings(props) {
         className={classes.tabs}
       >
         <Tab label="Profile" />
-        <Tab label="Modify Payment" />
-        <Tab label="Payout Information" />
-        <Tab label="Payment Details" />
+        <Tab label="Payout Info" />
+        <Tab label="Payment Info" />
         <Tab label="Notifications" />
         <Tab label="Password" />
       </Tabs>
@@ -63,16 +62,6 @@ export default function Settings(props) {
             </div>
             <div className={classes.profileInfoRow}>
               <Typography className={classes.profileText} variant="body1">
-                <b>Payment Info:</b>&nbsp;&nbsp;&nbsp;
-                {user.hasPayment
-                  ? `${user?.payment?.cardType?.toUpperCase()} ending in ${
-                      user?.payment?.last4
-                    }`
-                  : "No payment method on file."}
-              </Typography>
-            </div>
-            <div className={classes.profileInfoRow}>
-              <Typography className={classes.profileText} variant="body1">
                 <b>Earnings Total:</b>&nbsp;&nbsp;&nbsp;
                 {user.earnings_total ? `$${user.earnings_total}` : "$0"}
               </Typography>
@@ -88,7 +77,6 @@ export default function Settings(props) {
       </TabPanel>
       <TabPanel className={classes.tabPanel} value={value} index={3}></TabPanel>
       <TabPanel className={classes.tabPanel} value={value} index={4}></TabPanel>
-
       <Box size="large" className={classes.breadcrumbWrapper}>
         <Link to="/profile">
           <Typography variant="caption" className={classes.breadcrumb}>

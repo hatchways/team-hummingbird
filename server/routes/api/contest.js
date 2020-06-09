@@ -5,6 +5,29 @@ const auth = require("../../middleware/auth");
 const User = require("../../models/User");
 const Contest = require("../../models/Contest");
 const Submission = require("../../models/submission");
+
+const STRIPE_KEY = require("../../config/default.json").stripeKey;
+const STRIPE_SECRET = require("../../config/default.json").stripe_secret;
+const stripe = require("stripe")(STRIPE_SECRET);
+
+const chargeCreditCard = async (customerId, paymentMethod, amount) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100,
+      currency: "usd",
+      customer: customerId,
+      payment_method: paymentMethod,
+      //capture_method: "manual",
+      off_session: true,
+      capture_method: "manual",
+      confirm: true,
+    });
+    return paymentIntent;
+  } catch (err) {
+    console.log("ERROR:", err.message);
+  }
+};
+
 // Route: GET api/contest/:id
 // Desc: get contest with the id
 // access: private
@@ -168,7 +191,6 @@ contestRouter.post("/:id/submission", auth, (req, res) => {
 
 contestRouter.put("/:id/submission/:submission_id", auth, (req, res) => {
   const { winner } = req.body;
-  console.log(req.body);
   Contest.findById(req.params.id)
     .then((contest) => {
       if (contest) {
@@ -186,9 +208,31 @@ contestRouter.put("/:id/submission/:submission_id", auth, (req, res) => {
                           user.earnings_total + contest.prize_amount,
                       })
                         .then((r) => {
-                          res.status(200).json({
-                            message: "Submission updated successfully",
-                          });
+                          User.findById(req.user.id)
+                            .then((contestOwner) => {
+                              chargeCreditCard(
+                                contestOwner.stripe_customer_id,
+                                contestOwner.payment.id,
+                                contest.prize_amount
+                              )
+                                .then((r) => {
+                                  res.status(200).json({
+                                    message: "Submission updated successfully",
+                                  });
+                                })
+                                .catch((err) => {
+                                  console.log(err.message);
+                                  res.status(500).json({
+                                    message: "Error: " + err.message,
+                                  });
+                                });
+                            })
+                            .catch((err) => {
+                              console.log(err.message);
+                              res.status(500).json({
+                                message: "Error: " + err.message,
+                              });
+                            });
                         })
                         .catch((err) => {
                           console.log(err.message);

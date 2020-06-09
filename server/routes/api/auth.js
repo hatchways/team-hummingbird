@@ -44,6 +44,8 @@ router.post("/", function (req, res, next) {
                 email: user.email,
                 profile_image_url: user.profile_image_url,
                 earnings_total: user.earnings_total,
+                hasPayment: user.hasPayment,
+                payment: user.payment,
               },
             });
           }

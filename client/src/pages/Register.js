@@ -11,15 +11,20 @@ import {
   Snackbar,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
-import { Redirect } from "react-router-dom";
+import { Redirect, useLocation } from "react-router-dom";
 
 import { useAuth } from "../components/UserContext";
 
 function Alert(props) {
-  return <MuiAlert elevation={6} variant='filled' {...props} />;
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 function Register(props) {
+  let location = useLocation();
+  const referer = location.state ? location.state.referer : "/profile";
+  const { setAuthTokens } = useAuth();
+
+  const [isLoggedIn, setLoggedIn] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,9 +68,13 @@ function Register(props) {
           let resUser = json.user;
           resUser.token = json.token;
           setUser(resUser);
-          console.log(json.user)
-        }
-        else setOpenError(true);
+          console.log(json.user);
+          setAuthTokens({
+            token: json.token,
+            user: json.user,
+          });
+          setLoggedIn(true);
+        } else setOpenError(true);
         setResponseMessage(json.message);
       })
       .catch((err) => {
@@ -73,80 +82,73 @@ function Register(props) {
       });
   };
   const classes = useStyles();
-  if (openSuccess && user) {
+  if (isLoggedIn) {
+    return <Redirect to={referer} />;
+  } else {
     return (
-      <Redirect to={{
-            pathname: '/profile',
-            state: { user: user }
-        }}
-      />
-    )
-  }
-  else {
-    return (
-      <Container className={classes.container} maxWidth='sm'>
+      <Container className={classes.container} maxWidth="sm">
         <Paper className={classes.box} square>
           <br />
-          <Typography className={classes.title} variant='h3'>
+          <Typography className={classes.title} variant="h3">
             Sign Up
           </Typography>
           <div>
-            <Grid direction='column' container spacing={3} alignItems='center'>
-              <Box width='50%'>
+            <Grid direction="column" container spacing={3} alignItems="center">
+              <Box width="50%">
                 <TextField
                   className={classes.textField}
-                  id='name'
-                  label='Name'
-                  type='text'
-                  variant='outlined'
+                  id="name"
+                  label="Name"
+                  type="text"
+                  variant="outlined"
                   fullWidth
                   required
                   onChange={(e) => setName(e.target.value)}
                 />
               </Box>
               <br />
-              <Box width='50%'>
+              <Box width="50%">
                 <TextField
                   className={classes.textField}
-                  id='email'
-                  label='Email'
-                  type='email'
-                  variant='outlined'
+                  id="email"
+                  label="Email"
+                  type="email"
+                  variant="outlined"
                   fullWidth
                   required
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </Box>
               <br />
-              <Box width='50%'>
+              <Box width="50%">
                 <TextField
                   className={classes.textField}
-                  id='password'
-                  label='Password'
-                  type='password'
-                  variant='outlined'
+                  id="password"
+                  label="Password"
+                  type="password"
+                  variant="outlined"
                   fullWidth
                   required
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </Box>
               <br />
-              <Box width='50%'>
+              <Box width="50%">
                 <TextField
                   className={classes.textField}
-                  id='password2'
-                  label='Confirm Password'
-                  type='password'
-                  variant='outlined'
+                  id="password2"
+                  label="Confirm Password"
+                  type="password"
+                  variant="outlined"
                   fullWidth
                   required
                   onChange={(e) => setPassword2(e.target.value)}
                 />
               </Box>
             </Grid>
-            <Grid container justify='center' className={classes.grid}>
+            <Grid container justify="center" className={classes.grid}>
               <Button
-                size='large'
+                size="large"
                 className={classes.button}
                 onClick={handleSubmit}
               >
@@ -160,19 +162,23 @@ function Register(props) {
           autoHideDuration={6000}
           onClose={handleClose}
         >
-          <Alert onClose={handleClose} severity='success'>
+          <Alert onClose={handleClose} severity="success">
             {responseMessage}
           </Alert>
         </Snackbar>
-        <Snackbar open={openError} autoHideDuration={6000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity='error'>
+        <Snackbar
+          open={openError}
+          autoHideDuration={6000}
+          onClose={handleClose}
+        >
+          <Alert onClose={handleClose} severity="error">
             {responseMessage}
           </Alert>
         </Snackbar>
       </Container>
     );
   }
-};
+}
 
 const useStyles = makeStyles({
   container: {

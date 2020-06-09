@@ -67,7 +67,6 @@ function CheckoutForm() {
             `Your ${paymentMethod?.card?.brand} card ending in ${paymentMethod?.card?.last4} was added successfully`,
             "success"
           );
-          window.location.reload();
         })
         .catch((err) => {
           console.log(err);
@@ -93,7 +92,18 @@ function CheckoutForm() {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <Typography variant="h3">Payment Details</Typography>
+      <Typography variant="h3">Payment Info</Typography>
+
+      <div className={classes.profileInfoRow}>
+        <Typography style={{ marginTop: 20 }} variant="body1">
+          <b>Credit card on file:</b>&nbsp;&nbsp;&nbsp;
+          {user.hasPayment
+            ? `${user?.payment?.cardType?.toUpperCase()} ending in ${
+                user?.payment?.last4
+              }`
+            : "No payment method on file."}
+        </Typography>
+      </div>
 
       <Typography className={classes.instructionText} variant="subtitle1">
         Enter your card details:

@@ -22,6 +22,12 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  stripe_customer_id: {
+    type: String,
+  },
+  stripe_client_secret: {
+    type: String,
+  },
   profile_image_url: {
     type: String,
   },

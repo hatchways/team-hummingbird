@@ -2,8 +2,8 @@ const express = require("express");
 const stripeRouter = express.Router();
 
 const auth = require("../../middleware/auth");
-const key = require("../../config/default.json").stripe_secret;
-const stripe = require("stripe")(key);
+const STRIPE_SECRET = require("../../config/default.json").stripe_secret;
+const stripe = require("stripe")(STRIPE_SECRET);
 
 // Route: POST api/stripe/saveCard
 // Desc: client secret for saving a card for later
