@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import { useAuth } from "../components/UserContext";
 import { Link } from "react-router-dom";
+import AddBankInfo from "../components/AddBankInfo";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -27,6 +28,7 @@ export default function Settings(props) {
   const [user, setUser] = useState(authTokens ? authTokens.user : null);
   const classes = useStyles();
   const [value, setValue] = useState(0); //defaults to payment details for
+
   return (
     <Container className={classes.root}>
       <Tabs
@@ -38,6 +40,8 @@ export default function Settings(props) {
       >
         <Tab label="Profile" />
         <Tab label="Modify Payment" />
+        <Tab label="Payout Information" />
+        <Tab label="Payment Details" />
         <Tab label="Notifications" />
         <Tab label="Password" />
       </Tabs>
@@ -77,10 +81,14 @@ export default function Settings(props) {
         </Container>
       </TabPanel>
       <TabPanel className={classes.tabPanel} value={value} index={1}>
+        <AddBankInfo />
+      </TabPanel>
+      <TabPanel className={classes.tabPanel} value={value} index={2}>
         <AddCard />
       </TabPanel>
-      <TabPanel className={classes.tabPanel} value={value} index={2}></TabPanel>
       <TabPanel className={classes.tabPanel} value={value} index={3}></TabPanel>
+      <TabPanel className={classes.tabPanel} value={value} index={4}></TabPanel>
+
       <Box size="large" className={classes.breadcrumbWrapper}>
         <Link to="/profile">
           <Typography variant="caption" className={classes.breadcrumb}>
