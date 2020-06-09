@@ -93,7 +93,7 @@ function BankForm() {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <Typography variant="h3">Payout Information</Typography>
+      <Typography variant="h3">Payout Info</Typography>
 
       <Typography className={classes.instructionText} variant="subtitle1">
         If you're a contestant, enter your bank account info to receive payouts:

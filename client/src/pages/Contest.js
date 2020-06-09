@@ -24,9 +24,12 @@ import {
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { Redirect } from 'react-router-dom'
+import { Redirect } from "react-router-dom";
 function Alert(props) {
-  return <MuiAlert elevation={6} variant='filled' {...props}></MuiAlert>;
+  return <MuiAlert elevation={6} variant="filled" {...props}></MuiAlert>;
+}
+function Notice(props) {
+  return <MuiAlert severity="error" {...props}></MuiAlert>;
 }
 
 const Contest = (props) => {
@@ -52,6 +55,7 @@ const Contest = (props) => {
       : selectedImage.classList.add("selected");
   };
   const handleSubmit = (e) => {
+    if (!user.hasPayment) return;
     if (!(title && description && prize && deadlineDate && deadlineTime)) {
       setOpenAlert(true);
       setSeverity("error");
@@ -74,14 +78,14 @@ const Contest = (props) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-auth-token": authTokens.token
+            "x-auth-token": authTokens.token,
           },
           body: JSON.stringify({
             title,
             description,
             prize_amount: prize,
             deadline_date: deadlineDateToSubmit,
-            user_id: user.id
+            user_id: user.id,
           }),
         })
           .then((res) => {
@@ -94,10 +98,8 @@ const Contest = (props) => {
             setMessage(json.message);
 
             setTimeout(() => {
-              props.history.push('/profile')
-            }, 1000)
-
-
+              props.history.push("/profile");
+            }, 1000);
           })
           .catch((err) => {
             console.log(err);
@@ -113,41 +115,47 @@ const Contest = (props) => {
     setOpenAlert(false);
   };
   return (
-    <Container maxWidth='lg'>
-      <Typography variant='h1' className={classes.title} align='center'>
-        Create new contest
+    <Container maxWidth="lg">
+      <Typography variant="h3" className={classes.title} align="center">
+        New Contest
       </Typography>
       <Paper elevation={3} className={classes.box}>
         <br />
 
-        <Box width='60%' margin='auto'>
-          <Typography className={classes.title} variant='subtitle1'>
-            What do you need designed?*
+        <Box width="60%" margin="auto">
+          {!user.hasPayment ? (
+            <Notice>
+              Please <a href="/settings">add a payment method</a> in order to
+              create a contest.
+            </Notice>
+          ) : null}
+          <Typography className={classes.title} variant="subtitle1">
+            What do you need designed?
           </Typography>
 
           <TextField
-            id='contest-title'
-            type='text'
+            id="contest-title"
+            type="text"
             className={classes.textField}
-            label='Write a descriptive contest title'
-            variant='outlined'
+            label="Write a descriptive contest title"
+            variant="outlined"
             fullWidth
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </Box>
-        <Box width='60%' margin='auto'>
-          <Typography className={classes.title} variant='subtitle1'>
-            Description*
+        <Box width="60%" margin="auto">
+          <Typography className={classes.title} variant="subtitle1">
+            Description
           </Typography>
 
           <TextField
-            id='contest-description'
-            label='Details about what type of tattoo you want'
+            id="contest-description"
+            label="Details about what type of tattoo you want"
             className={classes.textField}
-            type='text'
-            variant='outlined'
+            type="text"
+            variant="outlined"
             fullWidth
             required
             multiline
@@ -156,17 +164,17 @@ const Contest = (props) => {
             onChange={(e) => setDescription(e.target.value)}
           />
         </Box>
-        <Box width='60%' margin='auto' display='flex'>
+        <Box width="60%" margin="auto" display="flex">
           <Grid container spacing={3}>
             <Grid item xs={3}>
-              <Typography className={classes.title} variant='subtitle1'>
+              <Typography className={classes.title} variant="subtitle1">
                 Prize amount*
               </Typography>
 
               <TextField
-                id='contest-prize'
-                type='number'
-                variant='outlined'
+                id="contest-prize"
+                type="number"
+                variant="outlined"
                 className={classes.textField}
                 fullWidth
                 required
@@ -174,7 +182,7 @@ const Contest = (props) => {
                 value={prize}
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position='start'>
+                    <InputAdornment position="start">
                       <AttachMoneyOutlinedIcon />
                     </InputAdornment>
                   ),
@@ -185,8 +193,8 @@ const Contest = (props) => {
             <Grid item xs={9}>
               <Typography
                 className={classes.title}
-                variant='subtitle1'
-                align='center'
+                variant="subtitle1"
+                align="center"
               >
                 Deadline*
               </Typography>
@@ -196,11 +204,11 @@ const Contest = (props) => {
                     <KeyboardDatePicker
                       style={{ border: "1px" }}
                       disableToolbar
-                      format='MM/dd/yyyy'
-                      margin='normal'
+                      format="MM/dd/yyyy"
+                      margin="normal"
                       required
-                      id='contest-deadline-date'
-                      placeholder='mm/dd/yyyy'
+                      id="contest-deadline-date"
+                      placeholder="mm/dd/yyyy"
                       disablePast
                       value={deadlineDate}
                       onChange={(e) => setDeadlineDate(e)}
@@ -211,8 +219,8 @@ const Contest = (props) => {
                   </Grid>
                   <Grid item xs={6}>
                     <KeyboardTimePicker
-                      margin='normal'
-                      id='contest-deadline-time'
+                      margin="normal"
+                      id="contest-deadline-time"
                       required
                       value={deadlineTime}
                       onChange={(e) => setDeadlineTime(e)}
@@ -226,17 +234,17 @@ const Contest = (props) => {
             </Grid>
           </Grid>
         </Box>
-        <Box width='60%' margin='auto'>
-          <Typography className={classes.title} variant='subtitle1'>
+        <Box width="60%" margin="auto">
+          <Typography className={classes.title} variant="subtitle1">
             Which designs do you like?
             <br />
-            <Typography variant='subtitle2'>
+            <Typography variant="subtitle2">
               Let's start by helping your designers understand which styles you
               prefer
             </Typography>
           </Typography>
 
-          <Box border={1} borderColor='grey.300' className={classes.designBox}>
+          <Box border={1} borderColor="grey.300" className={classes.designBox}>
             <GridList
               cellHeight={140}
               className={classes.gridList}
@@ -257,11 +265,13 @@ const Contest = (props) => {
           </Box>
         </Box>
 
-        <Grid container justify='center' className={classes.grid}>
+        <Grid container justify="center" className={classes.grid}>
           <Button
-            size='large'
-            type='submit'
-            className={classes.button}
+            size="large"
+            type="submit"
+            className={
+              user.hasPayment ? classes.button : classes.buttonDisabled
+            }
             onClick={handleSubmit}
           >
             CREATE CONTEST
@@ -343,8 +353,22 @@ const styles = makeStyles({
     borderRadius: "0",
     padding: "15px",
     "&:hover": {
-      background: "green",
+      background: "gray",
       cursor: "pointer",
+    },
+  },
+  buttonDisabled: {
+    marginTop: "60px",
+    marginBottom: "60px",
+    cursor: "not-allowed",
+    backgroundColor: "lightgray",
+    color: "white",
+    fontFamily: "Poppins",
+    fontWeight: 600,
+    borderRadius: "0",
+    padding: "15px",
+    "&:hover": {
+      background: "lightgray",
     },
   },
   imageTile: {

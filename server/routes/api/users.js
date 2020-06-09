@@ -5,17 +5,33 @@ const normalizeEmail = require("validator/lib/normalizeEmail");
 const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
+const STRIPE_KEY = require("../../config/default.json").stripeKey;
+const STRIPE_SECRET = require("../../config/default.json").stripe_secret;
+const stripe = require("stripe")(STRIPE_SECRET);
 
 const auth = require("../../middleware/auth");
 const Contest = require("../../models/Contest");
 const Submission = require("../../models/submission");
 const User = require("../../models/User");
 
+const createStripeCustomer = async () => {
+  //create Stripe customer
+  const customer = await stripe.customers.create();
+  //use customer id to create a future payment intent
+  const customer_id = customer["id"];
+  const intent = await stripe.setupIntents.create({
+    customer: customer_id,
+  });
+  console.log(intent);
+  return intent;
+};
+
 // @route   POST api/users/register
 // @desc    Register user
 // @access  Public
-router.post("/register", function (req, res, next) {
+router.post("/register", async function (req, res, next) {
   const { name, email, password, password2 } = req.body;
+  const stripeCustomer = await createStripeCustomer();
   try {
     const normalizedEmail = normalizeEmail(email);
     if (!isEmail(normalizedEmail))
@@ -33,6 +49,8 @@ router.post("/register", function (req, res, next) {
           email,
           email_normalized: normalizedEmail,
           password,
+          stripe_customer_id: stripeCustomer.customer,
+          stripe_client_secret: stripeCustomer.client_secret,
         });
 
         // Hash password before saving in database
@@ -77,24 +95,29 @@ router.post("/register", function (req, res, next) {
 // @desc    Update a user profile
 // @access  Private
 router.put("/", auth, (req, res) => {
-  const { user_id, url } = req.body;
+  const { user_id, url, payment } = req.body;
+  let updateQuery = {};
+  if (payment) {
+    updateQuery = {
+      hasPayment: true,
+      payment,
+    };
+  } else {
+    updateQuery = {
+      profile_image_url: url,
+    };
+  }
   if (user_id === req.user.id) {
-    User.findByIdAndUpdate(
-      req.user.id,
-      {
-        profile_image_url: url,
-      },
-      (err, result) => {
-        if (err) {
-          res.status(500).json({
-            message: err.message,
-          });
-        }
-        res.json({
-          message: "Profile updated successfully",
+    User.findByIdAndUpdate(req.user.id, updateQuery, (err, result) => {
+      if (err) {
+        res.status(500).json({
+          message: err.message,
         });
       }
-    );
+      res.json({
+        message: "Profile updated successfully",
+      });
+    });
   } else {
     res.status(401).json({
       message: "Unauthorized to update this profile",

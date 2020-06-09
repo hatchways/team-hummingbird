@@ -25,9 +25,10 @@ function TabPanel(props) {
 export default function Settings(props) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("xs"));
   const { authTokens, setAuthTokens } = useAuth();
-  const [user] = useState(authTokens ? authTokens.user : null);
+  const [user, setUser] = useState(authTokens ? authTokens.user : null);
   const classes = useStyles();
-  const [value, setValue] = useState(2); //defaults to payment details for
+  const [value, setValue] = useState(0); //defaults to payment details for
+
   return (
     <Container className={classes.root}>
       <Tabs
@@ -38,28 +39,31 @@ export default function Settings(props) {
         className={classes.tabs}
       >
         <Tab label="Profile" />
-        <Tab label="Payout Information" />
-        <Tab label="Payment Details" />
+        <Tab label="Payout Info" />
+        <Tab label="Payment Info" />
         <Tab label="Notifications" />
         <Tab label="Password" />
       </Tabs>
       <TabPanel className={classes.tabPanel} value={value} index={0}>
         <Container>
+          <Typography style={{ marginBottom: 20 }} variant="h3">
+            Profile
+          </Typography>
           <div className={classes.profileInfoWrapper}>
             <div className={classes.profileInfoRow}>
-              <Typography variant="body1">Name:</Typography>
-              <Typography variant="body2">{user?.name}</Typography>
+              <Typography className={classes.profileText} variant="body1">
+                <b>Name:</b>&nbsp;&nbsp;&nbsp;{user?.name}
+              </Typography>
             </div>
             <div className={classes.profileInfoRow}>
-              <Typography variant="body1">Email: </Typography>
-              <Typography variant="body2">{user?.email}</Typography>
+              <Typography className={classes.profileText} variant="body1">
+                <b>Email:</b>&nbsp;&nbsp;&nbsp;{user?.email}
+              </Typography>
             </div>
             <div className={classes.profileInfoRow}>
-              <Typography variant="body1">Payment Info: </Typography>
-              <Typography variant="body2">
-                {user.hasPaymentInfoSaved
-                  ? "Credit card info saved."
-                  : "No payment method on file."}
+              <Typography className={classes.profileText} variant="body1">
+                <b>Earnings Total:</b>&nbsp;&nbsp;&nbsp;
+                {user.earnings_total ? `$${user.earnings_total}` : "$0"}
               </Typography>
             </div>
           </div>
@@ -91,8 +95,10 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     height: "100%",
     width: "100%",
+    marginTop: 40,
     [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
+      marginTop: 0,
     },
   },
   breadcrumbWrapper: {
@@ -105,7 +111,7 @@ const useStyles = makeStyles((theme) => ({
     textDecoration: "underline",
   },
   tabPanel: {
-    display: "flex",
+    // display: "flex",
     flexGrow: 1,
     width: "100%",
     justifyContent: "center",
@@ -121,6 +127,9 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     width: "100%",
     justifyContent: "space-between",
+  },
+  profileText: {
+    fontSize: 16,
   },
   tabs: {
     "& .Mui-selected .MuiTab-wrapper": {
