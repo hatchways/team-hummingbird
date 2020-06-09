@@ -19,7 +19,6 @@ const chargeCreditCard = async (customerId, paymentMethod, amount) => {
       payment_method: paymentMethod,
       //capture_method: "manual",
       off_session: true,
-      capture_method: "manual",
       confirm: true,
     });
     return paymentIntent;
