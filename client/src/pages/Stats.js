@@ -23,6 +23,7 @@ import {
 import { CheckCircle } from "@material-ui/icons";
 import { useAuth } from "../components/UserContext";
 import { Link } from "react-router-dom";
+import { Line } from "react-chartjs-2";
 
 export default function Stats(props) {
   const { authTokens } = useAuth();
@@ -34,6 +35,33 @@ export default function Stats(props) {
   const [submissions, setSubmissions] = useState(imageGridList);
   const classes = useStyles();
   const [activeTab, setActiveTab] = useState(0);
+
+  const data = {
+    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    datasets: [
+      {
+        label: "Earnings (USD)",
+        fill: false,
+        lineTension: 0.1,
+        backgroundColor: "black",
+        borderColor: "black",
+        borderCapStyle: "butt",
+        borderDash: [],
+        borderDashOffset: 0.0,
+        borderJoinStyle: "miter",
+        pointBorderColor: "black",
+        pointBackgroundColor: "#fff",
+        pointBorderWidth: 1,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: "black",
+        pointHoverBorderColor: "rgba(220,220,220,1)",
+        pointHoverBorderWidth: 2,
+        pointRadius: 1,
+        pointHitRadius: 10,
+        data: [65, 59, 80, 81, 56, 55, 40],
+      },
+    ],
+  };
 
   const handleClickOpen = (submissionId) => {
     setOpenDialog(true);
@@ -79,10 +107,6 @@ export default function Stats(props) {
           <div className={classes.titleWrapper}>
             <Typography variant="h4">Your Stats</Typography>
           </div>
-          <Typography className={classes.profileText} variant="body1">
-            <b>Earnings Total:</b>&nbsp;&nbsp;&nbsp;
-            {user.earnings_total ? `$${user.earnings_total}` : "$0"}
-          </Typography>
         </Grid>
       </Grid>
       <Tabs
@@ -164,13 +188,21 @@ export default function Stats(props) {
                   bottomGutter
                   variant="h1"
                 >
-                  $300
+                  {user.earnings_total ? `$${user.earnings_total}` : "$0"}
                   <br />
                   earned
                 </Typography>
               </div>
             </GridListTile>
           </GridList>
+          <Typography
+            style={{ marginTop: 60, marginBottom: 20 }}
+            bottomGutter
+            variant="h1"
+          >
+            Earnings in {new Date().getFullYear()}
+          </Typography>
+          <Line data={data} />
         </Paper>
       </TabPanel>
       <TabPanel className={classes.tabPanel} value={activeTab} index={1}>
