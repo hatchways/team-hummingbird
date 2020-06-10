@@ -5,6 +5,7 @@ const auth = require("../../middleware/auth");
 const User = require("../../models/User");
 const Contest = require("../../models/Contest");
 const Submission = require("../../models/submission");
+const Transaction = require("../../models/Transaction");
 
 const STRIPE_KEY = require("../../config/default.json").stripeKey;
 const STRIPE_SECRET = require("../../config/default.json").stripe_secret;
@@ -215,9 +216,29 @@ contestRouter.put("/:id/submission/:submission_id", auth, (req, res) => {
                                 contest.prize_amount
                               )
                                 .then((r) => {
-                                  res.status(200).json({
-                                    message: "Submission updated successfully",
+                                  const transaction = new Transaction({
+                                    user_id_sender: req.user.id,
+                                    user_id_receiver: submission.user_id,
+                                    contest_id: contest.id,
+                                    submission_id: submission.id,
+                                    name: "Contest Winner Payment",
+                                    amount: contest.prize_amount,
                                   });
+                                  transaction
+                                    .save()
+                                    .then((transaction) => {
+                                      res.status(200).json({
+                                        message:
+                                          "Submission updated successfully",
+                                        transaction,
+                                      });
+                                    })
+                                    .catch((err) => {
+                                      console.log(err.message);
+                                      res.status(500).json({
+                                        message: "Error: " + err.message,
+                                      });
+                                    });
                                 })
                                 .catch((err) => {
                                   console.log(err.message);
