@@ -1,0 +1,5 @@
+# This folder holds temporarily downloaded images. 
+# This file ensures git tracks the empty folder but not the files. 
+*
+
+!.gitignore

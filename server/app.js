@@ -15,6 +15,7 @@ const contestRouter = require("./routes/api/contest");
 const contestsRouter = require("./routes/api/contests");
 const chatRoomRouter = require("./routes/api/chatroom");
 const stripeRouter = require("./routes/api/stripe");
+const visionRouter = require('./routes/api/vision')
 const db = config.get("mongoURI");
 
 const { json, urlencoded } = express;
@@ -45,7 +46,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/chatroom", chatRoomRouter);
 app.use("/api/stripe", stripeRouter);
-
+app.use("/api/vision", visionRouter)
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
