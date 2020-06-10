@@ -227,11 +227,27 @@ contestRouter.put("/:id/submission/:submission_id", auth, (req, res) => {
                                   transaction
                                     .save()
                                     .then((transaction) => {
-                                      res.status(200).json({
-                                        message:
-                                          "Submission updated successfully",
-                                        transaction,
-                                      });
+                                      Submission.updateMany(
+                                        { contest_id: contest.id },
+                                        {
+                                          $set: {
+                                            active: false,
+                                          },
+                                        }
+                                      )
+                                        .then((r) => {
+                                          res.status(200).json({
+                                            message:
+                                              "Submission updated successfully",
+                                            transaction,
+                                          });
+                                        })
+                                        .catch((err) => {
+                                          console.log(err.message);
+                                          res.status(500).json({
+                                            message: "Error: " + err.message,
+                                          });
+                                        });
                                     })
                                     .catch((err) => {
                                       console.log(err.message);

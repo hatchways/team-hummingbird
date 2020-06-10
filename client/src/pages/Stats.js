@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from "@material-ui/core";
 import { CheckCircle } from "@material-ui/icons";
+import numeral from "numeral";
 import { useAuth } from "../components/UserContext";
 import { Link } from "react-router-dom";
 import { Line } from "react-chartjs-2";
@@ -32,12 +33,14 @@ export default function Stats(props) {
 
   const [openDialog, setOpenDialog] = useState(false);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("xs"));
-  const [submissions, setSubmissions] = useState(imageGridList);
-  const classes = useStyles();
-  const [activeTab, setActiveTab] = useState(0);
-
-  const data = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
+  const [myContests, setMyContests] = useState(null);
+  const [enteredContests, setEnteredContests] = useState(null);
+  const [mySubmissions, setMySubmissions] = useState(null);
+  const [moneyReceived, setMoneyReceived] = useState(null);
+  const [moneySent, setMoneySent] = useState(null);
+  const [monthlyEarnings, setMonthlyEarnings] = useState([]);
+  const [dataYTD, setDataYTD] = useState({
+    labels: [],
     datasets: [
       {
         label: "Earnings (USD)",
@@ -58,10 +61,32 @@ export default function Stats(props) {
         pointHoverBorderWidth: 2,
         pointRadius: 1,
         pointHitRadius: 10,
-        data: [65, 59, 80, 81, 56, 55, 40],
+        data: monthlyEarnings,
       },
     ],
-  };
+  });
+  const classes = useStyles();
+  const [activeTab, setActiveTab] = useState(0);
+
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  let monthLabels = [];
+  for (let i = 0; i <= date.getMonth(); i++) {
+    if (dataYTD.labels.length <= i) dataYTD.labels.push(months[i]);
+    if (monthlyEarnings.length <= i) monthlyEarnings.push(0);
+  }
 
   const handleClickOpen = (submissionId) => {
     setOpenDialog(true);
@@ -71,26 +96,86 @@ export default function Stats(props) {
     setOpenDialog(false);
   };
 
-  // useEffect(() => {
-  //   console.log(user);
-  //   const getInfo = async () => {
-  //     const contestInfo = await fetch(`/api/contest/${contestId}`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "x-auth-token": authTokens.token,
-  //       },
-  //     });
-  //     let jsonContestInfo = await contestInfo.json();
-  //     console.log(jsonContestInfo);
-  //     setContestInfo(jsonContestInfo.contest);
-  //     setSubmissions(jsonContestInfo.submissions);
-  //     setContestOwner(jsonContestInfo.owner);
-  //     setContestWinner(
-  //       jsonContestInfo.submissions.filter((submission) => submission.winner)[0]
-  //     );
-  //   };
-  //   getInfo();
-  // }, [user]);
+  async function fetchData() {
+    let tempDataYTD = {
+      labels: [],
+      datasets: [
+        {
+          label: "Earnings (USD)",
+          fill: false,
+          lineTension: 0.1,
+          backgroundColor: "black",
+          borderColor: "black",
+          borderCapStyle: "butt",
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: "miter",
+          pointBorderColor: "black",
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "black",
+          pointHoverBorderColor: "rgba(220,220,220,1)",
+          pointHoverBorderWidth: 2,
+          pointRadius: 1,
+          pointHitRadius: 10,
+          data: monthlyEarnings,
+        },
+      ],
+    };
+
+    const resMyContests = await fetch("/api/users/contests?user_id=" + user.id);
+    resMyContests
+      .json()
+      .then((res) => {
+        setMyContests(res.contests);
+        console.log(res.contests);
+      })
+      .catch((err) => console.error(err));
+
+    const resEnteredContests = await fetch("/api/users/submissions", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
+    });
+    resEnteredContests
+      .json()
+      .then((res) => {
+        console.log(res);
+        setEnteredContests(res.contests);
+        setMySubmissions(res.submissions);
+      })
+      .catch((err) => console.error(err));
+
+    const resTransactions = await fetch("/api/users/stats", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
+    });
+    resTransactions
+      .json()
+      .then((res) => {
+        console.log(res);
+        setMoneyReceived(res.moneyReceived);
+        setMoneySent(res.moneySent);
+        res.moneyReceived.forEach((transaction) => {
+          const transactionDate = new Date(transaction.date);
+          monthlyEarnings[transactionDate.getMonth()] += transaction.amount;
+          console.log("monthlyEarnings:", monthlyEarnings);
+        });
+        tempDataYTD.datasets[0].data = monthlyEarnings;
+        setDataYTD(tempDataYTD);
+      })
+      .catch((err) => console.error(err));
+  }
+
+  useEffect(() => {
+    if (user && !myContests && !enteredContests && !moneyReceived) fetchData();
+  });
 
   return (
     <Container>
@@ -140,14 +225,15 @@ export default function Stats(props) {
                   bottomGutter
                   variant="h1"
                 >
-                  3<br />
+                  {mySubmissions ? mySubmissions.length : 0}
+                  <br />
                   submissions
                 </Typography>
               </div>
             </GridListTile>
             <GridListTile
               className={isMobile ? classes.tileRootMobile : classes.tileRoot}
-              key={0}
+              key={1}
               cols={1}
             >
               <div className={isMobile ? classes.tileMobile : classes.tile}>
@@ -156,14 +242,18 @@ export default function Stats(props) {
                   bottomGutter
                   variant="h1"
                 >
-                  1<br />
+                  {mySubmissions
+                    ? mySubmissions.filter((submission) => submission.winner)
+                        .length
+                    : 0}
+                  <br />
                   chosen
                 </Typography>
               </div>
             </GridListTile>
             <GridListTile
               className={isMobile ? classes.tileRootMobile : classes.tileRoot}
-              key={0}
+              key={2}
               cols={1}
             >
               <div className={isMobile ? classes.tileMobile : classes.tile}>
@@ -172,14 +262,18 @@ export default function Stats(props) {
                   bottomGutter
                   variant="h1"
                 >
-                  2<br />
-                  in progress
+                  {mySubmissions
+                    ? mySubmissions.filter((submission) => submission.active)
+                        .length
+                    : 0}
+                  <br />
+                  active
                 </Typography>
               </div>
             </GridListTile>
             <GridListTile
               className={isMobile ? classes.tileRootMobile : classes.tileRoot}
-              key={0}
+              key={3}
               cols={1}
             >
               <div className={isMobile ? classes.tileMobile : classes.tile}>
@@ -188,7 +282,9 @@ export default function Stats(props) {
                   bottomGutter
                   variant="h1"
                 >
-                  {user.earnings_total ? `$${user.earnings_total}` : "$0"}
+                  {user.earnings_total
+                    ? `${numeral(user.earnings_total).format("$0,0")}`
+                    : "$0"}
                   <br />
                   earned
                 </Typography>
@@ -200,9 +296,9 @@ export default function Stats(props) {
             bottomGutter
             variant="h1"
           >
-            Earnings in {new Date().getFullYear()}
+            Earnings in {date.getFullYear()}
           </Typography>
-          <Line data={data} />
+          <Line data={dataYTD} />
         </Paper>
       </TabPanel>
       <TabPanel className={classes.tabPanel} value={activeTab} index={1}>
