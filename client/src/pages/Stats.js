@@ -39,7 +39,34 @@ export default function Stats(props) {
   const [moneyReceived, setMoneyReceived] = useState(null);
   const [moneySent, setMoneySent] = useState(null);
   const [monthlyEarnings, setMonthlyEarnings] = useState([]);
-  const [dataYTD, setDataYTD] = useState({
+  const [dataYTDReceived, setDataYTDReceived] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "Earnings (USD)",
+        fill: false,
+        lineTension: 0.1,
+        backgroundColor: "black",
+        borderColor: "black",
+        borderCapStyle: "butt",
+        borderDash: [],
+        borderDashOffset: 0.0,
+        borderJoinStyle: "miter",
+        pointBorderColor: "black",
+        pointBackgroundColor: "#fff",
+        pointBorderWidth: 1,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: "black",
+        pointHoverBorderColor: "rgba(220,220,220,1)",
+        pointHoverBorderWidth: 2,
+        pointRadius: 1,
+        pointHitRadius: 10,
+        data: monthlyEarnings,
+      },
+    ],
+  });
+  const [monthlySpendings, setMonthlySpendings] = useState([]);
+  const [dataYTDSent, setDataYTDSent] = useState({
     labels: [],
     datasets: [
       {
@@ -84,8 +111,11 @@ export default function Stats(props) {
   ];
   let monthLabels = [];
   for (let i = 0; i <= date.getMonth(); i++) {
-    if (dataYTD.labels.length <= i) dataYTD.labels.push(months[i]);
+    if (dataYTDReceived.labels.length <= i)
+      dataYTDReceived.labels.push(months[i]);
     if (monthlyEarnings.length <= i) monthlyEarnings.push(0);
+    if (dataYTDSent.labels.length <= i) dataYTDSent.labels.push(months[i]);
+    if (monthlySpendings.length <= i) monthlySpendings.push(0);
   }
 
   const handleClickOpen = (submissionId) => {
@@ -97,7 +127,7 @@ export default function Stats(props) {
   };
 
   async function fetchData() {
-    let tempDataYTD = {
+    let tempDataYTDReceived = {
       labels: [],
       datasets: [
         {
@@ -120,6 +150,33 @@ export default function Stats(props) {
           pointRadius: 1,
           pointHitRadius: 10,
           data: monthlyEarnings,
+        },
+      ],
+    };
+
+    let tempDataYTDSent = {
+      labels: [],
+      datasets: [
+        {
+          label: "Earnings (USD)",
+          fill: false,
+          lineTension: 0.1,
+          backgroundColor: "black",
+          borderColor: "black",
+          borderCapStyle: "butt",
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: "miter",
+          pointBorderColor: "black",
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "black",
+          pointHoverBorderColor: "rgba(220,220,220,1)",
+          pointHoverBorderWidth: 2,
+          pointRadius: 1,
+          pointHitRadius: 10,
+          data: monthlySpendings,
         },
       ],
     };
@@ -165,10 +222,16 @@ export default function Stats(props) {
         res.moneyReceived.forEach((transaction) => {
           const transactionDate = new Date(transaction.date);
           monthlyEarnings[transactionDate.getMonth()] += transaction.amount;
-          console.log("monthlyEarnings:", monthlyEarnings);
         });
-        tempDataYTD.datasets[0].data = monthlyEarnings;
-        setDataYTD(tempDataYTD);
+        tempDataYTDReceived.datasets[0].data = monthlyEarnings;
+        setDataYTDReceived(tempDataYTDReceived);
+
+        res.moneySent.forEach((transaction) => {
+          const transactionDate = new Date(transaction.date);
+          monthlySpendings[transactionDate.getMonth()] += transaction.amount;
+        });
+        tempDataYTDSent.datasets[0].data = monthlySpendings;
+        setDataYTDSent(tempDataYTDSent);
       })
       .catch((err) => console.error(err));
   }
@@ -227,7 +290,9 @@ export default function Stats(props) {
                 >
                   {mySubmissions ? mySubmissions.length : 0}
                   <br />
-                  submissions
+                  {mySubmissions && mySubmissions.length === 1
+                    ? "submission"
+                    : "submissions"}
                 </Typography>
               </div>
             </GridListTile>
@@ -298,7 +363,7 @@ export default function Stats(props) {
           >
             Earnings in {date.getFullYear()}
           </Typography>
-          <Line data={dataYTD} />
+          <Line data={dataYTDReceived} />
         </Paper>
       </TabPanel>
       <TabPanel className={classes.tabPanel} value={activeTab} index={1}>
@@ -306,6 +371,105 @@ export default function Stats(props) {
           <Typography style={{ marginBottom: 20 }} bottomGutter variant="h1">
             Quick Totals
           </Typography>
+          <GridList
+            cellHeight={isMobile ? 300 : 90}
+            className={classes.gridList}
+            cols={isMobile ? 1 : 4}
+            spacing={2}
+          >
+            <GridListTile
+              className={isMobile ? classes.tileRootMobile : classes.tileRoot}
+              key={0}
+              cols={1}
+            >
+              <div className={isMobile ? classes.tileMobile : classes.tile}>
+                <Typography
+                  className={classes.tileText}
+                  bottomGutter
+                  variant="h1"
+                >
+                  {myContests ? myContests.length : 0}
+                  <br />
+                  {myContests && myContests.length === 1
+                    ? "contest"
+                    : "contests"}
+                </Typography>
+              </div>
+            </GridListTile>
+            <GridListTile
+              className={isMobile ? classes.tileRootMobile : classes.tileRoot}
+              key={1}
+              cols={1}
+            >
+              <div className={isMobile ? classes.tileMobile : classes.tile}>
+                <Typography
+                  className={classes.tileText}
+                  bottomGutter
+                  variant="h1"
+                >
+                  {myContests
+                    ? myContests.filter(
+                        (contest) => new Date(contest.deadline_date) < date
+                      ).length
+                    : 0}
+                  <br />
+                  completed
+                </Typography>
+              </div>
+            </GridListTile>
+            <GridListTile
+              className={isMobile ? classes.tileRootMobile : classes.tileRoot}
+              key={2}
+              cols={1}
+            >
+              <div className={isMobile ? classes.tileMobile : classes.tile}>
+                <Typography
+                  className={classes.tileText}
+                  bottomGutter
+                  variant="h1"
+                >
+                  {myContests
+                    ? myContests.filter(
+                        (contest) => new Date(contest.deadline_date) > date
+                      ).length
+                    : 0}
+                  <br />
+                  in progress
+                </Typography>
+              </div>
+            </GridListTile>
+            <GridListTile
+              className={isMobile ? classes.tileRootMobile : classes.tileRoot}
+              key={3}
+              cols={1}
+            >
+              <div className={isMobile ? classes.tileMobile : classes.tile}>
+                <Typography
+                  className={classes.tileText}
+                  bottomGutter
+                  variant="h1"
+                >
+                  {moneySent && moneySent.length === 1
+                    ? `${numeral(moneySent[0].amount).format("$0,0")}`
+                    : moneySent && moneySent.length > 1
+                    ? `${numeral(
+                        moneySent.reduce((a, b) => a.amount + b.amount)
+                      ).format("$0,0")}`
+                    : "$0"}
+                  <br />
+                  paid
+                </Typography>
+              </div>
+            </GridListTile>
+          </GridList>
+          <Typography
+            style={{ marginTop: 60, marginBottom: 20 }}
+            bottomGutter
+            variant="h1"
+          >
+            Spendings in {date.getFullYear()}
+          </Typography>
+          <Line data={dataYTDSent} />
         </Paper>
       </TabPanel>
       <Dialog

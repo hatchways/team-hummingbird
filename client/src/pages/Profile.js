@@ -156,7 +156,7 @@ function Profile(props) {
               {alertMessage}
             </Alert>
           </Snackbar>
-          <div>
+          <div style={{ textAlign: "center" }}>
             <S3
               accept="image/*"
               multiple={false}
@@ -188,14 +188,24 @@ function Profile(props) {
               >
                 PNG, JPG
               </Typography>
-              <Link to="/settings">
-                <Typography
-                  style={{ color: "black" }}
-                  display="block"
-                  variant="body1"
+              <Link to="/stats">
+                <Button
+                  component="span"
+                  size="large"
+                  className={classes.buttonBlack}
                 >
-                  Edit payment settings
-                </Typography>
+                  Stats
+                </Button>
+              </Link>
+              &nbsp;
+              <Link to="/settings">
+                <Button
+                  component="span"
+                  size="large"
+                  className={classes.buttonBlack}
+                >
+                  Settings
+                </Button>
               </Link>
             </div>
           </div>
@@ -305,6 +315,18 @@ const useStyles = makeStyles({
     // marginBottom: "100px",
     backgroundColor: "white",
     color: "black",
+    fontFamily: "Poppins",
+    fontWeight: 600,
+    padding: "0.8rem 2rem",
+    borderRadius: "0",
+    border: "1px solid #e2e8f0",
+    textTransform: "none",
+  },
+  buttonBlack: {
+    marginTop: "10px",
+    width: 200,
+    backgroundColor: "black",
+    color: "white",
     fontFamily: "Poppins",
     fontWeight: 600,
     padding: "0.8rem 2rem",
