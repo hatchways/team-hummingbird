@@ -220,7 +220,10 @@ export default function ContestSubmissions(props) {
                         margin: "5px",
                         width: "100%",
                         height: "100%",
-                        backgroundImage: `url(${submission.upload_files[0]})`,
+                        backgroundImage: `url(${
+                          submission.upload_files[0]["url"] ||
+                          submission.upload_files[0]
+                        })`,
                         backgroundSize: "cover",
                         backgroundRepeat: "no-repeat",
                         display: "flex",

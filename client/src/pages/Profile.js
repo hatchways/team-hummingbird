@@ -20,7 +20,7 @@ import ContestCard from "../components/ContestCard";
 import { useAuth } from "../components/UserContext";
 
 function Alert(props) {
-  return <MuiAlert elevation={6} variant='filled' {...props} />;
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 function a11yProps(index) {
@@ -35,7 +35,7 @@ function TabPanel(props) {
 
   return (
     <div
-      role='tabpanel'
+      role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
@@ -134,8 +134,8 @@ function Profile(props) {
   const classes = useStyles();
   if (authTokens) {
     return (
-      <Container className={classes.container} maxWidth='lg'>
-        <Grid direction='column' container spacing={3} alignItems='center'>
+      <Container className={classes.container} maxWidth="lg">
+        <Grid direction="column" container spacing={3} alignItems="center">
           <div className={classes.imageCropper}>
             <img
               className={classes.profilePic}
@@ -146,7 +146,7 @@ function Profile(props) {
               }
             ></img>
           </div>
-          <Typography className={classes.title} variant='h1'>
+          <Typography className={classes.title} variant="h1">
             {user ? user.name : ""}
           </Typography>
           <Snackbar
@@ -161,19 +161,19 @@ function Profile(props) {
           </Snackbar>
           <div>
             <S3
-              accept='image/*'
+              accept="image/*"
               multiple={false}
-              signingUrl='/s3/sign'
+              signingUrl="/s3/sign"
               signingUrlWithCredentials={true}
               className={classes.uploadButton}
-              id='s3'
+              id="s3"
               scrubFilename={(name) =>
                 Date.now() + "-" + name.replace(/[^\w\d_\-.]+/gi, "")
               }
               onFinish={(e) => handleUpdateProfileImage(e["uploadUrl"])}
             />
-            <label htmlFor='s3'>
-              <Button component='span' size='large' className={classes.button}>
+            <label htmlFor="s3">
+              <Button component="span" size="large" className={classes.button}>
                 Update Profile Image
               </Button>
             </label>
@@ -185,17 +185,17 @@ function Profile(props) {
               }}
             >
               <Typography
-                display='block'
+                display="block"
                 className={classes.instructions}
-                variant='caption'
+                variant="caption"
               >
                 PNG, JPG
               </Typography>
-              <Link to='/settings'>
+              <Link to="/settings">
                 <Typography
                   style={{ color: "black" }}
-                  display='block'
-                  variant='body1'
+                  display="block"
+                  variant="body1"
                 >
                   Edit payment settings
                 </Typography>
@@ -203,25 +203,25 @@ function Profile(props) {
             </div>
           </div>
         </Grid>
-        <AppBar position='static' className={classes.tabBar}>
+        <AppBar position="static" className={classes.tabBar}>
           <Tabs
             value={currentTab}
             TabIndicatorProps={{
               style: { background: "black", height: "4px" },
             }}
-            variant='fullWidth'
+            variant="fullWidth"
             onChange={() =>
               currentTab === 0 ? setCurrentTab(1) : setCurrentTab(0)
             }
-            aria-label='user contests'
+            aria-label="user contests"
           >
             <Tab
-              label='My Contests'
+              label="My Contests"
               {...a11yProps(0)}
               className={classes.tabs}
             />
             <Tab
-              label='Entered Contests'
+              label="Entered Contests"
               {...a11yProps(1)}
               className={classes.tabs}
             />
@@ -234,7 +234,7 @@ function Profile(props) {
                   return (
                     <ContestCard
                       contest_id={contest._id}
-                      imageUrl='https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png' //placeholder
+                      imageUrl="https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png" //placeholder
                       title={contest.title}
                       description={contest.description}
                       prizeAmount={contest.prize_amount}
@@ -255,7 +255,7 @@ function Profile(props) {
                       imageUrl={
                         mySubmissions.filter(
                           (s) => s.contest_id === contest._id
-                        )[0].upload_files[0]
+                        )[0].upload_files[0]["url"]
                       }
                       title={contest.title}
                       description={contest.description}

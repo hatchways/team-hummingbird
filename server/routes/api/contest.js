@@ -129,7 +129,7 @@ contestRouter.post("/", auth, (req, res) => {
 
 contestRouter.put("/:id", auth, (req, res) => {
   const { title, description, prize_amount, deadline_date, user_id } = req.body;
-
+  console.log(req.body);
   if (user_id === req.user.id) {
     Contest.findByIdAndUpdate(
       req.params.id,

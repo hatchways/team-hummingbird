@@ -35,27 +35,40 @@ contestsRouter.get("/discover", (req, res) => {
             const placeholderImage =
               "https://hatchways-hummingbird.s3.amazonaws.com/Assets/fb61d9c7dd33978f7274b8c47c42562a3d759e58.png";
             if (submissions[0]) {
-              return submissions[0]["upload_files"][0];
+              //console.log(submissions[0]);
+              return {
+                submission:
+                  submissions[0]["upload_files"][0]["url"] ||
+                  submissions[0]["upload_files"],
+                tags: submissions[0]["upload_files"][0]["tags"],
+              };
             } else {
-              return placeholderImage;
+              return { submission: placeholderImage, tags: [] };
             }
           });
           const userQuery = UserModel.findById(contest.user_id).then((v) => v);
           Promise.all([userQuery, submissionQuery]).then((combinedQuery) => {
             //removes extra data before sending
-            res({ ...combinedQuery[0]["_doc"], firstImage: combinedQuery[1] });
+            console.log(combinedQuery);
+            res({
+              ...combinedQuery[0]["_doc"],
+              firstImage: combinedQuery[1]["submission"],
+              tags: combinedQuery[1]["tags"],
+            });
           });
         });
       });
 
       Promise.all(userRequests).then((userArray) => {
         let contests = userArray.map((user, index) => {
-          const { name, profile_image_url, firstImage } = user;
+          const { name, profile_image_url, firstImage, tags } = user;
+          console.log(user);
           return {
             ..._contests[index]["_doc"],
             name,
             profile_image_url,
             firstImage,
+            tags: tags || [""],
           };
         });
         res.status(200).json({ contests });

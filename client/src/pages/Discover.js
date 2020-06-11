@@ -20,6 +20,7 @@ export default function Discover() {
       name: "Tom",
       profile_image_url: "",
       firstImage: "",
+      tags: [""],
     },
   ]);
 
@@ -81,6 +82,7 @@ export default function Discover() {
               name={contest.name}
               profile_image_url={contest.profile_image_url}
               firstImage={contest.firstImage}
+              tags={contest.tags}
             />
           </a>
         );
