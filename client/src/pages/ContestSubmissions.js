@@ -192,52 +192,43 @@ export default function ContestSubmissions(props) {
         <Tab label="DETAILS" />
       </Tabs>
       <TabPanel className={classes.tabPanel} value={activeTab} index={0}>
-        <GridList
-          cellHeight={isMobile ? 300 : 180}
-          className={classes.gridList}
-          cols={isMobile ? 1 : 4}
-          spacing={2}
-        >
-          {submissions
-            ? submissions.map((submission, index) => (
-                <GridListTile key={index} cols={1}>
-                  <a
-                    href="#"
-                    style={{
-                      "&:hover": {
-                        boxShadow:
-                          "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                      },
-                    }}
-                    onClick={() =>
-                      user.id === contestInfo.user_id && !contestWinner
-                        ? handleClickOpen(submission._id)
-                        : null
-                    }
-                  >
-                    <div
+        <Paper style={{ minHeight: "300px", padding: "3rem" }}>
+          <GridList
+            cellHeight={isMobile ? 300 : 180}
+            className={classes.gridList}
+            cols={isMobile ? 1 : 4}
+            spacing={2}
+          >
+            {submissions
+              ? submissions.map((submission, index) => (
+                  <GridListTile key={index} cols={1}>
+                    <a
+                      href="#"
                       style={{
-                        margin: "5px",
-                        width: "100%",
-                        height: "100%",
-                        backgroundImage: `url(${submission.upload_files[0]})`,
-                        backgroundSize: "cover",
-                        backgroundRepeat: "no-repeat",
-                        display: "flex",
-                        justifyContent: "center",
+                        "&:hover": {
+                          boxShadow:
+                            "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                        },
                       }}
+                      onClick={() =>
+                        user.id === contestInfo.user_id && !contestWinner
+                          ? handleClickOpen(submission._id)
+                          : null
+                      }
                     >
-                      <Link
+                      <div
                         style={{
-                          color: "white",
-                          alignSelf: "flex-end",
-                          marginBottom: "0.5rem",
-                          fontWeight: "bold",
-                          textShadow: "0px 0px 3px black",
+                          margin: "5px",
+                          width: "100%",
+                          height: "100%",
+                          backgroundImage: `url(${submission.upload_files[0]})`,
+                          backgroundSize: "cover",
+                          backgroundRepeat: "no-repeat",
+                          display: "flex",
+                          justifyContent: "center",
                         }}
-                        to="/messages"
                       >
-                        <Typography
+                        <Link
                           style={{
                             color: "white",
                             alignSelf: "flex-end",
@@ -245,27 +236,38 @@ export default function ContestSubmissions(props) {
                             fontWeight: "bold",
                             textShadow: "0px 0px 3px black",
                           }}
+                          to="/messages"
                         >
-                          by @
-                          <span style={{ textDecoration: "underline" }}>
-                            {submission.user_name
-                              ? submission.user_name
-                              : "artist"}
-                          </span>
-                        </Typography>
-                      </Link>
-                      {/* <IconButton
+                          <Typography
+                            style={{
+                              color: "white",
+                              alignSelf: "flex-end",
+                              marginBottom: "0.5rem",
+                              fontWeight: "bold",
+                              textShadow: "0px 0px 3px black",
+                            }}
+                          >
+                            by @
+                            <span style={{ textDecoration: "underline" }}>
+                              {submission.user_name
+                                ? submission.user_name
+                                : "artist"}
+                            </span>
+                          </Typography>
+                        </Link>
+                        {/* <IconButton
                       aria-label={`info about ${submission.title}`}
                       style={{ color: "green", float: "right" }}
                     >
                       <CheckCircle />
                     </IconButton> */}
-                    </div>
-                  </a>
-                </GridListTile>
-              ))
-            : ""}
-        </GridList>
+                      </div>
+                    </a>
+                  </GridListTile>
+                ))
+              : ""}
+          </GridList>
+        </Paper>
       </TabPanel>
       <TabPanel className={classes.tabPanel} value={activeTab} index={1}>
         <Paper style={{ minHeight: "300px", padding: "3rem" }}>
