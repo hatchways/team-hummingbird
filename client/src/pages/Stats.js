@@ -347,8 +347,12 @@ export default function Stats(props) {
                   bottomGutter
                   variant="h1"
                 >
-                  {user.earnings_total
-                    ? `${numeral(user.earnings_total).format("$0,0")}`
+                  {moneyReceived && moneyReceived.length === 1
+                    ? `${numeral(moneyReceived[0].amount).format("$0,0")}`
+                    : moneyReceived && moneyReceived.length > 1
+                    ? `${numeral(
+                        moneyReceived.reduce((a, b) => a.amount + b.amount)
+                      ).format("$0,0")}`
                     : "$0"}
                   <br />
                   earned
