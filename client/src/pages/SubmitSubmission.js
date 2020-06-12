@@ -8,7 +8,7 @@ import {
   Snackbar,
   Box,
   Chip,
-  CircularProgress
+  CircularProgress,
 } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import CloudUploadOutlinedIcon from "@material-ui/icons/CloudUploadOutlined";
@@ -19,7 +19,10 @@ import { useAuth } from "../components/UserContext";
 export default function SubmitSubmission(props) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploadedWithTags, setUploadedWithTags] = useState([]);
-  const [uploadProgress, setUploadProgress] = useState({ message: "", value: 0 })
+  const [uploadProgress, setUploadProgress] = useState({
+    message: "",
+    value: 0,
+  });
   const classes = useStyles();
   //Snackbar state
   const [openAlert, setOpenAlert] = useState(false);
@@ -57,6 +60,7 @@ export default function SubmitSubmission(props) {
       } else {
         handleAlert("Uploaded Successfully", "success");
         setUploadedFiles([]);
+        window.location.href = "/contest/" + contestId;
       }
     } else {
       handleAlert("Select a file first", "error");
@@ -70,7 +74,6 @@ export default function SubmitSubmission(props) {
   };
 
   const handleRemoval = (index) => {
-
     setUploadedWithTags((prev) => {
       let copy = prev.slice();
       copy.splice(index, 1);
@@ -84,7 +87,7 @@ export default function SubmitSubmission(props) {
   };
 
   const getAI = async (img) => {
-    setUploadProgress({ message: "Scanning For Copyright", value: 50 }) //objects, explicit content, etc. 
+    setUploadProgress({ message: "Scanning For Copyright", value: 50 }); //objects, explicit content, etc.
 
     //   const getImageLabels = await fetch(
     //     `/api/vision/detectLabels?imgURL=${img}`,
@@ -99,37 +102,25 @@ export default function SubmitSubmission(props) {
     //   const labelsJson = await getImageLabels.json();
     //   return labelsJson["labels"];
     // };
-    const detectLogos = await fetch(
-      `/api/vision/detectLogos?imgURL=${img}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-auth-token": authTokens.token,
-        },
-      }
-    );
+    const detectLogos = await fetch(`/api/vision/detectLogos?imgURL=${img}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
+    });
     const logosJson = await detectLogos.json();
 
     if (logosJson.message) {
-
-      setUploadedWithTags((prev) => [
-        ...prev,
-        { url: img, tags: [""] },
-      ]);
-      setUploadProgress({ message: "", value: 0 })
+      setUploadedWithTags((prev) => [...prev, { url: img, tags: [""] }]);
+      setUploadProgress({ message: "", value: 0 });
+    } else {
+      let logosString = logosJson.join(" , ");
+      const warningString = `Warning! We've detected copyrighted or trademarked logos: ${logosString}. Please double check before uploading`;
+      handleAlert(warningString, "error");
+      setUploadedWithTags((prev) => [...prev, { url: img, tags: logosJson }]);
+      setUploadProgress({ message: "", value: 0 });
     }
-    else {
-      let logosString = logosJson.join(' , ')
-      const warningString = `Warning! We've detected copyrighted or trademarked logos: ${logosString}. Please double check before uploading`
-      handleAlert(warningString, "error")
-      setUploadedWithTags((prev) => [
-        ...prev,
-        { url: img, tags: logosJson },
-      ]);
-      setUploadProgress({ message: "", value: 0 })
-    }
-
   };
   return (
     <div className={classes.container}>
@@ -168,24 +159,31 @@ export default function SubmitSubmission(props) {
               signingUrl="/s3/sign"
               signingUrlWithCredentials={true}
               className={classes.uploadButton}
-              onProgress={value => setUploadProgress({ message: "Uploading File", value })}
+              onProgress={(value) =>
+                setUploadProgress({ message: "Uploading File", value })
+              }
               id="s3"
               scrubFilename={(name) =>
                 Date.now() + "-" + name.replace(/[^\w\d_\-.]+/gi, "")
               }
               onFinish={(e) => {
                 const url = e["uploadUrl"];
-                getAI(url)
+                getAI(url);
                 setUploadedFiles((prev) => [...prev, url]);
               }}
             />
             <label htmlFor="s3">
               <Button component="span">
-                {(uploadProgress.value > 0) ? <div className={classes.progressWrapper}>
-                  <Typography variant="body1">{uploadProgress.message}</Typography>
-                  <CircularProgress />
-                </div> : <CloudUploadOutlinedIcon fontSize="large" />}
-
+                {uploadProgress.value > 0 ? (
+                  <div className={classes.progressWrapper}>
+                    <Typography variant="body1">
+                      {uploadProgress.message}
+                    </Typography>
+                    <CircularProgress />
+                  </div>
+                ) : (
+                  <CloudUploadOutlinedIcon fontSize="large" />
+                )}
               </Button>
             </label>
             <div style={{ margin: "2rem" }}>
@@ -228,7 +226,6 @@ export default function SubmitSubmission(props) {
                       id="remove-upload"
                       key={file.url}
                     >
-
                       <img
                         alt="preview"
                         className={classes.preview}
@@ -243,19 +240,21 @@ export default function SubmitSubmission(props) {
                         }}
                       >
                         x
-                        </button>
-                      {file.tags[0].length > 0 ?
+                      </button>
+                      {file.tags[0].length > 0 ? (
                         <Chip
                           style={{
                             position: "absolute",
                             bottom: 0,
                             left: 0,
                             borderRadius: 0,
-                            maxWidth: '5rem'
+                            maxWidth: "5rem",
                           }}
                           color="primary"
                           size="small"
-                          label={`${file?.tags[0]}?`} /> : null}
+                          label={`${file?.tags[0]}?`}
+                        />
+                      ) : null}
 
                       {/* {file.tags.length > 0 ? (
                         <>
@@ -284,8 +283,8 @@ export default function SubmitSubmission(props) {
                 })}
               </div>
             ) : (
-                <img style={{ display: "none", height: "75px", width: "75px" }} />
-              )}
+              <img style={{ display: "none", height: "75px", width: "75px" }} />
+            )}
           </div>
 
           <Button
@@ -364,10 +363,10 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "200px",
   },
   progressWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center'
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
   chip: {
     "$ .MuiChip-root": {},
