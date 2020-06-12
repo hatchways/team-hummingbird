@@ -244,6 +244,18 @@ export default function SubmitSubmission(props) {
                       >
                         x
                         </button>
+                      {file.tags[0].length > 0 ?
+                        <Chip
+                          style={{
+                            position: "absolute",
+                            bottom: 0,
+                            left: 0,
+                            borderRadius: 0,
+                            maxWidth: '5rem'
+                          }}
+                          color="primary"
+                          size="small"
+                          label={`${file?.tags[0]}?`} /> : null}
 
                       {/* {file.tags.length > 0 ? (
                         <>
