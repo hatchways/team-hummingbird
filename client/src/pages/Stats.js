@@ -36,6 +36,8 @@ export default function Stats(props) {
   const [myContests, setMyContests] = useState(null);
   const [enteredContests, setEnteredContests] = useState(null);
   const [mySubmissions, setMySubmissions] = useState(null);
+  const [totalEarnings, setTotalEarnings] = useState(0);
+  const [totalSpendings, setTotalSpendings] = useState(0);
   const [moneyReceived, setMoneyReceived] = useState(null);
   const [moneySent, setMoneySent] = useState(null);
   const [monthlyEarnings, setMonthlyEarnings] = useState([]);
@@ -217,6 +219,17 @@ export default function Stats(props) {
       .json()
       .then((res) => {
         console.log(res);
+        let tempTotalEarnings = 0;
+        res.moneyReceived.forEach((t) => {
+          tempTotalEarnings += t.amount;
+        });
+        setTotalEarnings(tempTotalEarnings);
+        let tempTotalSpendings = 0;
+        res.moneySent.forEach((t) => {
+          tempTotalSpendings += t.amount;
+        });
+        setTotalSpendings(tempTotalSpendings);
+
         setMoneyReceived(res.moneyReceived);
         setMoneySent(res.moneySent);
         res.moneyReceived.forEach((transaction) => {
@@ -347,13 +360,7 @@ export default function Stats(props) {
                   bottomGutter
                   variant="h1"
                 >
-                  {moneyReceived && moneyReceived.length === 1
-                    ? `${numeral(moneyReceived[0].amount).format("$0,0")}`
-                    : moneyReceived && moneyReceived.length > 1
-                    ? `${numeral(
-                        moneyReceived.reduce((a, b) => a.amount + b.amount)
-                      ).format("$0,0")}`
-                    : "$0"}
+                  {numeral(totalEarnings).format("$0,0")}
                   <br />
                   earned
                 </Typography>
@@ -453,13 +460,7 @@ export default function Stats(props) {
                   bottomGutter
                   variant="h1"
                 >
-                  {moneySent && moneySent.length === 1
-                    ? `${numeral(moneySent[0].amount).format("$0,0")}`
-                    : moneySent && moneySent.length > 1
-                    ? `${numeral(
-                        moneySent.reduce((a, b) => a.amount + b.amount)
-                      ).format("$0,0")}`
-                    : "$0"}
+                  {numeral(totalSpendings).format("$0,0")}
                   <br />
                   paid
                 </Typography>
