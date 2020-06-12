@@ -141,8 +141,8 @@ export default function ContestSubmissions(props) {
                 {contestInfo && user.id == contestInfo.user_id
                   ? "you"
                   : contestOwner
-                    ? contestOwner.name
-                    : "Placeholder Paul"}
+                  ? contestOwner.name
+                  : "Placeholder Paul"}
               </Typography>
             </Grid>
           </Grid>
@@ -180,8 +180,8 @@ export default function ContestSubmissions(props) {
           Winner: <b>@{contestWinner.user_name}</b>
         </Typography>
       ) : (
-          ""
-        )}
+        ""
+      )}
       <Tabs
         variant="fullWidth"
         value={activeTab}
@@ -201,55 +201,48 @@ export default function ContestSubmissions(props) {
           >
             {submissions
               ? submissions.map((submission, index) => (
-                <GridListTile key={index} cols={1}>
-                  <a
-                    href="#"
-                    style={{
-                      margin: "5px",
-                      width: "100%",
-                      height: "100%",
-                      backgroundImage: `url(${
-                        submission.upload_files[0]["url"] ||
-                        submission.upload_files[0]
-                        })`,
-                      backgroundSize: "cover",
-                      backgroundRepeat: "no-repeat",
-                      display: "flex",
-                      justifyContent: "center",
-                      "&:hover": {
-                        boxShadow:
-                          "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                      },
-                    }}
-                    onClick={() =>
-                      user.id === contestInfo.user_id && !contestWinner
-                        ? handleClickOpen(submission._id)
-                        : null
-                    }
-                  >
-                    <div
+                  <GridListTile key={index} cols={1}>
+                    <a
+                      href="#"
                       style={{
                         margin: "5px",
                         width: "100%",
                         height: "100%",
-                        backgroundImage: `url(${submission.upload_files[0]})`,
+                        backgroundImage: `url(${
+                          submission.upload_files[0]["url"] ||
+                          submission.upload_files[0]
+                        })`,
                         backgroundSize: "cover",
                         backgroundRepeat: "no-repeat",
                         display: "flex",
                         justifyContent: "center",
+                        "&:hover": {
+                          boxShadow:
+                            "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                        },
                       }}
+                      onClick={() =>
+                        user.id === contestInfo.user_id && !contestWinner
+                          ? handleClickOpen(submission._id)
+                          : null
+                      }
                     >
-                      <Link
+                      <div
                         style={{
-                          color: "white",
-                          alignSelf: "flex-end",
-                          marginBottom: "0.5rem",
-                          fontWeight: "bold",
-                          textShadow: "0px 0px 3px black",
+                          margin: "5px",
+                          width: "100%",
+                          height: "100%",
+                          backgroundImage: `url(${
+                            submission.upload_files[0]["url"] ||
+                            submission.upload_files[0]
+                          })`,
+                          backgroundSize: "cover",
+                          backgroundRepeat: "no-repeat",
+                          display: "flex",
+                          justifyContent: "center",
                         }}
-                        to="/messages"
                       >
-                        <Typography
+                        <Link
                           style={{
                             color: "white",
                             alignSelf: "flex-end",
@@ -257,25 +250,35 @@ export default function ContestSubmissions(props) {
                             fontWeight: "bold",
                             textShadow: "0px 0px 3px black",
                           }}
+                          to="/messages"
                         >
-                          by @
+                          <Typography
+                            style={{
+                              color: "white",
+                              alignSelf: "flex-end",
+                              marginBottom: "0.5rem",
+                              fontWeight: "bold",
+                              textShadow: "0px 0px 3px black",
+                            }}
+                          >
+                            by @
                             <span style={{ textDecoration: "underline" }}>
-                            {submission.user_name
-                              ? submission.user_name
-                              : "artist"}
-                          </span>
-                        </Typography>
-                      </Link>
-                      {/* <IconButton
+                              {submission.user_name
+                                ? submission.user_name
+                                : "artist"}
+                            </span>
+                          </Typography>
+                        </Link>
+                        {/* <IconButton
                       aria-label={`info about ${submission.title}`}
                       style={{ color: "green", float: "right" }}
                     >
                       <CheckCircle />
                     </IconButton> */}
-                    </div>
-                  </a>
-                </GridListTile>
-              ))
+                      </div>
+                    </a>
+                  </GridListTile>
+                ))
               : ""}
           </GridList>
         </Paper>
