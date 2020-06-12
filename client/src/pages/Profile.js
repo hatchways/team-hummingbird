@@ -75,16 +75,13 @@ function Profile(props) {
       })
       .catch((err) => console.error(err));
 
-    const resEnteredContests = await fetch(
-      "/api/users/submissions?user_id=" + user.id,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "x-auth-token": authTokens.token,
-        },
-      }
-    );
+    const resEnteredContests = await fetch("/api/users/submissions", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": authTokens.token,
+      },
+    });
     resEnteredContests
       .json()
       .then((res) => {
@@ -159,7 +156,7 @@ function Profile(props) {
               {alertMessage}
             </Alert>
           </Snackbar>
-          <div>
+          <div style={{ textAlign: "center" }}>
             <S3
               accept="image/*"
               multiple={false}
@@ -191,14 +188,24 @@ function Profile(props) {
               >
                 PNG, JPG
               </Typography>
-              <Link to="/settings">
-                <Typography
-                  style={{ color: "black" }}
-                  display="block"
-                  variant="body1"
+              <Link to="/stats">
+                <Button
+                  component="span"
+                  size="large"
+                  className={classes.buttonBlack}
                 >
-                  Edit payment settings
-                </Typography>
+                  Stats
+                </Button>
+              </Link>
+              &nbsp;
+              <Link to="/settings">
+                <Button
+                  component="span"
+                  size="large"
+                  className={classes.buttonBlack}
+                >
+                  Settings
+                </Button>
               </Link>
             </div>
           </div>
@@ -231,17 +238,17 @@ function Profile(props) {
           <Paper className={classes.box} square>
             {myContests
               ? myContests.map((contest) => {
-                  return (
-                    <ContestCard
-                      contest_id={contest._id}
-                      imageUrl="https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png" //placeholder
-                      title={contest.title}
-                      description={contest.description}
-                      prizeAmount={contest.prize_amount}
-                      deadlineDate={new Date(contest.deadline_date)}
-                    />
-                  );
-                })
+                return (
+                  <ContestCard
+                    contest_id={contest._id}
+                    imageUrl="https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png" //placeholder
+                    title={contest.title}
+                    description={contest.description}
+                    prizeAmount={contest.prize_amount}
+                    deadlineDate={new Date(contest.deadline_date)}
+                  />
+                );
+              })
               : ""}
           </Paper>
         </TabPanel>
@@ -249,21 +256,21 @@ function Profile(props) {
           <Paper className={classes.box} square>
             {enteredContests && mySubmissions
               ? enteredContests.map((contest) => {
-                  return (
-                    <ContestCard
-                      contest_id={contest._id}
-                      imageUrl={
-                        mySubmissions.filter(
-                          (s) => s.contest_id === contest._id
-                        )[0].upload_files[0]["url"]
-                      }
-                      title={contest.title}
-                      description={contest.description}
-                      prizeAmount={contest.prize_amount}
-                      deadlineDate={new Date(contest.deadline_date)}
-                    />
-                  );
-                })
+                return (
+                  <ContestCard
+                    contest_id={contest._id}
+                    imageUrl={
+                      mySubmissions.filter(
+                        (s) => s.contest_id === contest._id
+                      )[0].upload_files[0]["url"]
+                    }
+                    title={contest.title}
+                    description={contest.description}
+                    prizeAmount={contest.prize_amount}
+                    deadlineDate={new Date(contest.deadline_date)}
+                  />
+                );
+              })
               : ""}
           </Paper>
         </TabPanel>
@@ -308,6 +315,18 @@ const useStyles = makeStyles({
     // marginBottom: "100px",
     backgroundColor: "white",
     color: "black",
+    fontFamily: "Poppins",
+    fontWeight: 600,
+    padding: "0.8rem 2rem",
+    borderRadius: "0",
+    border: "1px solid #e2e8f0",
+    textTransform: "none",
+  },
+  buttonBlack: {
+    marginTop: "10px",
+    width: 200,
+    backgroundColor: "black",
+    color: "white",
     fontFamily: "Poppins",
     fontWeight: 600,
     padding: "0.8rem 2rem",

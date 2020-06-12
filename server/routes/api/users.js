@@ -13,6 +13,7 @@ const auth = require("../../middleware/auth");
 const Contest = require("../../models/Contest");
 const Submission = require("../../models/submission");
 const User = require("../../models/User");
+const Transaction = require("../../models/Transaction");
 
 const createStripeCustomer = async () => {
   //create Stripe customer
@@ -156,10 +157,9 @@ router.get("/contests", (req, res) => {
 // @desc    Get all contests that a user submitted to
 // @access  Private
 router.get("/submissions", auth, (req, res) => {
-  const { user_id } = req.query;
   let result = {};
 
-  Submission.find({ user_id })
+  Submission.find({ user_id: req.user.id })
     .then((submissions) => {
       let contestIds = [];
       submissions.forEach((submission) =>
@@ -185,6 +185,46 @@ router.get("/submissions", auth, (req, res) => {
         message: err.message,
       });
     });
+});
+
+// @route   GET api/users/stats/
+// @desc    Get user stats
+// @access  Private
+router.get("/stats", auth, async (req, res) => {
+  let result = {};
+  result.moneyReceived = await Transaction.find({
+    user_id_receiver: req.user.id,
+  });
+  result.moneySent = await Transaction.find({ user_id_sender: req.user.id });
+  console.log(result);
+  res.status(200).json(result);
+
+  // Submission.find({ user_id })
+  //   .then((submissions) => {
+  //     let contestIds = [];
+  //     submissions.forEach((submission) =>
+  //       contestIds.push(submission.contest_id)
+  //     );
+  //     result.submissions = submissions;
+  //     Contest.find({
+  //       _id: { $in: contestIds },
+  //     })
+  //       .sort({ deadline_date: -1 })
+  //       .then((contests) => {
+  //         result.contests = contests;
+  //         res.json(result);
+  //       })
+  //       .catch((err) => {
+  //         res.status(500).json({
+  //           message: err.message,
+  //         });
+  //       });
+  //   })
+  //   .catch((err) => {
+  //     res.status(500).json({
+  //       message: err.message,
+  //     });
+  //   });
 });
 
 // @route   GET api/users/

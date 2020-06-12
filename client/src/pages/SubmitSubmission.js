@@ -86,19 +86,19 @@ export default function SubmitSubmission(props) {
   const getAI = async (img) => {
     setUploadProgress({ message: "Scanning For Copyright", value: 50 }) //objects, explicit content, etc. 
 
-    //     //   const getImageLabels = await fetch(
-    //     //     `/api/vision/detectLabels?imgURL=${img}`,
-    //     //     {
-    //     //       method: "POST",
-    //     //       headers: {
-    //     //         "Content-Type": "application/json",
-    //     //         "x-auth-token": authTokens.token,
-    //     //       },
-    //     //     }
-    //     //   );
-    //     //   const labelsJson = await getImageLabels.json();
-    //     //   return labelsJson["labels"];
-    //     // };
+    //   const getImageLabels = await fetch(
+    //     `/api/vision/detectLabels?imgURL=${img}`,
+    //     {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         "x-auth-token": authTokens.token,
+    //       },
+    //     }
+    //   );
+    //   const labelsJson = await getImageLabels.json();
+    //   return labelsJson["labels"];
+    // };
     const detectLogos = await fetch(
       `/api/vision/detectLogos?imgURL=${img}`,
       {

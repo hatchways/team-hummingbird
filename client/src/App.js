@@ -14,6 +14,7 @@ import Messages from "./pages/Messages";
 import Settings from "./pages/Settings";
 import ContestSubmissions from "./pages/ContestSubmissions";
 import Discover from "./pages/Discover";
+import Stats from "./pages/Stats";
 
 import { AuthContext } from "./components/UserContext";
 
@@ -44,6 +45,7 @@ function App() {
           <Route path="/settings" component={Settings} />
           <Route path="/submission" component={Submission} />
           <Route path="/messages" component={Messages} />
+          <Route path="/stats" component={Stats} />
         </BrowserRouter>
       </AuthContext.Provider>
     </MuiThemeProvider>
