@@ -8,6 +8,7 @@ import {
   Snackbar,
   Box,
   Chip,
+  CircularProgress
 } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import CloudUploadOutlinedIcon from "@material-ui/icons/CloudUploadOutlined";
@@ -18,7 +19,7 @@ import { useAuth } from "../components/UserContext";
 export default function SubmitSubmission(props) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploadedWithTags, setUploadedWithTags] = useState([]);
-
+  const [uploadProgress, setUploadProgress] = useState({ message: "", value: 0 })
   const classes = useStyles();
   //Snackbar state
   const [openAlert, setOpenAlert] = useState(false);
@@ -30,8 +31,6 @@ export default function SubmitSubmission(props) {
   const [user] = useState(authTokens ? authTokens.user : null);
   const handleSubmit = async () => {
     if (uploadedWithTags.length > 0) {
-      console.log(uploadedFiles);
-      console.log(uploadedWithTags);
       const submission = {
         contest_id: contestId,
         user_id: user.id,
@@ -49,7 +48,7 @@ export default function SubmitSubmission(props) {
         }),
       });
       let requestJson = await request.json();
-      console.log(requestJson);
+
       if (requestJson.error) {
         handleAlert(
           "There was a problem submitting your file, please try again later.",
@@ -71,46 +70,67 @@ export default function SubmitSubmission(props) {
   };
 
   const handleRemoval = (index) => {
-    console.log("clicked!");
+
     setUploadedWithTags((prev) => {
       let copy = prev.slice();
       copy.splice(index, 1);
       return copy;
     });
+    setUploadedFiles((prev) => {
+      let copy = prev.slice();
+      copy.splice(index, 1);
+      return copy;
+    });
   };
-  React.useEffect(() => {
-    //after uploading and before submitting, we run image analytics
 
-    const getAI = async (img) => {
-      const getImageLabels = await fetch(
-        `/api/vision/detectLabels?imgURL=${img}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-auth-token": authTokens.token,
-          },
-        }
-      );
-      const labelsJson = await getImageLabels.json();
-      return labelsJson["labels"];
-    };
-    if (uploadedFiles.length >= 1) {
-      uploadedFiles.forEach(async (image) => {
-        const tags = await getAI(image);
-        const tagsExtracted = tags.map((tag) => {
-          return tag.description;
-        });
-        setUploadedWithTags((prev) => [
-          ...prev,
-          { url: image, tags: tagsExtracted },
-        ]);
-      });
+  const getAI = async (img) => {
+    setUploadProgress({ message: "Scanning For Copyright", value: 50 }) //objects, explicit content, etc. 
+
+    //     //   const getImageLabels = await fetch(
+    //     //     `/api/vision/detectLabels?imgURL=${img}`,
+    //     //     {
+    //     //       method: "POST",
+    //     //       headers: {
+    //     //         "Content-Type": "application/json",
+    //     //         "x-auth-token": authTokens.token,
+    //     //       },
+    //     //     }
+    //     //   );
+    //     //   const labelsJson = await getImageLabels.json();
+    //     //   return labelsJson["labels"];
+    //     // };
+    const detectLogos = await fetch(
+      `/api/vision/detectLogos?imgURL=${img}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": authTokens.token,
+        },
+      }
+    );
+    const logosJson = await detectLogos.json();
+
+    if (logosJson.message) {
+
+      setUploadedWithTags((prev) => [
+        ...prev,
+        { url: img, tags: [""] },
+      ]);
+      setUploadProgress({ message: "", value: 0 })
     }
-  }, [uploadedFiles]);
-  React.useEffect(() => {
-    console.log(uploadedWithTags);
-  }, [uploadedWithTags]);
+    else {
+      let logosString = logosJson.join(' , ')
+      const warningString = `Warning! We've detected copyrighted or trademarked logos: ${logosString}. Please double check before uploading`
+      handleAlert(warningString, "error")
+      setUploadedWithTags((prev) => [
+        ...prev,
+        { url: img, tags: logosJson },
+      ]);
+      setUploadProgress({ message: "", value: 0 })
+    }
+
+  };
   return (
     <div className={classes.container}>
       <Box size="large" className={classes.breadcrumbWrapper}>
@@ -131,7 +151,7 @@ export default function SubmitSubmission(props) {
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
             open={openAlert}
-            autoHideDuration={5000}
+            autoHideDuration={10000}
             onClose={() => setOpenAlert(false)}
           >
             <Alert severity={severity} onClose={() => setOpenAlert(false)}>
@@ -148,18 +168,24 @@ export default function SubmitSubmission(props) {
               signingUrl="/s3/sign"
               signingUrlWithCredentials={true}
               className={classes.uploadButton}
+              onProgress={value => setUploadProgress({ message: "Uploading File", value })}
               id="s3"
               scrubFilename={(name) =>
                 Date.now() + "-" + name.replace(/[^\w\d_\-.]+/gi, "")
               }
               onFinish={(e) => {
                 const url = e["uploadUrl"];
+                getAI(url)
                 setUploadedFiles((prev) => [...prev, url]);
               }}
             />
             <label htmlFor="s3">
               <Button component="span">
-                <CloudUploadOutlinedIcon fontSize="large" />
+                {(uploadProgress.value > 0) ? <div className={classes.progressWrapper}>
+                  <Typography variant="body1">{uploadProgress.message}</Typography>
+                  <CircularProgress />
+                </div> : <CloudUploadOutlinedIcon fontSize="large" />}
+
               </Button>
             </label>
             <div style={{ margin: "2rem" }}>
@@ -191,35 +217,35 @@ export default function SubmitSubmission(props) {
                     <div
                       className={classes.previewWrapper}
                       style={{
-                        width: "20rem",
-                        height: "20rem",
-                        margin: "2rem 0",
-                        position: "relative",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        width: "5rem",
+                        height: "5rem",
+                        margin: "2rem",
+                        // position: "relative", //for tags
+                        // display: "flex",
+                        // justifyContent: "center",
+                        // alignItems: "center",
                       }}
                       id="remove-upload"
                       key={file.url}
                     >
-                      <div>
-                        <img
-                          alt="preview"
-                          className={classes.preview}
-                          src={file.url}
-                        />
-                        <button
-                          className={classes.removalButton}
-                          onClick={() => handleRemoval(index)}
-                          style={{
-                            position: "absolute",
-                            right: 0,
-                          }}
-                        >
-                          x
+
+                      <img
+                        alt="preview"
+                        className={classes.preview}
+                        src={file.url}
+                      />
+                      <button
+                        className={classes.removalButton}
+                        onClick={() => handleRemoval(index)}
+                        style={{
+                          position: "absolute",
+                          right: 0,
+                        }}
+                      >
+                        x
                         </button>
-                      </div>
-                      {file.tags.length > 0 ? (
+
+                      {/* {file.tags.length > 0 ? (
                         <>
                           {file.tags.map((tag, index, all) => {
                             let offsetAngle = 360 / all.length;
@@ -240,14 +266,14 @@ export default function SubmitSubmission(props) {
                             );
                           })}
                         </>
-                      ) : null}
+                      ) : null} */}
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <img style={{ display: "none", height: "75px", width: "75px" }} />
-            )}
+                <img style={{ display: "none", height: "75px", width: "75px" }} />
+              )}
           </div>
 
           <Button
@@ -324,6 +350,12 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 0,
     padding: theme.spacing(2),
     minWidth: "200px",
+  },
+  progressWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   chip: {
     "$ .MuiChip-root": {},

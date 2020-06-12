@@ -23,7 +23,7 @@ const saveImage = (url, googleFn) => {
     const path = image_path.replace("./", "");
     googleFn(path);
     //remove the file
-    fs.unlinkSync(image_path);
+    //fs.unlinkSync(image_path);
   });
   return googleResponse;
 };
@@ -65,14 +65,19 @@ visionRouter.post("/detectLogos", auth, async (req, res) => {
   //test image with 10 logos
   const logoTest =
     "https://hatchways-hummingbird.s3.amazonaws.com/1591743074124-Top-10-Famous-Logos-1.jpg";
-  const { imgURL = logoTest } = req.query;
+  const { imgURL } = req.query;
   const okGoogle = async (downloadedImg) => {
     const [result] = await client.logoDetection(downloadedImg);
     const logos = result.logoAnnotations;
     if (result.error) {
       res.status(500).json("something went wrong, try again later");
     } else {
-      res.status(200).json(logos);
+      const brands = logos.map(brand => brand.description)
+      if (brands.length == 0) {
+        res.status(200).json({ message: 'No Logos Detected' })
+      } else if (brands.length > 0) {
+        res.status(200).json(brands);
+      }
       console.log("Logos detected:");
       logos.forEach((logo) => console.log(logo.description));
     }

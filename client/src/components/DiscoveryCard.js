@@ -25,7 +25,7 @@ export default function DiscoveryCard(props) {
   const [countdown, setCountdown] = useState(0);
   const classes = useStyles();
   useEffect(() => {
-    console.log(tags);
+
     const dateHelper = () => {
       const deadline = Date.parse(deadline_date);
       const now = Date.now();
@@ -75,7 +75,7 @@ export default function DiscoveryCard(props) {
             }}
           />
         </Typography>
-        {tags && tags.length > 1 ? <Tags tags={tags || [""]} /> : null}
+        {/* {tags && tags.length > 1 ? <Tags tags={tags || [""]} /> : null} */}
       </CardContent>
       <CardContent style={{ textAlign: "right" }}>
         <Typography gutterBottom>
@@ -100,9 +100,9 @@ export default function DiscoveryCard(props) {
 
 const Tags = (props) => {
   const tags = props.tags;
-  console.log(tags);
+
   if (tags.length > 1) {
-    console.log(tags.length, true);
+
     return (
       <>
         <Typography>Tags</Typography>
