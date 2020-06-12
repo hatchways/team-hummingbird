@@ -24,7 +24,7 @@ contestsRouter.get("/", auth, (req, res) => {
 // access:  private
 contestsRouter.get("/discover", (req, res) => {
   ContestModel.find({ deadline_date: { $gte: Date.now() } })
-    .sort({ creation_date: -1 })
+    .sort({ deadline_date: 1 })
     .then((_contests) => {
       //find contest holder's name, contest holder's avatar,
       //and the first image from the first submission
