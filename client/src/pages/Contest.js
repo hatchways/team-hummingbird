@@ -13,6 +13,7 @@ import {
   Typography,
   InputAdornment,
   Snackbar,
+  useMediaQuery,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import AttachMoneyOutlinedIcon from "@material-ui/icons/AttachMoneyOutlined";
@@ -33,12 +34,13 @@ function Notice(props) {
 }
 
 const Contest = (props) => {
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("xs"));
   const { authTokens, setAuthTokens } = useAuth();
   const [user] = useState(authTokens ? authTokens.user : null);
   const currentDate = new Date();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [prize, setPrize] = useState();
+  const [prize, setPrize] = useState("");
   const [deadlineDate, setDeadlineDate] = useState(
     new Date(currentDate.setDate(currentDate.getDate() + 1))
   );
@@ -122,7 +124,7 @@ const Contest = (props) => {
       <Paper elevation={3} className={classes.box}>
         <br />
 
-        <Box width="60%" margin="auto">
+        <Box width={isMobile ? "90%" : "60%"} margin="auto">
           {!user.hasPayment ? (
             <Notice>
               Please <a href="/settings">add a payment method</a> in order to
@@ -145,14 +147,14 @@ const Contest = (props) => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </Box>
-        <Box width="60%" margin="auto">
+        <Box width={isMobile ? "90%" : "60%"} margin="auto">
           <Typography className={classes.title} variant="subtitle1">
             Description
           </Typography>
 
           <TextField
             id="contest-description"
-            label="Details about what type of tattoo you want"
+            label="Describe your ideal tattoo"
             className={classes.textField}
             type="text"
             variant="outlined"
@@ -164,9 +166,9 @@ const Contest = (props) => {
             onChange={(e) => setDescription(e.target.value)}
           />
         </Box>
-        <Box width="60%" margin="auto" display="flex">
+        <Box width={isMobile ? "90%" : "60%"} margin="auto" display="flex">
           <Grid container spacing={3}>
-            <Grid item xs={3}>
+            <Grid item xs={12} md={4}>
               <Typography className={classes.title} variant="subtitle1">
                 Prize amount*
               </Typography>
@@ -190,18 +192,24 @@ const Contest = (props) => {
                 onChange={(e) => setPrize(e.target.value)}
               />
             </Grid>
-            <Grid item xs={9}>
+            <Grid item xs={12} md={8}>
               <Typography
                 className={classes.title}
                 variant="subtitle1"
                 align="center"
+                style={{ marginBottom: 0 }}
               >
                 Deadline*
               </Typography>
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                <Grid
+                  container
+                  spacing={2}
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
+                  <Grid item xs={8} md={6}>
                     <KeyboardDatePicker
+                      label="Due Date"
                       style={{ border: "1px" }}
                       disableToolbar
                       format="MM/dd/yyyy"
@@ -217,9 +225,10 @@ const Contest = (props) => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={8} md={6}>
                     <KeyboardTimePicker
                       margin="normal"
+                      label="End Time"
                       id="contest-deadline-time"
                       required
                       value={deadlineTime}
@@ -234,7 +243,7 @@ const Contest = (props) => {
             </Grid>
           </Grid>
         </Box>
-        <Box width="60%" margin="auto">
+        <Box width={isMobile ? "90%" : "60%"} margin="auto">
           <Typography className={classes.title} variant="subtitle1">
             Which designs do you like?
             <br />
@@ -248,7 +257,7 @@ const Contest = (props) => {
             <GridList
               cellHeight={140}
               className={classes.gridList}
-              cols={4}
+              cols={isMobile ? 1 : 3}
               spacing={10}
             >
               {imageGridList.map((image) => (
@@ -290,12 +299,15 @@ const Contest = (props) => {
 export default Contest;
 
 //Custom Style
-const styles = makeStyles({
+const styles = makeStyles((theme) => ({
   box: {
     width: "80%",
     margin: "auto",
     marginTop: "30px",
     marginBottom: "30px",
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+    },
   },
 
   title: {
@@ -392,7 +404,7 @@ const styles = makeStyles({
     zIndex: 10,
     pointerEvents: "none",
   },
-});
+}));
 
 const imageGridList = [
   {

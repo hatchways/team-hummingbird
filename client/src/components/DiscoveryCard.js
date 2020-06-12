@@ -7,6 +7,7 @@ import {
   CardContent,
   Typography,
   makeStyles,
+  Chip,
 } from "@material-ui/core";
 import { FormatQuoteSharp } from "@material-ui/icons";
 
@@ -19,10 +20,12 @@ export default function DiscoveryCard(props) {
     name,
     profile_image_url,
     firstImage,
+    tags,
   } = props;
   const [countdown, setCountdown] = useState(0);
   const classes = useStyles();
   useEffect(() => {
+
     const dateHelper = () => {
       const deadline = Date.parse(deadline_date);
       const now = Date.now();
@@ -51,7 +54,11 @@ export default function DiscoveryCard(props) {
           </Typography>
         }
       />
-      <CardMedia style={{ height: "75%" }} src={firstImage} component="img" />
+      <CardMedia
+        style={{ height: "75%", maxHeight: "500px" }}
+        src={firstImage}
+        component="img"
+      />
       <CardContent>
         <Typography>
           <FormatQuoteSharp
@@ -68,6 +75,7 @@ export default function DiscoveryCard(props) {
             }}
           />
         </Typography>
+        {/* {tags && tags.length > 1 ? <Tags tags={tags || [""]} /> : null} */}
       </CardContent>
       <CardContent style={{ textAlign: "right" }}>
         <Typography gutterBottom>
@@ -89,6 +97,29 @@ export default function DiscoveryCard(props) {
     </Card>
   );
 }
+
+const Tags = (props) => {
+  const tags = props.tags;
+
+  if (tags.length > 1) {
+
+    return (
+      <>
+        <Typography>Tags</Typography>
+        {tags.map((tag) => (
+          <Chip
+            style={{ borderRadius: 0, margin: "0.25rem" }}
+            label={tag}
+            color="primary"
+            size="small"
+            variant="outlined"
+          />
+        ))}
+      </>
+    );
+  }
+  return null;
+};
 
 const useStyles = makeStyles((theme) => ({
   root: {

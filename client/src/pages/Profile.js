@@ -238,17 +238,17 @@ function Profile(props) {
           <Paper className={classes.box} square>
             {myContests
               ? myContests.map((contest) => {
-                  return (
-                    <ContestCard
-                      contest_id={contest._id}
-                      imageUrl="https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png" //placeholder
-                      title={contest.title}
-                      description={contest.description}
-                      prizeAmount={contest.prize_amount}
-                      deadlineDate={new Date(contest.deadline_date)}
-                    />
-                  );
-                })
+                return (
+                  <ContestCard
+                    contest_id={contest._id}
+                    imageUrl="https://hatchways-hummingbird.s3.amazonaws.com/Assets/612bd8560dbfd2834c5d539bf0a1055d505f48a4.png" //placeholder
+                    title={contest.title}
+                    description={contest.description}
+                    prizeAmount={contest.prize_amount}
+                    deadlineDate={new Date(contest.deadline_date)}
+                  />
+                );
+              })
               : ""}
           </Paper>
         </TabPanel>
@@ -256,21 +256,21 @@ function Profile(props) {
           <Paper className={classes.box} square>
             {enteredContests && mySubmissions
               ? enteredContests.map((contest) => {
-                  return (
-                    <ContestCard
-                      contest_id={contest._id}
-                      imageUrl={
-                        mySubmissions.filter(
-                          (s) => s.contest_id === contest._id
-                        )[0].upload_files[0]
-                      }
-                      title={contest.title}
-                      description={contest.description}
-                      prizeAmount={contest.prize_amount}
-                      deadlineDate={new Date(contest.deadline_date)}
-                    />
-                  );
-                })
+                return (
+                  <ContestCard
+                    contest_id={contest._id}
+                    imageUrl={
+                      mySubmissions.filter(
+                        (s) => s.contest_id === contest._id
+                      )[0].upload_files[0]["url"]
+                    }
+                    title={contest.title}
+                    description={contest.description}
+                    prizeAmount={contest.prize_amount}
+                    deadlineDate={new Date(contest.deadline_date)}
+                  />
+                );
+              })
               : ""}
           </Paper>
         </TabPanel>

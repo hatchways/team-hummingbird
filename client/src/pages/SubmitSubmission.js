@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
-import { Grid, Button, Typography, Snackbar, Box } from "@material-ui/core";
+import {
+  Grid,
+  Button,
+  Typography,
+  Snackbar,
+  Box,
+  Chip,
+  CircularProgress
+} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import CloudUploadOutlinedIcon from "@material-ui/icons/CloudUploadOutlined";
 import { Link } from "react-router-dom";
@@ -10,6 +18,8 @@ import { useAuth } from "../components/UserContext";
 
 export default function SubmitSubmission(props) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [uploadedWithTags, setUploadedWithTags] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState({ message: "", value: 0 })
   const classes = useStyles();
   //Snackbar state
   const [openAlert, setOpenAlert] = useState(false);
@@ -20,12 +30,12 @@ export default function SubmitSubmission(props) {
   const { authTokens } = useAuth();
   const [user] = useState(authTokens ? authTokens.user : null);
   const handleSubmit = async () => {
-    if (uploadedFiles.length > 0) {
+    if (uploadedWithTags.length > 0) {
       const submission = {
         contest_id: contestId,
         user_id: user.id,
         user_name: user.name,
-        upload_files: uploadedFiles,
+        upload_files: uploadedWithTags,
       };
       let request = await fetch(`/api/contest/:id/submission`, {
         method: "POST",
@@ -38,7 +48,7 @@ export default function SubmitSubmission(props) {
         }),
       });
       let requestJson = await request.json();
-      console.log(requestJson);
+
       if (requestJson.error) {
         handleAlert(
           "There was a problem submitting your file, please try again later.",
@@ -47,7 +57,6 @@ export default function SubmitSubmission(props) {
       } else {
         handleAlert("Uploaded Successfully", "success");
         setUploadedFiles([]);
-        window.location.href = "/contest/" + contestId;
       }
     } else {
       handleAlert("Select a file first", "error");
@@ -61,12 +70,66 @@ export default function SubmitSubmission(props) {
   };
 
   const handleRemoval = (index) => {
-    console.log("clicked!");
+
+    setUploadedWithTags((prev) => {
+      let copy = prev.slice();
+      copy.splice(index, 1);
+      return copy;
+    });
     setUploadedFiles((prev) => {
       let copy = prev.slice();
       copy.splice(index, 1);
       return copy;
     });
+  };
+
+  const getAI = async (img) => {
+    setUploadProgress({ message: "Scanning For Copyright", value: 50 }) //objects, explicit content, etc. 
+
+    //   const getImageLabels = await fetch(
+    //     `/api/vision/detectLabels?imgURL=${img}`,
+    //     {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         "x-auth-token": authTokens.token,
+    //       },
+    //     }
+    //   );
+    //   const labelsJson = await getImageLabels.json();
+    //   return labelsJson["labels"];
+    // };
+    const detectLogos = await fetch(
+      `/api/vision/detectLogos?imgURL=${img}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": authTokens.token,
+        },
+      }
+    );
+    const logosJson = await detectLogos.json();
+
+    if (logosJson.message) {
+
+      setUploadedWithTags((prev) => [
+        ...prev,
+        { url: img, tags: [""] },
+      ]);
+      setUploadProgress({ message: "", value: 0 })
+    }
+    else {
+      let logosString = logosJson.join(' , ')
+      const warningString = `Warning! We've detected copyrighted or trademarked logos: ${logosString}. Please double check before uploading`
+      handleAlert(warningString, "error")
+      setUploadedWithTags((prev) => [
+        ...prev,
+        { url: img, tags: logosJson },
+      ]);
+      setUploadProgress({ message: "", value: 0 })
+    }
+
   };
   return (
     <div className={classes.container}>
@@ -88,7 +151,7 @@ export default function SubmitSubmission(props) {
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
             open={openAlert}
-            autoHideDuration={5000}
+            autoHideDuration={10000}
             onClose={() => setOpenAlert(false)}
           >
             <Alert severity={severity} onClose={() => setOpenAlert(false)}>
@@ -105,18 +168,24 @@ export default function SubmitSubmission(props) {
               signingUrl="/s3/sign"
               signingUrlWithCredentials={true}
               className={classes.uploadButton}
+              onProgress={value => setUploadProgress({ message: "Uploading File", value })}
               id="s3"
               scrubFilename={(name) =>
                 Date.now() + "-" + name.replace(/[^\w\d_\-.]+/gi, "")
               }
               onFinish={(e) => {
                 const url = e["uploadUrl"];
+                getAI(url)
                 setUploadedFiles((prev) => [...prev, url]);
               }}
             />
             <label htmlFor="s3">
               <Button component="span">
-                <CloudUploadOutlinedIcon fontSize="large" />
+                {(uploadProgress.value > 0) ? <div className={classes.progressWrapper}>
+                  <Typography variant="body1">{uploadProgress.message}</Typography>
+                  <CircularProgress />
+                </div> : <CloudUploadOutlinedIcon fontSize="large" />}
+
               </Button>
             </label>
             <div style={{ margin: "2rem" }}>
@@ -141,15 +210,30 @@ export default function SubmitSubmission(props) {
                 PNG, JPG, GIF
               </Typography>
             </div>
-            {uploadedFiles.length > 0 ? (
-              <>
-                {uploadedFiles.map((file, index) => {
+            {uploadedWithTags.length > 0 ? (
+              <div>
+                {uploadedWithTags.map((file, index) => {
                   return (
                     <div
                       className={classes.previewWrapper}
+                      style={{
+                        width: "5rem",
+                        height: "5rem",
+                        margin: "2rem",
+                        // position: "relative", //for tags
+                        // display: "flex",
+                        // justifyContent: "center",
+                        // alignItems: "center",
+                      }}
                       id="remove-upload"
-                      key={file}
+                      key={file.url}
                     >
+
+                      <img
+                        alt="preview"
+                        className={classes.preview}
+                        src={file.url}
+                      />
                       <button
                         className={classes.removalButton}
                         onClick={() => handleRemoval(index)}
@@ -159,19 +243,49 @@ export default function SubmitSubmission(props) {
                         }}
                       >
                         x
-                      </button>
-                      <img
-                        alt="preview"
-                        className={classes.preview}
-                        src={file}
-                      />
+                        </button>
+                      {file.tags[0].length > 0 ?
+                        <Chip
+                          style={{
+                            position: "absolute",
+                            bottom: 0,
+                            left: 0,
+                            borderRadius: 0,
+                            maxWidth: '5rem'
+                          }}
+                          color="primary"
+                          size="small"
+                          label={`${file?.tags[0]}?`} /> : null}
+
+                      {/* {file.tags.length > 0 ? (
+                        <>
+                          {file.tags.map((tag, index, all) => {
+                            let offsetAngle = 360 / all.length;
+                            let rotateAngle = offsetAngle * index;
+                            return (
+                              <Chip
+                                variant="outlined"
+                                key={index}
+                                size="small"
+                                color="primary"
+                                label={tag}
+                                style={{
+                                  position: "absolute",
+                                  borderRadius: 0,
+                                  transform: `rotate(${rotateAngle}deg) translate(0, -5rem) rotate(-${rotateAngle}deg)`,
+                                }}
+                              />
+                            );
+                          })}
+                        </>
+                      ) : null} */}
                     </div>
                   );
                 })}
-              </>
+              </div>
             ) : (
-              <img style={{ display: "none", height: "75px", width: "75px" }} />
-            )}
+                <img style={{ display: "none", height: "75px", width: "75px" }} />
+              )}
           </div>
 
           <Button
@@ -222,8 +336,6 @@ const useStyles = makeStyles((theme) => ({
     display: "none",
   },
   previewWrapper: {
-    height: "75px",
-    width: "75px",
     margin: "5px",
     display: "inline",
     position: "relative",
@@ -250,5 +362,14 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 0,
     padding: theme.spacing(2),
     minWidth: "200px",
+  },
+  progressWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  chip: {
+    "$ .MuiChip-root": {},
   },
 }));
